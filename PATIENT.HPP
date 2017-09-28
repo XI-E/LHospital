@@ -1,26 +1,38 @@
 #ifndef PATIENT
 #define PATIENT
-class patient
+
+#include "base.hpp"
+
+class patient : public person
 {
-		str name;
-		address addr;
-		date dob;
-		str guardian_name;
-		int age;
-		char sex;	//x-female | y-male | z-others
-		char contact_no[K];
+    protected:
+        disease dis;
+   		str guardian_name;
 		str emergency_contact;
-		char emer_contact_no[K];
+		phn emer_contact_no;
 		insurance insur_info;
-		///////////////////////////////////////
-		///Symptoms reported by patient////
-		str symp[4];
-		str allergies[2];
-		///////////////////////////////////////
-		date d_of_admission;
+		date admission_date;
+		unsigned long bill_amt;
 	public:
-
-
-}
+	    patient(str, int, date, adr, phn, disease, str, str, phn, insurance);
+	    patient(str, int, date, adr, phn, disease, str, str, phn, insurance, date); //if date_of_admission is not the current system date
+		//'get's
+		disease getdis();
+		char* getguardian_name();
+		char* getemergency_contact();
+		char* getemer_contact_no();
+		insurance getinsur_info();
+		int getadmission_date(int);
+		unsigned long getbill_amt();
+		
+		//updating functions
+		disease setdis(disease);
+		char* setguardian_name(char*);
+		char* setemergency_contact(char*);
+		char* setemer_contact_no(char*);
+		insurance setinsur_info(insurance);
+		date setadmission_date();
+		unsigned long setbill_amt(unsigned long);
+};
 
 #endif

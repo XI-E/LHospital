@@ -17,21 +17,6 @@ class employee : public person{
 		time shift_end;
 };
 
-class patient : public person{
-	public:
-		patient(str, int, date, adr, phn,
-					date, disease);
-
-		int getadm_date(int);
-		disease getdis();
-		unsigned long getbill_amt();
-
-	private:
-		date admission_date;
-		disease dis;
-		unsigned long bill_amt;
-};
-
 class doctor : public employee{
 	public:
 
@@ -48,63 +33,6 @@ class nurse : public employee{
 	private:
 		int patient[5];
 };
-
-/////////////////////////////////////////////
-/// Function definitions for class person
-
-person::person(str inp1, int inp2, date inp3, adr inp4, phn inp5){
-	strcpy(name, inp1);
-	sex = inp2;
-	dob = inp3;
-	address = inp4;
-	strcpy(phone, inp5);
-}
-
-char* person::getname(){
-	return name;
-}
-
-int person::getage(){
-	return age;
-}
-
-int person::getsex(){
-	return sex;
-}
-
-int person::getdob(int inp){
-	switch(inp){
-		case DAY:
-			return dob.day;
-		case MONTH:
-			return dob.month;
-		case YEAR:
-			return dob.year;
-		default:
-			return 0;
-	}
-}
-
-char* person::getadr(int inp){
-	switch(inp){
-		case HOUSE_NO:
-			return address.house_no;
-		case STREET:
-			return address.street;
-		case CITY:
-			return address.city;
-		case DISTRICT:
-			return address.district;
-		case STATE:
-			return address.state;
-		default:
-			return 0;
-	}
-}
-
-char* person::getphn(){
-	return phone;
-}
 
 //////////////////////////////////////////////
 //////////////////////////////////////////////

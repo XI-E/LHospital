@@ -62,7 +62,7 @@ struct date{
 
 };
 
-struct address{
+struct adr{
 	str house_no;
 	str street;
 	str city;
@@ -72,7 +72,9 @@ struct address{
 
 struct disease{
 	str name;
-	int type;  		// refers to body part affected (LUNG, HEART, etc)
+	int type;  		    // refers to body part affected (LUNG, HEART, etc)
+	str symptoms[4];    //symptoms reported by patient
+	str allergies[2];   //patient's known allergies
 };
 
 struct insurance{
@@ -93,6 +95,13 @@ class person{
 		char* getadr(int);
 		char* getphn();
 
+		//Updating functions
+		char* setname(char*);
+		int setsex(int);
+		date setdob(date);
+		adr setadr(adr);
+		char* setphn(char*);
+
 	protected:
 		str name;
 		unsigned age;
@@ -100,7 +109,9 @@ class person{
 		date dob;
 		adr address;
 		phn phone;
-
+	
+	private:
+	    void calc_age();
 };
 
 
