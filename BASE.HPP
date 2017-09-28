@@ -1,6 +1,8 @@
 #ifndef BASE
 #define BASE
 
+#include <string.h>
+
 const int K = 14;
 typedef char str[80];
 typedef char phn[11];
