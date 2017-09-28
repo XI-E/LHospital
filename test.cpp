@@ -1,10 +1,21 @@
 #include "ui.hpp"
 
+void test_frame();
+void test_printer();
+
 void main()
 {
 	clrscr();
 
 	ui::init();
+
+	test_printer();
+	
+	getch();
+}
+
+void test_frame()
+{
 	frame f;
 	f.display();
 
@@ -46,5 +57,27 @@ void main()
 	getch();
 
 	f.setvisibility_mode(frame::nosides);
+}
+
+void test_printer()
+{
+	printer p;
+	p << ui::centeralign << "Heading is here\n"
+	  << ui::leftalign << "LEFT align"
+	  << ui::rightalign << "RIGHT align";
+
+	p.settcolor(BLACK);
+	p.setbcolor(CYAN);
+
+	p << ui::centeralign << "WAAH!";
+
+	clrscr();
+	gotoxy(1,1);
+	p.setcorner_top_left(coord(10,5));
+	p.setheight(ui::scr_height/4);
+	p.setwidth(ui::scr_width/2);
+	p.gotobegin();
+	p.print();	
+
 	getch();
 }

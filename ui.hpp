@@ -2,6 +2,8 @@
 #define UI_HPP
 
 #include <conio.h>
+#include <stdarg.h>
+#include <string.h>
 
 class ui
 {
@@ -14,6 +16,12 @@ class ui
 			right = 4,
 			bottom = 8,
 			all = 16 //When all sides need to be modified
+		};
+		enum align
+		{
+			leftalign = 1,
+			centeralign = 2,
+			rightalign = 4
 		};
 		static int scr_height;
 		static int scr_width;
@@ -37,6 +45,70 @@ class coord
 		//An invalid int supplied is ignored
 		void setx (int);
 		void sety (int);
+};
+
+class node_printer
+{
+	node_printer *next;
+	coord pos;	//Where to place this chunk
+	char str[80];
+	int tcolor;
+	int bcolor;
+
+	public:
+		node_printer(char []  = ""); //Param will be assigned as str
+		~node_printer();   //Dtor
+
+		void setnext(node_printer *);
+		void setpos(coord);
+		void setstr(char []);
+		void settcolor(int);
+		void setbcolor(int);
+
+		node_printer * getnext();
+		coord getpos();
+		char * getstr();
+		int gettcolor();
+		int getbcolor();
+
+		void print();
+};
+
+class printer
+{
+	node_printer *head;
+	node_printer *current;
+
+	//Height and width of area in which it will print
+	int height;
+	int width;
+	coord corner_top_left; 
+
+	int state; //For internal purposes
+
+	public:
+		printer(int = ui::scr_width, int = ui::scr_height - 1);
+		~printer();
+
+		void settcolor(int); //TODO
+		void setbcolor(int);
+		void setcorner_top_left(coord);
+		void setheight(int);
+		void setwidth(int);
+
+		int gettcolor();
+		int getbcolor();
+		coord getcorner_top_left();
+		int getheight();
+		int getwidth();
+
+		printer & operator<<(int); //Sets state
+		
+		//Will add param as str of the node current points to
+		printer & operator<<(char []);
+
+		void print();
+		void gotobegin(); //Sets printer to print from beginning
 };
 
 class frame
@@ -80,5 +152,7 @@ class frame
 		void setcolor(int);
 		void setcorner_top_left(coord);
 };
+
+void test_frame();
 
 #endif
