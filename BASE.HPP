@@ -31,6 +31,7 @@ struct insurance
 	str provider;
 	unsigned long int amount;
 	unsigned long int id_no;
+	date expiry_date;
 };
 
 
