@@ -62,7 +62,7 @@ struct date{
 
 };
 
-struct adr{
+struct address{
 	str house_no;
 	str street;
 	str city;
