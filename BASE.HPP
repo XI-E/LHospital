@@ -2,7 +2,7 @@
 #define BASE
 
 const int K = 14;
-typedef char[80] str;
+typedef char str[80];
 struct date
 {
 	int day;
