@@ -2,6 +2,7 @@
 #define BASE
 
 #include <string.h>
+#include <time.h>
 
 const int K = 14;
 typedef char str[80];
@@ -19,23 +20,8 @@ struct time{
 	unsigned int minute;
 	unsigned int second;
 
-	time(){
-		hour = 0;
-		minute = 0;
-		second = 0;
-	}
-	time(unsigned h, unsigned m, unsigned s){
-		if(h < 24 && m < 60 && s < 60){
-			hour = h;
-			minute = m;
-			second = s;
-		}
-		else{
-			hour = 0;
-			minute = 0;
-			second = 0;
-		}
-	}
+	time();
+	time(unsigned h, unsigned m, unsigned s);
 };
 
 struct date{
@@ -43,25 +29,8 @@ struct date{
 	unsigned int month;
 	unsigned int year;
 
-	date(){
-		day = 0;
-		month = 0;
-		year = 0;
-	};
-
-	date(unsigned d, unsigned m, unsigned y){
-		if( d<=31 && m <=12){
-			day = d;
-			month = m;
-			year = y;
-		}
-		else{
-			day = 0;
-			month = 0;
-			year = 0;
-		}
-	}
-
+	date();
+	date(unsigned d, unsigned m, unsigned y);
 };
 
 struct adr{

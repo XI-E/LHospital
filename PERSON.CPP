@@ -1,5 +1,5 @@
 #include "base.hpp"
-#include <time.h>    //for time_t, localtime() and tm structure
+//#include <time.h>    //for time_t, localtime() and tm structure
 
 /////////////////////////////////////////////
 /// Function definitions for class person
@@ -110,4 +110,50 @@ char* person::setphn(char* a)
 {
 	strcpy(phone, a);
 	return phone;
+}
+
+time::time()
+{
+	hour = 0;
+	minute = 0;
+	second = 0;
+}
+
+time::time(unsigned h, unsigned m, unsigned s)
+{
+	if(h < 24 && m < 60 && s < 60)
+	{
+		hour = h;
+		minute = m;
+		second = s;
+	}
+	else
+	{
+		hour = 0;
+		minute = 0;
+		second = 0;
+	}
+}
+
+date::date()
+{
+	day = 0;
+	month = 0;
+	year = 0;
+};
+
+date::date(unsigned d, unsigned m, unsigned y)
+{
+	if( d<=31 && m <=12)
+	{
+		day = d;
+		month = m;
+		year = y;
+	}
+	else
+	{
+		day = 0;
+		month = 0;
+		year = 0;
+	}
 }
