@@ -4,7 +4,7 @@
 /////////////////////////////////////////////
 /// Function definitions for class person
 
-person::person(str inp1, int inp2, date inp3, adr inp4, phn inp5)
+person::person(str inp1, int inp2, Date inp3, adr inp4, phn inp5)
 {
 	strcpy(name, inp1);
 	sex = inp2;
@@ -70,7 +70,7 @@ void person::calc_age()
 {
     time_t t = time(0);
     struct tm *now = localtime(&t);
-    date dnow(now->tm_mday, (now->tm_mon + 1) ,(now->tm_year + 1900));
+    Date dnow(now->tm_mday, (now->tm_mon + 1) ,(now->tm_year + 1900));
     if(dnow.month > dob.month || dnow.month == dob.month && dnow.day >= dob.day)
     {
         age = dnow.year - dob.year;
@@ -93,7 +93,7 @@ int person::setsex(int a)
     return sex;
 }
 
-date person::setdob(date a)
+Date person::setdob(Date a)
 {
 	dob = a;
 	calc_age();
@@ -112,14 +112,14 @@ char* person::setphn(char* a)
 	return phone;
 }
 
-time::time()
+Time::Time()
 {
 	hour = 0;
 	minute = 0;
 	second = 0;
 }
 
-time::time(unsigned h, unsigned m, unsigned s)
+Time::Time(unsigned h, unsigned m, unsigned s)
 {
 	if(h < 24 && m < 60 && s < 60)
 	{
@@ -135,14 +135,14 @@ time::time(unsigned h, unsigned m, unsigned s)
 	}
 }
 
-date::date()
+Date::Date()
 {
 	day = 0;
 	month = 0;
 	year = 0;
 };
 
-date::date(unsigned d, unsigned m, unsigned y)
+Date::Date(unsigned d, unsigned m, unsigned y)
 {
 	if( d<=31 && m <=12)
 	{

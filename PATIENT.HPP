@@ -11,11 +11,11 @@ class patient : public person
 		str emergency_contact;
 		phn emer_contact_no;
 		insurance insur_info;
-		date admission_date;
+		Date admission_date;
 		unsigned long bill_amt;
 	public:
-		 patient(str, int, date, adr, phn, disease, str, str, phn, insurance);
-		 patient(str, int, date, adr, phn, disease, str, str, phn, insurance, date); //if date_of_admission is not the current system date
+		 patient(str, int, Date, adr, phn, disease, str, str, phn, insurance);
+		 patient(str, int, Date, adr, phn, disease, str, str, phn, insurance, Date); //if date_of_admission is not the current system date
 		//'get's
 		disease getdis();
 		char* getguardian_name();
@@ -31,7 +31,7 @@ class patient : public person
 		char* setemergency_contact(char*);
 		char* setemer_contact_no(char*);
 		insurance setinsur_info(insurance);
-		date setadmission_date(date);
+		Date setadmission_date(Date);
 		unsigned long setbill_amt(unsigned long);
 };
 

@@ -1,7 +1,7 @@
 #include "patient.hpp"
 
 ///////FUNCTION DEFINITIONS FOR CLASS PATIENT/////////
-patient::patient(str inp1, int inp2 , date inp3, adr inp4, phn inp5, disease inp6, str inp7, str inp8, phn inp9, insurance inp10) : person(inp1, inp2, inp3, inp4, inp5)
+patient::patient(str inp1, int inp2 , Date inp3, adr inp4, phn inp5, disease inp6, str inp7, str inp8, phn inp9, insurance inp10) : person(inp1, inp2, inp3, inp4, inp5)
 {
     dis = inp6;
     strcpy(guardian_name, inp7);
@@ -11,13 +11,13 @@ patient::patient(str inp1, int inp2 , date inp3, adr inp4, phn inp5, disease inp
     
     time_t t = time(0);
     struct tm *now = localtime(&t);
-    date dnow(now->tm_mday, (now->tm_mon + 1) ,(now->tm_year + 1900));
+    Date dnow(now->tm_mday, (now->tm_mon + 1) ,(now->tm_year + 1900));
     admission_date = dnow;
     
     bill_amt = 0;   //bill_amt will be set by doctor after treatment
 }
 
-patient::patient(str inp1, int inp2 , date inp3, adr inp4, phn inp5, disease inp6, str inp7, str inp8, phn inp9, insurance inp10, date inp11) : person(inp1, inp2, inp3, inp4, inp5)    //if date_of_admission is not the current system date
+patient::patient(str inp1, int inp2 , Date inp3, adr inp4, phn inp5, disease inp6, str inp7, str inp8, phn inp9, insurance inp10, Date inp11) : person(inp1, inp2, inp3, inp4, inp5)    //if date_of_admission is not the current system date
 {
     dis = inp6;
     strcpy(guardian_name, inp7);
@@ -105,7 +105,7 @@ insurance patient::setinsur_info(insurance a)
 	 return insur_info;
 }
 
-date patient::setadmission_date(date a)
+Date patient::setadmission_date(Date a)
 {
 	 admission_date = a;
 	 return admission_date;

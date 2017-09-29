@@ -15,22 +15,22 @@ enum body_parts {BRAIN, HEART, SKIN, LUNG, BONE, GEN}; // GEN for general proble
 enum adr_parts {HOUSE_NO, STREET, CITY, DISTRICT, STATE};
 enum times_of {START, END};
 
-struct time{
+struct Time{
 	unsigned int hour;
 	unsigned int minute;
 	unsigned int second;
 
-	time();
-	time(unsigned h, unsigned m, unsigned s);
+	Time();
+	Time(unsigned h, unsigned m, unsigned s);
 };
 
-struct date{
+struct Date{
 	unsigned int day;
 	unsigned int month;
 	unsigned int year;
 
-	date();
-	date(unsigned d, unsigned m, unsigned y);
+	Date();
+	Date(unsigned d, unsigned m, unsigned y);
 };
 
 struct adr{
@@ -51,12 +51,12 @@ struct disease{
 struct insurance{
 	str provider;
 	unsigned long amount;
-	date expiry;
+	Date expiry;
 };
 
 class person{
 	public:
-		person(str, int, date, adr, phn);	// Explicit constructor
+		person(str, int, Date, adr, phn);	// Explicit constructor
 
 		// 'Get's
 		char* getname();
@@ -69,7 +69,7 @@ class person{
 		//Updating functions
 		char* setname(char*);
 		int setsex(int);
-		date setdob(date);
+		Date setdob(Date);
 		adr setadr(adr);
 		char* setphn(char*);
 
@@ -77,7 +77,7 @@ class person{
 		str name;
 		unsigned age;
 		unsigned sex;
-		date dob;
+		Date dob;
 		adr address;
 		phn phone;
 	

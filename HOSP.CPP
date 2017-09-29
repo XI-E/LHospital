@@ -4,17 +4,17 @@
 
 class employee : public person{
 	public:
-	employee(str, int, date, adr, phn,
-				unsigned long, time, time, int);
+	employee(str, int, Date, adr, phn,
+				unsigned long, Time, Time, int);
 
 	unsigned long getsal();
-	time getshift(int);
+	Time getshift(int);
 
 	protected:
 		unsigned id;
 		unsigned long salary;
-		time shift_start;
-		time shift_end;
+		Time shift_start;
+		Time shift_end;
 };
 
 class doctor : public employee{
@@ -38,10 +38,10 @@ class nurse : public employee{
 //////////////////////////////////////////////
 /// Function definitions for class employee
 
-employee::employee(str inp1, int inp2, date inp3,
+employee::employee(str inp1, int inp2, Date inp3,
 					 adr inp4, phn inp5,
-					 unsigned long inp6, time inp7,
-					 time inp8, int inp9) :
+					 unsigned long inp6, Time inp7,
+					 Time inp8, int inp9) :
 					 person(inp1, inp2, inp3,
 					 inp4, inp5)
 {
@@ -55,14 +55,14 @@ unsigned long employee::getsal(){
 	return salary;
 }
 
-time employee::getshift(int inp){
+Time employee::getshift(int inp){
 	switch(inp){
 		case START:
 			return shift_start;
 		case END:
 			return shift_end;
 		default:
-			return time(0,0,0);
+			return Time(0,0,0);
 	}
 }
 ////////////////////////////////////////////////////////////
