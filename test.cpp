@@ -2,6 +2,8 @@
 
 void test_frame();
 void test_printer();
+void test_body();
+void test_textbox();
 
 void main()
 {
@@ -9,11 +11,97 @@ void main()
 
 	ui::init();
 
-	test_printer();
+	list_layout l;
+	l.setpos(coord(2,1));
+	l.setheight(6);
 	
+	interactive *list[10];
+	
+	//Setting the text boxes
+	for(int i = 0; i < 9; i++)
+	{
+		char s[] = {'A'+i, ':', ' ', '\0'};
+		l.settcolor(LIGHTGRAY);
+		l << coord(2, i + 1) << s;
+		l.settcolor(RED);
+		list[i] = l.settext_box(coord(5, i + 1));
+	}
+
+	l.settcolor(LIGHTGRAY);
+	list[9] = l.setbutton(coord(3, i + 1), "Submit");
+
+	//Rudimentary scrolling
+	i = 100;
+	int j = 0;
+
+	int lines_scrolled = l.getlines_scrolled(),
+		height = l.getheight();
+
+	coord pos_topleft(2,1);
+	int y = pos_topleft.gety();
+	while(i--)
+	{
+		coord c = list[j]->getpos();
+		if(c.gety() - lines_scrolled > height)
+		{
+			lines_scrolled = c.gety() - height;
+		}
+		else if(c.gety() - lines_scrolled < y)
+		{
+			lines_scrolled = c.gety() - y;
+		}
+
+		l.setlines_scrolled(lines_scrolled);
+		int response = list[j]->input(-lines_scrolled);
+
+		if(response == interactive::GOTONEXT)
+		{
+			if(j < 9) j++; else j = 0;
+		}
+		else if(response == interactive::GOTOPREV)
+		{
+			if(j > 0) j--; else j = 9;
+		}
+		else if(response == interactive::CLICKED)
+		{
+			coord init_pos(wherex(), wherey());
+			gotoxy(1, ui::scr_height-1);
+			cprintf("%s%d", "Clicked ", i);
+			gotoxy(init_pos.getx(), init_pos.gety());
+		}
+	}
+
 	getch();
 }
 
+void test_textbox()
+{
+	text_box t;
+	t.setpos(coord(1,1));
+	for(int i = 0; i < 5; i++)
+	{
+		int a = t.input();
+
+		int x = wherex(), y = wherey();
+		gotoxy(1, ui::scr_height-1);
+		if(a == interactive::GOTONEXT)
+		{
+			cout << "GOTONEXT";
+		}
+		else if(a == interactive::GOTOPREV)
+		{
+			cout << "GOTOPREV";
+		}
+		else
+		{
+			cout << "UNDEFINED";
+		}
+
+		gotoxy(x, y);
+	}
+}
+
+/*
 void test_frame()
 {
 	frame f;
@@ -56,7 +144,17 @@ void test_frame()
 	f.setcorner_top_left(coord( (ui::scr_width-f.getwidth()) / 2, (ui::scr_height-f.getheight()) / 2));
 	getch();
 
-	f.setvisibility_mode(frame::nosides);
+	f.setvisibility_mode(frame::nosides);	
+}
+
+void test_body()
+{
+	body b;
+	b.setwidth(ui::scr_width/2);
+	b.setcorner_top_left(coord(5,2));
+	b << ui::left
+	  << "Well, this is a sentence, you know! \nThis is the next line. Hopefully this will get wrapped up as it has gotten too long \nBye!"
+	;
 }
 
 void test_printer()
@@ -81,3 +179,4 @@ void test_printer()
 
 	getch();
 }
+*/

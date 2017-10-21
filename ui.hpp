@@ -4,6 +4,9 @@
 #include <conio.h>
 #include <stdarg.h>
 #include <string.h>
+#include <stdio.h>
+#include <iostream.h>
+#include <ctype.h>
 
 class ui
 {
@@ -46,7 +49,7 @@ class coord
 		void setx (int);
 		void sety (int);
 };
-
+/*
 class node_printer
 {
 	node_printer *next;
@@ -109,6 +112,202 @@ class printer
 
 		void print();
 		void gotobegin(); //Sets printer to print from beginning
+		void hide(); //Hides printed data
+};
+*/
+
+class list_layout_node
+{
+    list_layout_node *next;     //Pointer to next node
+    coord pos;                  //Position where to print
+    int tcolor;                 //Text colour
+    int bcolor;                 //Background colour
+    char str[100];              //String to print
+
+    public:
+        list_layout_node();     //Ctor
+        ~list_layout_node();    //Dtor
+
+        //Setters
+        void setnext(list_layout_node *);
+        void setpos(coord);
+        void settcolor(int);
+        void setbcolor(int);
+        void setstr(const char *);
+
+        //Getters
+        list_layout_node * getnext();
+        coord getpos();
+        int gettcolor();
+        int getbcolor();
+        const char * getstr();
+};
+
+struct string_node
+{
+    string_node *next;
+    string_node *prev;
+    char data;
+
+    string_node();
+};
+
+class interactive : public list_layout_node
+{
+	interactive *prev;    //ptr to previous node
+	interactive *next;    //ptr to next node
+	int offset;		   	  //offset to y position when printing
+	public:
+		interactive();
+		~interactive();
+		virtual int input(int);
+
+		void setoffset(int);
+		int getoffset();
+
+		enum
+        {
+            GOTONEXT,
+			GOTOPREV,
+			CLICKED
+		};
+		
+		enum keys
+		{
+			TAB,
+			ENTER,
+			BACKSPACE,
+			SHIFT_TAB,
+			UP,
+			DOWN,
+			LEFT,
+			RIGHT
+		};
+
+		static int getkey();
+};
+
+class text_box : public interactive
+{
+    public:
+        int input(int = 0);   //Takes input,stores it
+                       //& returns GOTONEXT or
+					   //GOTOPREV; parameter is offset
+					   //y coordinate
+		void print_str(string_node*); //Prints string
+};
+
+class button : public interactive
+{
+	int tcolor_selected; //tcolor when selected
+	int bcolor_selected; //bcolor when selected
+
+	public:
+		button();
+		void settcolor_selected(int);
+		void setbcolor_selected(int);
+		int gettcolor_selected();
+		int getbcolor_selected();
+
+		int input(int = 0); //Returns CLICKED,
+							//GOTONEXT or 
+							
+		void print(int = 0); //Prints the button
+						 //pmt indicates if btn is selected
+						 //or not
+};
+
+class list_layout
+{
+    list_layout_node *head;
+	list_layout_node *current;
+	
+	//Following are used as temporary
+	//placeholders till data is written to the nodes
+	coord pos;
+	int tcolor;
+	int bcolor;
+	int tcolor_selected;
+	int bcolor_selected;
+
+	//FOR SCROLLING IMPLEMENTATION
+	int height; //height of container; to implement scrolling
+	int lines_scrolled;
+
+	enum print_modes
+	{
+		DISPLAY, 
+		HIDE
+	};
+	void print(int = DISPLAY);
+    public:
+		list_layout();
+		
+		//Set a label
+		list_layout& operator<<(coord);
+		list_layout& operator<<(const char *);
+
+		//Sets a text box at the position indicated by
+		//coord and returns a pointer to it
+		interactive * settext_box(coord);
+
+		interactive * setbutton(coord, const char *);
+		//								^text the btn displays
+
+		void settcolor(int);
+		void setbcolor(int);
+		void settcolor_selected(int);
+		void setbcolor_selected(int);
+
+		//temp; to be shifted to .cpp
+		void setheight(int h){height = h;};
+		void setlines_scrolled(int l)
+		{hide();lines_scrolled = l;display();};
+		void setpos(coord c){pos = c;}
+		int getheight(){return height;}
+		int getlines_scrolled(){return lines_scrolled;}
+		coord getpos(){return pos;}
+
+		void display();
+		void hide();
+};
+
+class printer
+{};
+
+class body
+{
+	coord corner_top_left;
+	int height;
+	int width;
+	int padding[2];
+	printer p;
+	int wrap(char[], int length);
+	int tcolor;
+	int bcolor;
+
+	public:
+		body(int = ui::scr_width, int = ui::scr_height - 1);
+		body & operator<<(int); //state
+		body & operator<<(char []); //str
+		void print();
+		void hide();
+
+		void setcorner_top_left(coord);
+		void setheight(int);
+		void setwidth(int);
+		void setpaddingx(int);
+		void setpaddingy(int);
+		void settcolor(int);
+		void setbcolor(int);
+
+		coord getcorner_top_left();
+		int getheight();
+		int getwidth();
+		int getpaddingx();
+		int getpaddingy();
+		int gettcolor();
+		int getbcolor(); 	
 };
 
 class frame
@@ -126,6 +325,7 @@ class frame
 					   //    ios::bottom | ios::left -> 3	
 
 	public:
+		body b;
 		enum visibility_modes
 		{
 			all = 1,
@@ -152,7 +352,5 @@ class frame
 		void setcolor(int);
 		void setcorner_top_left(coord);
 };
-
-void test_frame();
 
 #endif

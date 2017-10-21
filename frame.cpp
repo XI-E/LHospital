@@ -72,7 +72,7 @@ int frame::getside_visibility(int side)
 }
 
 
-frame::frame(coord topleft, int h, int w)
+frame::frame(coord topleft, int h, int w) : b(w, h)
 {
 	for(int i = 0; i < 8; i++)
 	{
@@ -85,10 +85,23 @@ frame::frame(coord topleft, int h, int w)
 	width = w;
 	state = 0;
 	corner_top_left = topleft;
+
+	topleft.setx(topleft.getx() + 1);
+	topleft.sety(topleft.gety() + 1);
+	b.setcorner_top_left(topleft);
 }
 
 void frame::display(int param)
 {
+	if(param == 1)
+	{
+		b.print();
+	}
+	else
+	{
+		b.hide();
+	}
+
 	textcolor(frame::color);
 
 	coord &c = corner_top_left;
@@ -155,6 +168,7 @@ void frame::display(int param)
 	cprintf("%c", bottom_right);
 
 	gotoxy(x, y);
+
 	textcolor(ui::tcolor);
 }
 
@@ -227,6 +241,7 @@ void frame::setheight(int h)
 
 	display(0);
 	frame::height = h;
+	b.setheight(h - 2);
 	display();
 }
 
@@ -236,6 +251,7 @@ void frame::setwidth(int w)
 
 	display(0);
 	frame::width = w;
+	b.setwidth(w - 2);
 	display();
 }
 

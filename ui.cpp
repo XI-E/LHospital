@@ -7,7 +7,6 @@ int ui::scr_height = 0,
 
 void ui::init()
 {
-	_setcursortype(_NOCURSOR); //hides cursor
 	textcolor(ui::tcolor);
 	textbackground(ui::bcolor);
 

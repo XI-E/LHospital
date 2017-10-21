@@ -105,6 +105,7 @@ void printer::setbcolor(int c)
 void printer::setcorner_top_left(coord c)
 {
 	corner_top_left = c;
+	gotoxy(c.getx(), c.gety());
 }
 
 void printer::setheight(int h)
@@ -125,6 +126,7 @@ void printer::setwidth(int w)
 		current = current->getnext();
 	}
 
+	width = w;
 	current = temp;
 }
 
@@ -209,4 +211,17 @@ void printer::print()
 void printer::gotobegin()
 {
 	current = head;
+}
+
+void printer::hide()
+{
+	gotoxy(corner_top_left.getx(), corner_top_left.gety());
+	for(int i = 0; i < height; i++)
+	{
+		for(int j = 0; j < width; j++)
+		{
+			cprintf(" ");
+		}
+		gotoxy(corner_top_left.getx(), wherey() + 1);
+	}
 }
