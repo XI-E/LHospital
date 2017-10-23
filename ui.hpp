@@ -1,12 +1,22 @@
 #ifndef UI_HPP
 #define UI_HPP
-
 #include <conio.h>
 #include <stdarg.h>
 #include <string.h>
 #include <stdio.h>
 #include <iostream.h>
 #include <ctype.h>
+#include <stdlib.h>
+
+class manipulator
+{
+	static int index;
+	int own_index;
+
+	public:
+		manipulator();
+		int operator==(manipulator);
+};
 
 class ui
 {
@@ -31,23 +41,19 @@ class ui
 		static void init();
 		static int tcolor;
 		static int bcolor;
+		static manipulator endl;
 };
 
-class coord
+struct coord
 {
 	int x;
 	int y;
 
-	public:
-		coord();
-		coord(int, int);
-
-		int getx();
-		int gety();
-
-		//An invalid int supplied is ignored
-		void setx (int);
-		void sety (int);
+	coord(int = 1,int = 1);
+	coord & operator+=(coord);
+	coord & operator-=(coord);
+	coord operator+(coord);
+	coord operator-(coord);
 };
 /*
 class node_printer
@@ -221,6 +227,8 @@ class list_layout
 {
     list_layout_node *head;
 	list_layout_node *current;
+
+	coord corner_top_left; //top left corner of container
 	
 	//Following are used as temporary
 	//placeholders till data is written to the nodes
@@ -232,6 +240,7 @@ class list_layout
 
 	//FOR SCROLLING IMPLEMENTATION
 	int height; //height of container; to implement scrolling
+	int width;
 	int lines_scrolled;
 
 	enum print_modes
@@ -258,23 +267,113 @@ class list_layout
 		void setbcolor(int);
 		void settcolor_selected(int);
 		void setbcolor_selected(int);
+		void setcorner_top_left(coord);
+		void setheight(int);
+		void setwidth(int);
+		void setlines_scrolled(int);
+		void setpos(coord);
 
-		//temp; to be shifted to .cpp
-		void setheight(int h){height = h;};
-		void setlines_scrolled(int l)
-		{hide();lines_scrolled = l;display();};
-		void setpos(coord c){pos = c;}
-		int getheight(){return height;}
-		int getlines_scrolled(){return lines_scrolled;}
-		coord getpos(){return pos;}
-
+		int getheight();
+		int getwidth();
+		int getlines_scrolled();
+		coord getpos();
+		coord getcorner_top_left();
+		
 		void display();
 		void hide();
 };
 
-class printer
-{};
+class frame
+{
+	char border_chars[8];
+	int color;
+	int sides_visibility[8];
+	int frame_visibility;
+	coord corner_top_left; //top left
+	int height;  //height and width includes border
+	int width;
+	int state;	//Used by << Operator
+	void setside_visibility(int, int); //state, side
+	int convert(int); //Eg: ios::top | ios::left -> 0
+					   //    ios::bottom | ios::left -> 3	
 
+	void print(int = 1); //0 = hide, 1 = display
+
+	public:
+		enum visibility_modes
+		{
+			all = 1,
+			nosides = 2
+		};
+
+		frame(coord = coord(1,1), int = ui::scr_width, int = ui::scr_height - 1);
+
+		void display();
+		void hide();
+		
+		void setvisibility_mode(int);
+		frame & operator<<(int); //Sets state
+		frame & operator<<(char); //Sets border_char according
+								//to state
+
+		int getheight();
+		int getwidth();
+		coord getcorner_top_left();
+		int getframe_visibility(); //Returns 1 if visible; 0 = not visible
+		int getcolor();
+		char getborder_char(int);
+		int getside_visibility(int);
+
+		void setheight(int);
+		void setwidth(int);
+		void setcolor(int);
+		void setcorner_top_left(coord);
+};
+
+class box
+{
+	coord corner_top_left;
+	int height;
+	int width;
+	int padding;
+
+	int tcolor;
+	int bcolor;
+
+	int wrap(char[], int length, int = 0);
+	//                           ^It will set first parameter
+	//							  to have only one line
+	list_layout layout;
+
+	coord pos_pointer;
+
+	public:
+		frame f;
+
+		box(int = ui::scr_width, int = ui::scr_height - 1);
+
+		//GETTERS
+		coord getcorner_top_left();
+		int getheight();
+		int getwidth();
+		int getpadding();
+
+		//SETTERS
+		void setcorner_top_left(coord);
+		void setheight(int);
+		void setpadding(int);
+		void settcolor(int);
+		void setbcolor(int);
+
+		box & operator<<(char *);
+		box & operator<<(char);
+		box & operator<<(int);
+		box & operator<<(long);
+		box & operator<<(double);
+		box & operator<<(manipulator);
+};
+
+/*
 class body
 {
 	coord corner_top_left;
@@ -309,48 +408,6 @@ class body
 		int gettcolor();
 		int getbcolor(); 	
 };
+*/
 
-class frame
-{
-	char border_chars[8];
-	int color;
-	int sides_visibility[8];
-	int frame_visibility;
-	coord corner_top_left; //top left
-	int height;  //height and width includes border
-	int width;
-	int state;	//Used by << Operator
-	void setside_visibility(int, int); //state, side
-	int convert(int); //Eg: ios::top | ios::left -> 0
-					   //    ios::bottom | ios::left -> 3	
-
-	public:
-		body b;
-		enum visibility_modes
-		{
-			all = 1,
-			nosides = 2
-		};
-
-		frame(coord = coord(1,1), int = ui::scr_height, int = ui::scr_width);
-		void display(int = 1); //1 = display, 0 = hide
-		void setvisibility_mode(int);
-		frame & operator<<(int); //Sets state
-		frame & operator<<(char); //Sets border_char according
-								//to state
-
-		int getheight();
-		int getwidth();
-		coord getcorner_top_left();
-		int getframe_visibility(); //Returns 1 if visible; 0 = not visible
-		int getcolor();
-		char getborder_char(int);
-		int getside_visibility(int);
-
-		void setheight(int);
-		void setwidth(int);
-		void setcolor(int);
-		void setcorner_top_left(coord);
-};
-
-#endif
+#endif /* UI_HPP */

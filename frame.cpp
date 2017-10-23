@@ -72,7 +72,7 @@ int frame::getside_visibility(int side)
 }
 
 
-frame::frame(coord topleft, int h, int w) : b(w, h)
+frame::frame(coord topleft, int w, int h)
 {
 	for(int i = 0; i < 8; i++)
 	{
@@ -85,31 +85,27 @@ frame::frame(coord topleft, int h, int w) : b(w, h)
 	width = w;
 	state = 0;
 	corner_top_left = topleft;
-
-	topleft.setx(topleft.getx() + 1);
-	topleft.sety(topleft.gety() + 1);
-	b.setcorner_top_left(topleft);
 }
 
-void frame::display(int param)
+void frame::display()
 {
-	if(param == 1)
-	{
-		b.print();
-	}
-	else
-	{
-		b.hide();
-	}
+	print(1);
+}
 
+void frame::hide()
+{
+	print(0);
+}
+
+void frame::print(int param)
+{
 	textcolor(frame::color);
-
-	coord &c = corner_top_left;
-	int x = c.getx(),
-		y = c.gety();
 
 	char visible_chars[8];
 	frame_visibility = param;
+
+	int x = corner_top_left.x,
+		y = corner_top_left.y;
 
 	int arr[] = {
 				ui::top,
@@ -143,7 +139,7 @@ void frame::display(int param)
 		}
 	}
 
-	gotoxy(x,y);
+	gotoxy(x, y);
 
 	cprintf("%c", top_left);
 
@@ -153,13 +149,13 @@ void frame::display(int param)
 	}
 	cprintf("%c", top_right);
 
-	for(i = 1; i < height - 2; i++)
+	for(i = 1; i < height - 1; i++)
 	{
 		gotoxy(x, y + i); cprintf("%c", left);
 		gotoxy(x + width - 1, y + i); cprintf("%c", right);
 	}
 
-	gotoxy(x, y + height - 2);
+	gotoxy(x, y + height - 1);
 	cprintf("%c", bottom_left);
 	for(i = 1; i < width - 1; i++)
 	{
@@ -167,7 +163,7 @@ void frame::display(int param)
 	}
 	cprintf("%c", bottom_right);
 
-	gotoxy(x, y);
+	gotoxy(corner_top_left.x, corner_top_left.y);
 
 	textcolor(ui::tcolor);
 }
@@ -239,9 +235,8 @@ void frame::setheight(int h)
 {
 	if(h > ui::scr_height) return;
 
-	display(0);
+	hide();
 	frame::height = h;
-	b.setheight(h - 2);
 	display();
 }
 
@@ -249,9 +244,8 @@ void frame::setwidth(int w)
 {
 	if(w > ui::scr_width) return;
 
-	display(0);
+	hide();
 	frame::width = w;
-	b.setwidth(w - 2);
 	display();
 }
 
@@ -263,7 +257,7 @@ void frame::setcolor(int c)
 
 void frame::setcorner_top_left(coord c)
 {
-	display(0);
+	hide();
 	frame::corner_top_left = c;
-	display(1);
+	display();
 }

@@ -1,9 +1,9 @@
 #include "ui.hpp"
 
-void test_frame();
 void test_printer();
 void test_body();
 void test_textbox();
+void test_listlayout();
 
 void main()
 {
@@ -11,6 +11,24 @@ void main()
 
 	ui::init();
 
+	box b((ui::scr_width * 2)/3, (ui::scr_height * 4) / 5);
+	b.setcorner_top_left(coord(ui::scr_width/4, 4));
+	b.f.setcolor(GREEN);
+
+	b.settcolor(YELLOW);
+	b << "Here's a number " << 123 << ui::endl;
+
+	b.settcolor(RED);
+	b << "Here's a double " << 123.456 << ui::endl;
+	b.settcolor(YELLOW);
+	b.setbcolor(GREEN);
+	b << "Here's a character: " << 'a' << ui::endl;
+
+	getch();
+}
+
+void test_listlayout()
+{
 	list_layout l;
 	l.setpos(coord(2,1));
 	l.setheight(6);
@@ -38,17 +56,17 @@ void main()
 		height = l.getheight();
 
 	coord pos_topleft(2,1);
-	int y = pos_topleft.gety();
+	int y = pos_topleft.y;
 	while(i--)
 	{
 		coord c = list[j]->getpos();
-		if(c.gety() - lines_scrolled > height)
+		if(c.y - lines_scrolled > height)
 		{
-			lines_scrolled = c.gety() - height;
+			lines_scrolled = c.y - height;
 		}
-		else if(c.gety() - lines_scrolled < y)
+		else if(c.y - lines_scrolled < y)
 		{
-			lines_scrolled = c.gety() - y;
+			lines_scrolled = c.y - y;
 		}
 
 		l.setlines_scrolled(lines_scrolled);
@@ -67,11 +85,9 @@ void main()
 			coord init_pos(wherex(), wherey());
 			gotoxy(1, ui::scr_height-1);
 			cprintf("%s%d", "Clicked ", i);
-			gotoxy(init_pos.getx(), init_pos.gety());
+			gotoxy(init_pos.x, init_pos.y);
 		}
 	}
-
-	getch();
 }
 
 void test_textbox()

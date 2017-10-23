@@ -1,9 +1,23 @@
 #include "ui.hpp"
 
+int manipulator::index = 0;
+
+manipulator::manipulator()
+{
+	own_index = index;
+	index++;
+}
+
+int manipulator::operator==(manipulator m)
+{
+	return own_index == m.own_index;
+}
+
 int ui::scr_height = 0,
 	ui::scr_width = 0,
 	ui::tcolor = LIGHTGRAY,
 	ui::bcolor = BLACK;
+manipulator ui::endl;
 
 void ui::init()
 {
@@ -18,39 +32,34 @@ void ui::init()
 	scr_height = (int) info.screenheight;
 }
 
-coord::coord()
+coord::coord(int X, int Y)
 {
-	x = y = 1;
+	x = X;
+	y = Y;
 }
 
-coord::coord(int a, int b)
+coord & coord::operator+=(coord b)
 {
-	x = a;
-	y = b;
+	x += b.x;
+	y += b.y;
+
+	return *this;
 }
 
-int coord::getx()
+coord & coord::operator-=(coord b)
 {
-	return x;
+	x -= b.x;
+	y -= b.y;
+
+	return *this;
 }
 
-int coord::gety()
+coord coord::operator+(coord b)
 {
-	return y;
+	return coord(*this) += b ;
 }
 
-void coord::setx(int a)
+coord coord::operator-(coord b)
 {
-	if(a < 0 || a > ui::scr_width)
-		return;
-
-	x = a;
-}
-
-void coord::sety(int a)
-{
-	if(a < 0 || a > ui::scr_height)
-		return;
-
-	y = a;
+	return coord(*this) -= b;
 }
