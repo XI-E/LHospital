@@ -20,6 +20,8 @@ class employee : public person{
 
 class doctor : public employee{
 	public:
+	doctor(str, int, Date, address, phone,
+				unsigned long, Time, Time, int);
 
 	private:
 		int spl[2];						// Doctor's specialization
@@ -30,6 +32,8 @@ class doctor : public employee{
 
 class nurse : public employee{
 	public:
+	nurse(str, int, Date, address, phone,
+				unsigned long, Time, Time, int);
 
 	private:
 		int patient[5];
@@ -71,6 +75,25 @@ Time employee::get_shift(int inp){
 			return Time(0,0,0);
 	}
 }
+
+/////////////////////////////////////////
+//// Doctor & Nurse class member defs
+
+doctor::doctor(str inp1, int inp2, Date inp3,
+					 address inp4, phone inp5,
+					 unsigned long inp6, Time inp7,
+					 Time inp8, int inp9) :
+					 employee(inp1, inp2, inp3,
+					 inp4, inp5, inp6, in7, inp8, inp9)
+                     {}
+
+nurse::nurse(str inp1, int inp2, Date inp3,
+					 address inp4, phone inp5,
+					 unsigned long inp6, Time inp7,
+					 Time inp8, int inp9) :
+					 employee(inp1, inp2, inp3,
+					 inp4, inp5, inp6, in7, inp8, inp9)
+                     {}
 
 /////////////////////////////////////////
 //// Pharmacy function definitions
