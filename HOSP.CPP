@@ -1,6 +1,7 @@
 #include <iostream.h>
 #include <string.h>
 #include "base.hpp"
+#include "patient.hpp"
 
 class employee : public person{
 	public:
@@ -34,6 +35,11 @@ class nurse : public employee{
 		int patient[5];
 };
 
+class pharmacy{
+	public:
+		static void sale(int, int, int);
+}
+
 //////////////////////////////////////////////
 //////////////////////////////////////////////
 /// Function definitions for class employee
@@ -65,6 +71,20 @@ Time employee::getshift(int inp){
 			return Time(0,0,0);
 	}
 }
+
+/////////////////////////////////////////
+//// Pharmacy function definitions
+
+void pharmacy::sale(int pat_id, int code, int quantity){
+	patient a = get_pat(pat_id);
+	for(int i = 1; i < 50; i++){
+		if(a.get_med(i, 0) == 0 &&
+			a.get_med(i - 1, 0) != 0){
+				a.set_med(i, code, quantity);
+			}
+	}
+}
+
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////

@@ -43,9 +43,8 @@ struct adr{
 
 struct disease{
 	str name;
-	int type;  		    // refers to body part affected (LUNG, HEART, etc)
+	int type;  		    //refers to body part affected (LUNG, HEART, etc)
 	str symptoms[4];    //symptoms reported by patient
-	str allergies[2];   //patient's known allergies
 };
 
 struct insurance{
@@ -53,6 +52,13 @@ struct insurance{
 	unsigned long amount;
 	Date expiry;
 };
+
+struct medicine{
+	int code;
+	float price;
+	str name;
+	float dosage;
+}
 
 class person{
 	public:
@@ -80,9 +86,9 @@ class person{
 		Date dob;
 		adr address;
 		phn phone;
-	
+
 	private:
-	    void calc_age();
+		void calc_age();
 };
 
 
