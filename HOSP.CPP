@@ -21,10 +21,10 @@ class employee : public person{
 class doctor : public employee{
 	public:
 	doctor(str, int, Date, address, phone,
-				unsigned long, Time, Time, int);
+				unsigned long, Time, Time, int, int, int);
 
 	private:
-		int spl[2];						// Doctor's specialization
+		int speciality[2];				// Doctor's specialization
 		int patient[10];				// Patients currently under care
 										// Can take only 10 at once
 
@@ -82,10 +82,18 @@ Time employee::get_shift(int inp){
 doctor::doctor(str inp1, int inp2, Date inp3,
 					 address inp4, phone inp5,
 					 unsigned long inp6, Time inp7,
-					 Time inp8, int inp9) :
+					 Time inp8, int inp9, int inp10,
+                     int inp11) :
 					 employee(inp1, inp2, inp3,
 					 inp4, inp5, inp6, in7, inp8, inp9)
-                     {}
+{
+    speciality[0] = inp10;
+    speciality[1] = inp11;
+    
+    for(int i = 0; i < 10; i++){
+        patient[i] = 0;
+    }
+}
 
 nurse::nurse(str inp1, int inp2, Date inp3,
 					 address inp4, phone inp5,
@@ -93,7 +101,11 @@ nurse::nurse(str inp1, int inp2, Date inp3,
 					 Time inp8, int inp9) :
 					 employee(inp1, inp2, inp3,
 					 inp4, inp5, inp6, in7, inp8, inp9)
-                     {}
+{
+    for(int i = 0; i < 5; i++){
+        patient[i] = 0;
+    }
+}
 
 /////////////////////////////////////////
 //// Pharmacy function definitions
