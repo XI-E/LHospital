@@ -4,32 +4,32 @@
 /////////////////////////////////////////////
 /// Function definitions for class person
 
-person::person(str inp1, int inp2, Date inp3, adr inp4, phn inp5)
+person::person(str inp1, int inp2, Date inp3, address inp4, phone inp5)
 {
 	strcpy(name, inp1);
 	sex = inp2;
 	dob = inp3;
-	address = inp4;
-	strcpy(phone, inp5);
+	adr = inp4;
+	strcpy(phone_no, inp5);
 	calc_age();
 }
 
-char* person::getname()
+char* person::get_name()
 {
 	return name;
 }
 
-int person::getage()
+int person::get_age()
 {
 	return age;
 }
 
-int person::getsex()
+int person::get_sex()
 {
 	return sex;
 }
 
-int person::getdob(int inp)
+int person::get_dob(int inp)
 {
 	switch(inp){
 		case DAY:
@@ -43,7 +43,7 @@ int person::getdob(int inp)
 	}
 }
 
-char* person::getadr(int inp)
+char* person::get_address(int inp)
 {
 	switch(inp){
 		case HOUSE_NO:
@@ -61,7 +61,7 @@ char* person::getadr(int inp)
 	}
 }
 
-char* person::getphn()
+char* person::get_phn()
 {
 	return phone;
 }
@@ -81,35 +81,30 @@ void person::calc_age()
     }
 }
 
-char* person::setname(char* a)
+void person::set_name(char* a)
 {
     strcpy(name, a);
-    return name;
 }
 
-int person::setsex(int a)
+void person::set_sex(int a)
 {
     sex = a;
-    return sex;
 }
 
-Date person::setdob(Date a)
+void person::set_dob(Date a)
 {
 	dob = a;
 	calc_age();
-	return dob;
 }
 
-adr person::setadr(adr a)
+void person::set_address(address a)
 {
 	address = a;
-	return address;
 }
 
-char* person::setphn(char* a)
+void person::set_phone(char* a)
 {
-	strcpy(phone, a);
-	return phone;
+	strcpy(phone_no, a);
 }
 
 Time::Time()

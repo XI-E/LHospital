@@ -5,7 +5,7 @@
 
 class employee : public person{
 	public:
-	employee(str, int, Date, adr, phn,
+	employee(str, int, Date, address, phone,
 				unsigned long, Time, Time, int);
 
 	unsigned long getsal();
@@ -45,7 +45,7 @@ class pharmacy{
 /// Function definitions for class employee
 
 employee::employee(str inp1, int inp2, Date inp3,
-					 adr inp4, phn inp5,
+					 address inp4, phone inp5,
 					 unsigned long inp6, Time inp7,
 					 Time inp8, int inp9) :
 					 person(inp1, inp2, inp3,
@@ -57,11 +57,11 @@ employee::employee(str inp1, int inp2, Date inp3,
 	id = inp9;
 }
 
-unsigned long employee::getsal(){
+unsigned long employee::get_sal(){
 	return salary;
 }
 
-Time employee::getshift(int inp){
+Time employee::get_shift(int inp){
 	switch(inp){
 		case START:
 			return shift_start;
