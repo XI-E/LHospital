@@ -152,3 +152,57 @@ Date::Date(unsigned d, unsigned m, unsigned y)
 		year = 0;
 	}
 }
+
+str userid::default_key = "LEMON";
+
+userid::userid(str name ,str plaintext)	//plaintext is the unencrypted password
+{
+	strcpy(username, name);
+	makecipher(plaintext);
+//	cout<<plaintext<<' '<<default_key<<endl;
+//	cout<<strlen(plaintext)<<' '<<strlen(default_key)<<' '<<strlen(passcipher)<<endl;
+//	decipher();
+}
+
+void userid::makecipher(str plaintext)
+{
+	int len = strlen(plaintext);
+	int keylen = strlen(default_key);
+	for(int i = 0; i < len; ++i)
+	{
+	  int plntext_i = (int)plaintext[i] + 127;
+	  int key_i = (int)default_key[i % keylen] + 127;
+	  passcipher[i] = (char) ( ( (plntext_i + key_i) % 256 ) - 127);
+	}
+	passcipher[i] = '\0';
+//	cout<<passcipher<<endl<<endl;
+}
+
+char * userid::decipher()
+{
+	str decryptedpass;
+	int len = strlen(passcipher);
+	int keylen = strlen(default_key);
+	for(int i = 0; i < len; ++i)
+	{
+	  int cipher_i = (int)passcipher[i] + 127;
+	  int key_i = (int)default_key[i % keylen] + 127;
+	  decryptedpass[i] = (char) ( ( (cipher_i - key_i + 256) % 256 ) - 127);
+	}
+	decryptedpass[i] = '\0';
+//	cout<<endl<<decryptedpass<<endl;
+	return decryptedpass;
+}
+
+char * userid::getusername()
+{
+	return username;
+}
+
+int userid::login(char * password)
+{
+	if(!strcmp(password, decipher()))
+		return 1;
+	else
+		return 0;
+}

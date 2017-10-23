@@ -91,5 +91,18 @@ class person{
 		void calc_age();
 };
 
+class userid
+{
+		str username;
+		str passcipher;   //encrypted password
+		static str default_key;    //key for making the vigenere cipher
+		void makecipher(char *);    //makes the vigenere cipher
+		char * decipher();      //deciphers the cipher 'passcipher'
+
+	public:
+		userid(char *, char *);
+		char * getusername();
+		int login(char *);
+};
 
 #endif
