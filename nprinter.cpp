@@ -421,10 +421,12 @@ list_layout::list_layout()
     head = NULL,
     current = NULL;
 
-    tcolor = LIGHTGRAY;
-    bcolor = BLACK;
-    tcolor_selected = BLACK;
-    bcolor_selected = LIGHTGRAY;
+    tcolor = ui::tcolor;
+    bcolor = ui::bcolor;
+    tcolor_selected = ui::bcolor;
+    bcolor_selected = ui::tcolor;
+    tcolor_input = tcolor;
+    bcolor_input = bcolor;
 
     height = ui::scr_height - 1;
     width = ui::scr_width;
@@ -465,8 +467,8 @@ interactive * list_layout::settext_box(coord c)
 {
     interactive *new_node = new text_box;
     new_node->setpos(c);
-    new_node->settcolor(tcolor);
-    new_node->setbcolor(bcolor);
+    new_node->settcolor(tcolor_input);
+    new_node->setbcolor(bcolor_input);
 
     current->setnext(new_node);
     current = current->getnext();
@@ -494,11 +496,13 @@ interactive * list_layout::setbutton(coord c, const char *s)
 void list_layout::settcolor(int c)
 {
     tcolor = c;
+    tcolor_input = c;
 }
 
 void list_layout::setbcolor(int c)
 {
     bcolor = c;
+    bcolor_input = c;
 }
 
 void list_layout::settcolor_selected(int c)
@@ -509,6 +513,16 @@ void list_layout::settcolor_selected(int c)
 void list_layout::setbcolor_selected(int c)
 {
     bcolor_selected = c;
+}
+
+void list_layout::settcolor_input(int c)
+{
+    tcolor_input = c;
+}
+
+void list_layout::setbcolor_input(int c)
+{
+    bcolor_input = c;
 }
 
 void list_layout::setcorner_top_left(coord c)
@@ -849,6 +863,16 @@ void box::settcolor_selected(int c)
 void box::setbcolor_selected(int c)
 {
     layout.setbcolor_selected(c);
+}
+
+void box::settcolor_input(int c)
+{
+    layout.settcolor_input(c);
+}
+
+void box::setbcolor_input(int c)
+{
+    layout.setbcolor_input(c);
 }
 
 box & box::operator<< (char *inp_str)

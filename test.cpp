@@ -11,22 +11,21 @@ void main()
 
 	ui::init();
 
-	char name[30]; char *n = name;
+	char name[30];
 	int age;
 	long phn;
 	float amt;
 		 
 	box b;
+	b.settcolor_input(YELLOW);
+
 	b << "Enter details: " << ui::endl
-	  << "Name: "; 
-	b.settcolor(YELLOW); b >> n;
-	b.settcolor(ui::tcolor); b << "Age: ";
-	b.settcolor(YELLOW); b >> age;
-	b.settcolor(ui::tcolor); b << "Phone num: ";
-	b.settcolor(YELLOW); b >> phn;
-	b.settcolor(ui::tcolor); b << "Amount: ";
-	b.settcolor(YELLOW); b >> amt;
-	b.settcolor(ui::tcolor); b.setexit_button("Submit");
+	  << "Namee: "; b >> name;
+	b << "Age: "; b >> age;
+	b << "Phone num: "; b >> phn;
+	b << "Amount: "; b >> amt;
+	
+	b.setexit_button("Submit");
 	b.loop();
 
 	b.clear();

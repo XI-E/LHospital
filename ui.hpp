@@ -237,6 +237,8 @@ class list_layout
 	int bcolor;
 	int tcolor_selected;
 	int bcolor_selected;
+	int tcolor_input;
+	int bcolor_input;
 
 	//FOR SCROLLING IMPLEMENTATION
 	int height; //height of container; to implement scrolling
@@ -267,6 +269,8 @@ class list_layout
 		void setbcolor(int);
 		void settcolor_selected(int);
 		void setbcolor_selected(int);
+		void settcolor_input(int);
+		void setbcolor_input(int);
 		void setcorner_top_left(coord);
 		void setheight(int);
 		void setwidth(int);
@@ -400,6 +404,8 @@ class box
 		void setbcolor(int);
 		void settcolor_selected(int);
 		void setbcolor_selected(int);
+		void settcolor_input(int);
+		void setbcolor_input(int);
 
 		box & operator<<(char *);
 		box & operator<<(char);
