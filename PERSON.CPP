@@ -1,5 +1,4 @@
 #include "base.hpp"
-//#include <time.h>    //for time_t, localtime() and tm structure
 
 /////////////////////////////////////////////
 /// Function definitions for class person
@@ -153,11 +152,10 @@ Date::Date(unsigned d, unsigned m, unsigned y)
 	}
 }
 
-str userid::default_key = "LEMON";
-
 userid::userid(str name ,str plaintext)	//plaintext is the unencrypted password
 {
 	strcpy(username, name);
+	set_key(plaintext);
 	makecipher(plaintext);
 //	cout<<plaintext<<' '<<default_key<<endl;
 //	cout<<strlen(plaintext)<<' '<<strlen(default_key)<<' '<<strlen(passcipher)<<endl;
@@ -176,6 +174,18 @@ void userid::makecipher(str plaintext)
 	}
 	passcipher[i] = '\0';
 //	cout<<passcipher<<endl<<endl;
+}
+
+void userid::set_key(char * plaintext)
+{
+	 randomize();
+	 int len = strlen(plaintext);
+	 int keylen = random(len/2 + 1) + len/2;    //so that the key is not too short
+	 for (int i = 0; i <=keylen; ++i)
+	 {
+		  default_key[i] = (char)( random(256) - 127 );
+	 }
+	 default_key[i] = '\0';
 }
 
 char * userid::decipher()

@@ -3,6 +3,7 @@
 
 #include <string.h>
 #include <time.h>
+#include <stdlib.h> //for random() and randomize()
 
 const int K = 14;
 typedef char str[80];
@@ -94,10 +95,11 @@ class person{
 class userid
 {
 		str username;
-		str passcipher;   //encrypted password
-		static str default_key;    //key for making the vigenere cipher
+		str passcipher;             //encrypted password
+		str default_key;            //key for making the vigenere cipher
 		void makecipher(char *);    //makes the vigenere cipher
-		char * decipher();      //deciphers the cipher 'passcipher'
+		void set_key(char *);       //sets default_key
+		char * decipher();          //deciphers the cipher 'passcipher'
 
 	public:
 		userid(char *, char *);
