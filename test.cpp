@@ -11,18 +11,31 @@ void main()
 
 	ui::init();
 
-	box b((ui::scr_width * 2)/3, (ui::scr_height * 4) / 5);
-	b.setcorner_top_left(coord(ui::scr_width/4, 4));
-	b.f.setcolor(GREEN);
+	char name[30]; char *n = name;
+	int age;
+	long phn;
+	float amt;
+		 
+	box b;
+	b << "Enter details: " << ui::endl
+	  << "Name: "; 
+	b.settcolor(YELLOW); b >> n;
+	b.settcolor(ui::tcolor); b << "Age: ";
+	b.settcolor(YELLOW); b >> age;
+	b.settcolor(ui::tcolor); b << "Phone num: ";
+	b.settcolor(YELLOW); b >> phn;
+	b.settcolor(ui::tcolor); b << "Amount: ";
+	b.settcolor(YELLOW); b >> amt;
+	b.settcolor(ui::tcolor); b.setexit_button("Submit");
+	b.loop();
 
-	b.settcolor(YELLOW);
-	b << "Here's a number " << 123 << ui::endl;
+	b.clear();
 
-	b.settcolor(RED);
-	b << "Here's a double " << 123.456 << ui::endl;
-	b.settcolor(YELLOW);
-	b.setbcolor(GREEN);
-	b << "Here's a character: " << 'a' << ui::endl;
+	b << "You entered the following data: " << ui::endl
+	  << "Name: " << name << ui::endl
+	  << "Age: " << age << ui::endl
+	  << "Phone num: " << phn << ui::endl
+	  << "Amount: " << amt << ui::endl;
 
 	getch();
 }

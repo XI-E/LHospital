@@ -281,6 +281,7 @@ class list_layout
 		
 		void display();
 		void hide();
+		void clear();
 };
 
 class frame
@@ -330,6 +331,31 @@ class frame
 		void setcorner_top_left(coord);
 };
 
+//Stores information related to a text box
+//Such as what type to convert it's data to
+//and where to store it
+struct info_tbox
+{
+	text_box * tbox;
+	int type;
+	void * data_store; //Need a new var name
+
+	enum data_types
+	{					//Stored as (void * is actually)
+		INT, 			//int *
+		LONG,			//long *
+		STRING,			//char *
+		CHAR,			//char *
+		DOUBLE,			//double *
+		FLOAT,			//float *
+		OTHER //Not supported at the moment
+	};
+
+	info_tbox();
+	void setdata();
+
+};
+
 class box
 {
 	coord corner_top_left;
@@ -337,15 +363,23 @@ class box
 	int width;
 	int padding;
 
-	int tcolor;
-	int bcolor;
+	int wrap(char[], int, int = 0);
+	//                    ^It will set first parameter
+	//					  to have only one line
+	void set_tbox(int, void *);
 
-	int wrap(char[], int length, int = 0);
-	//                           ^It will set first parameter
-	//							  to have only one line
 	list_layout layout;
 
+	//Pos of the pointer in the box
 	coord pos_pointer;
+
+	//List of text boxes and buttons
+	interactive * list_interactive[30]; 
+	button * exit_btn; //Clicking this button exits
+					   //the loop
+	info_tbox list_tbox[30];
+	int index_interactive;
+	int index_tbox;	
 
 	public:
 		frame f;
@@ -364,13 +398,34 @@ class box
 		void setpadding(int);
 		void settcolor(int);
 		void setbcolor(int);
+		void settcolor_selected(int);
+		void setbcolor_selected(int);
 
 		box & operator<<(char *);
 		box & operator<<(char);
 		box & operator<<(int);
 		box & operator<<(long);
 		box & operator<<(double);
+		box & operator<<(float);
 		box & operator<<(manipulator);
+
+		box & operator>>(char *&);
+		box & operator>>(char &);
+		box & operator>>(int &);
+		box & operator>>(long &);
+		box & operator>>(double &);
+		box & operator>>(float &);
+
+		void setexit_button(char *);
+
+		//Sets the box to loop, effectively enabling
+		//all the text boxes and buttons. Also enables
+		//scrolling
+		void loop();
+
+		void display();
+		void hide();
+		void clear();
 };
 
 /*

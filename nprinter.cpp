@@ -589,6 +589,72 @@ void list_layout::hide()
     print(HIDE);
 }
 
+void list_layout::clear()
+{
+    list_layout_node *curr = head;
+    head = current = NULL;
+
+    while(curr)
+    {
+        list_layout_node *temp = curr->getnext();
+        delete curr;
+        curr = temp;
+    }
+
+    lines_scrolled = 0;
+    pos = corner_top_left;
+}
+
+info_tbox::info_tbox()
+{
+    tbox = NULL;
+    data_store = NULL;
+    type = OTHER;
+}
+
+void info_tbox::setdata()
+{
+    char *fstr;
+    switch(type)
+    {
+        case INT:
+        {
+            fstr = "%d";
+            break;
+        }
+        case LONG:
+        {
+            fstr = "%ld";
+            break;
+        }
+        case STRING:
+        {
+            char *s = (char *) data_store;
+            strcpy(s, tbox->getstr());
+            return;
+        }
+        case CHAR:
+        {
+            fstr = "%c";
+            break;
+        }
+        case DOUBLE:
+        {
+            fstr = "%g";
+            break;
+        }
+        case FLOAT:
+        {
+            fstr = "%f";
+            break;
+        }
+        default:
+            return;
+    }
+
+    sscanf(tbox->getstr(), fstr, data_store);
+}
+
 /*
 * Wraps a string with specified number of
 * characters (length) in each line. Returns number of lines
@@ -670,14 +736,31 @@ int box::wrap(char str[], int length, int return_one_line)
     return num_lines;
 }
 
+void box::set_tbox(int data_type, void *ptr)
+{
+    text_box *new_tbox = 
+        (text_box *) layout.settext_box(pos_pointer);
+    
+    pos_pointer.y++;
+    pos_pointer.x = layout.getcorner_top_left().x;
+
+    list_interactive[index_interactive]
+        = (interactive *) new_tbox;
+    info_tbox &t = list_tbox[index_tbox];
+    index_interactive++;
+    index_tbox++;
+
+    t.tbox = new_tbox;
+    t.type = data_type;
+    t.data_store = ptr;
+}
+
 box::box(int w, int h) : f(coord(1,1), w, h)
 {
     width = w;
     height = h;
     padding = 1;
 
-    tcolor = LIGHTGRAY;
-    bcolor = BLACK;
     corner_top_left = coord(1,1);
 
     f << (ui::top | ui::left) << (char) 201
@@ -695,6 +778,14 @@ box::box(int w, int h) : f(coord(1,1), w, h)
     layout.setcorner_top_left(coord(3,3));
 
     pos_pointer = layout.getcorner_top_left();
+
+    for(int i = 0; i < 30; i++)
+    {
+        list_interactive[i] = NULL;
+    }
+    exit_btn = NULL;
+    index_interactive = index_tbox = 0;
+
     f.display();
 }
 
@@ -742,12 +833,22 @@ void box::setpadding(int p)
 
 void box::settcolor(int c)
 {
-    tcolor = c;
+    layout.settcolor(c);
 }
 
 void box::setbcolor(int c)
 {
-    bcolor = c;
+    layout.setbcolor(c);
+}
+
+void box::settcolor_selected(int c)
+{
+    layout.settcolor_selected(c);
+}
+
+void box::setbcolor_selected(int c)
+{
+    layout.setbcolor_selected(c);
 }
 
 box & box::operator<< (char *inp_str)
@@ -757,9 +858,6 @@ box & box::operator<< (char *inp_str)
     strcpy(string, inp_str);
 
     coord c = layout.getcorner_top_left();
-
-    layout.settcolor(tcolor);
-    layout.setbcolor(bcolor);
     
     int num_lines;
 
@@ -841,6 +939,13 @@ box & box::operator<<(double d)
     return (*this) << str;
 }
 
+box & box::operator<<(float f)
+{
+    char str[100];
+    sprintf(str, "%f", f);
+    return (*this) << str;
+}
+
 box & box::operator<<(manipulator m)
 {
     if(m == ui::endl)
@@ -849,4 +954,127 @@ box & box::operator<<(manipulator m)
         pos_pointer.x = layout.getcorner_top_left().x;
     }
     return *this;
+}
+
+box & box::operator>>(char *&s)
+{
+    set_tbox(info_tbox::STRING, (void *) s);
+    return *this;
+}
+
+box & box::operator>>(char &ch)
+{
+    set_tbox(info_tbox::CHAR, (void *) &ch);
+    return *this;
+}
+
+box & box::operator>>(int &i)
+{
+    set_tbox(info_tbox::INT, (void *) &i);
+    return *this;
+}
+
+box & box::operator>>(long &l)
+{
+    set_tbox(info_tbox::LONG, (void *) &l);
+    return *this;
+}
+
+box & box::operator>>(double &d)
+{
+    set_tbox(info_tbox::DOUBLE, (void *) &d);
+    return *this;
+}
+
+box & box::operator>>(float &f)
+{
+    set_tbox(info_tbox::FLOAT, (void *) &f);
+    return *this;
+}
+
+void box::setexit_button(char *str)
+{
+    coord c = layout.getcorner_top_left();
+    if(pos_pointer.x != c.x)
+        pos_pointer.y++;
+    
+    pos_pointer.x = c.x + (layout.getwidth() - strlen(str)) / 2;
+
+    button * new_btn = 
+        (button *) layout.setbutton(pos_pointer, str);
+
+    pos_pointer.y++;
+    pos_pointer.x = c.x;
+
+    exit_btn = new_btn;
+    list_interactive[index_interactive]
+        = (interactive *) new_btn;
+    index_interactive++;
+}
+
+void box::loop()
+{
+    int j = 0,
+    lines_scrolled = layout.getlines_scrolled(),
+    height = layout.getheight(),
+    index_last_interactive = index_interactive - 1,
+    &ili = index_last_interactive;
+
+    while(1)
+    {
+        coord c = list_interactive[j]->getpos();
+        if(c.y - lines_scrolled > height)
+		{
+			lines_scrolled = c.y - height;
+		}
+		else if(c.y - lines_scrolled < layout.getcorner_top_left().y)
+		{
+            lines_scrolled = 
+                c.y - layout.getcorner_top_left().y;
+		}
+
+		layout.setlines_scrolled(lines_scrolled);
+        int response = 
+            list_interactive[j]->input(-lines_scrolled);
+
+        if(response == interactive::GOTONEXT)
+        {
+            if(j < ili) j++; else j = 0;
+        }
+        else if(response == interactive::GOTOPREV)
+        {
+            if(j > 0) j--; else j = ili;
+        }
+        else if(response == interactive::CLICKED)
+        {
+            break;
+        }
+    }
+
+    for(int i = 0; i < index_tbox; i++)
+    {
+        list_tbox[i].setdata();
+    }
+}
+
+void box::display()
+{
+    layout.display();
+    f.display();
+}
+
+void box::hide()
+{
+    layout.hide();
+    f.hide();
+}
+
+void box::clear()
+{
+    layout.hide();
+    layout.clear();
+    pos_pointer = layout.getcorner_top_left();
+    index_interactive = index_tbox = 0;
+    exit_btn = NULL;
+    f.display();
 }
