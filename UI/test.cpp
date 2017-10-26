@@ -1,7 +1,7 @@
 //You need to use ui::init() first before using any of these functions
 
-#include "ui.hpp"
-#include "test.hpp"
+#include "ui/ui.hpp"
+#include "ui/test.hpp"
 
 void test_all()
 {

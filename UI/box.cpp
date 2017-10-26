@@ -1,4 +1,4 @@
-#include "ui.hpp"
+#include "ui/ui.hpp"
 
 info_tbox::info_tbox()
 {
