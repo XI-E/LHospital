@@ -1,5 +1,6 @@
 #ifndef UI_HPP
 #define UI_HPP
+
 #include <conio.h>
 #include <stdarg.h>
 #include <string.h>
@@ -30,18 +31,13 @@ class ui
 			bottom = 8,
 			all = 16 //When all sides need to be modified
 		};
-		enum align
-		{
-			leftalign = 1,
-			centeralign = 2,
-			rightalign = 4
-		};
 		static int scr_height;
 		static int scr_width;
 		static void init();
 		static int tcolor;
 		static int bcolor;
 		static manipulator endl;
+		static manipulator centeralign;
 };
 
 struct coord
@@ -55,72 +51,6 @@ struct coord
 	coord operator+(coord);
 	coord operator-(coord);
 };
-/*
-class node_printer
-{
-	node_printer *next;
-	coord pos;	//Where to place this chunk
-	char str[80];
-	int tcolor;
-	int bcolor;
-
-	public:
-		node_printer(char []  = ""); //Param will be assigned as str
-		~node_printer();   //Dtor
-
-		void setnext(node_printer *);
-		void setpos(coord);
-		void setstr(char []);
-		void settcolor(int);
-		void setbcolor(int);
-
-		node_printer * getnext();
-		coord getpos();
-		char * getstr();
-		int gettcolor();
-		int getbcolor();
-
-		void print();
-};
-
-class printer
-{
-	node_printer *head;
-	node_printer *current;
-
-	//Height and width of area in which it will print
-	int height;
-	int width;
-	coord corner_top_left; 
-
-	int state; //For internal purposes
-
-	public:
-		printer(int = ui::scr_width, int = ui::scr_height - 1);
-		~printer();
-
-		void settcolor(int); //TODO
-		void setbcolor(int);
-		void setcorner_top_left(coord);
-		void setheight(int);
-		void setwidth(int);
-
-		int gettcolor();
-		int getbcolor();
-		coord getcorner_top_left();
-		int getheight();
-		int getwidth();
-
-		printer & operator<<(int); //Sets state
-		
-		//Will add param as str of the node current points to
-		printer & operator<<(char []);
-
-		void print();
-		void gotobegin(); //Sets printer to print from beginning
-		void hide(); //Hides printed data
-};
-*/
 
 class list_layout_node
 {
@@ -206,7 +136,7 @@ class text_box : public interactive
 class button : public interactive
 {
 	int tcolor_selected; //tcolor when selected
-	int bcolor_selected; //bcolor when selected
+	int bcolor_selected; //bcolor when seilected
 
 	public:
 		button();
@@ -384,11 +314,13 @@ class box
 	info_tbox list_tbox[30];
 	int index_interactive;
 	int index_tbox;	
+	int center_toggle;
 
 	public:
 		frame f;
 
-		box(int = ui::scr_width, int = ui::scr_height - 1);
+		box(coord = coord(1,1), int = ui::scr_width,
+			 int = ui::scr_height - 1);
 
 		//GETTERS
 		coord getcorner_top_left();
@@ -433,42 +365,5 @@ class box
 		void hide();
 		void clear();
 };
-
-/*
-class body
-{
-	coord corner_top_left;
-	int height;
-	int width;
-	int padding[2];
-	printer p;
-	int wrap(char[], int length);
-	int tcolor;
-	int bcolor;
-
-	public:
-		body(int = ui::scr_width, int = ui::scr_height - 1);
-		body & operator<<(int); //state
-		body & operator<<(char []); //str
-		void print();
-		void hide();
-
-		void setcorner_top_left(coord);
-		void setheight(int);
-		void setwidth(int);
-		void setpaddingx(int);
-		void setpaddingy(int);
-		void settcolor(int);
-		void setbcolor(int);
-
-		coord getcorner_top_left();
-		int getheight();
-		int getwidth();
-		int getpaddingx();
-		int getpaddingy();
-		int gettcolor();
-		int getbcolor(); 	
-};
-*/
 
 #endif /* UI_HPP */

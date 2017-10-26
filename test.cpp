@@ -1,43 +1,47 @@
+//You need to use ui::init() first before using any of these functions
+
 #include "ui.hpp"
+#include "test.hpp"
 
-void test_printer();
-void test_body();
-void test_textbox();
-void test_listlayout();
-
-void main()
+void test_all()
 {
-	clrscr();
-
-	ui::init();
-
-	char name[30];
+	char name[40];
 	int age;
 	long phn;
 	float amt;
 		 
-	box b;
-	b.settcolor_input(YELLOW);
+	box window;
+	window.settcolor(CYAN);
+	window << ui::centeralign << "LHOSPITAL";
+	window << ui::endl << ui::endl;
+	window.settcolor(ui::tcolor);
+	window << "Fill the following form: " << ui::endl;
+	
+	coord c(ui::scr_width/4, ui::scr_height/3);
+	box b(c, ui::scr_width / 3, 10);
 
+	b.settcolor_input(YELLOW);
 	b << "Enter details: " << ui::endl
-	  << "Namee: "; b >> name;
+	  << "Name: "; b >> name;
 	b << "Age: "; b >> age;
 	b << "Phone num: "; b >> phn;
 	b << "Amount: "; b >> amt;
 	
+	b.f.setvisibility_mode(frame::nosides);
+
+	b.f.display();
 	b.setexit_button("Submit");
 	b.loop();
 
-	b.clear();
+	b.hide();
 
-	b << "You entered the following data: " << ui::endl
+	window << "You entered the following data: " << ui::endl
 	  << "Name: " << name << ui::endl
 	  << "Age: " << age << ui::endl
 	  << "Phone num: " << phn << ui::endl
 	  << "Amount: " << amt << ui::endl;
-
-	getch();
 }
+
 
 void test_listlayout()
 {
@@ -129,7 +133,6 @@ void test_textbox()
 	}
 }
 
-/*
 void test_frame()
 {
 	frame f;
@@ -174,37 +177,3 @@ void test_frame()
 
 	f.setvisibility_mode(frame::nosides);	
 }
-
-void test_body()
-{
-	body b;
-	b.setwidth(ui::scr_width/2);
-	b.setcorner_top_left(coord(5,2));
-	b << ui::left
-	  << "Well, this is a sentence, you know! \nThis is the next line. Hopefully this will get wrapped up as it has gotten too long \nBye!"
-	;
-}
-
-void test_printer()
-{
-	printer p;
-	p << ui::centeralign << "Heading is here\n"
-	  << ui::leftalign << "LEFT align"
-	  << ui::rightalign << "RIGHT align";
-
-	p.settcolor(BLACK);
-	p.setbcolor(CYAN);
-
-	p << ui::centeralign << "WAAH!";
-
-	clrscr();
-	gotoxy(1,1);
-	p.setcorner_top_left(coord(10,5));
-	p.setheight(ui::scr_height/4);
-	p.setwidth(ui::scr_width/2);
-	p.gotobegin();
-	p.print();	
-
-	getch();
-}
-*/
