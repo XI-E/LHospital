@@ -12,7 +12,10 @@ typedef char phone[11];
 enum sex {MALE, FEMALE, TRANS};
 enum date_type {DAY, MONTH, YEAR};
 enum time_type {HOUR, MINUTE, SECOND};
-enum body_parts {BRAIN, HEART, SKIN, LUNG, BONE, GEN}; // GEN for general problems
+enum body_parts {BRAIN, HEART, SKIN,
+	LUNG, BONE, EYE,
+	THROAT, TEETH, STOMACH,
+	BLOOD, ASSMAN, GEN}; // GEN for general problems
 enum address_parts {HOUSE_NO, STREET, CITY, DISTRICT, STATE};
 enum times_of {START, END};
 
@@ -59,6 +62,12 @@ struct medicine{
 	float price;
 	str name;
 	float dosage;
+	long stock;
+}
+
+struct transaction{
+	float amount;
+	str reason;
 }
 
 class person{

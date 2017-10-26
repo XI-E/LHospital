@@ -5,6 +5,19 @@
 
 //enum access_level {OTHERS, DOCTOR, NURSE, RECEPTIONIST};
 
+class hospital{
+	public:
+		static float get_bal();
+		static void deduct_money(float, char*);
+		static void add_money(float, char*);
+		static transaction* get_transaction(int);
+		static void read_balance();
+	private:
+		hospital();
+		static float balance;
+
+}
+
 class employee : public person{
 	public:
 	employee(str, int, Date, address, phone, unsigned long, Time, Time, int, str = "", str = "");  //for all those with user accounts(doctors, nurses, receptionists), last 2 arguments are to be provided as well
@@ -45,11 +58,51 @@ class receptionist : public employee
 class pharmacy{
 	public:
 		static void sale(int, int, int);
+		static void purchase(int, int);
 };
 
 
 //////////////////////////////////////////////
-//////////////////////////////////////////////
+///////////////////////////////////////////////// Function definitions for class hospital
+
+float hospital::get_bal(){
+	return balance;
+}
+
+void hospital::deduct_money(float amt, char* reason){
+	hospital::balance -= amt;
+
+	ofstream hosp_finances ("transactions.dat", ios::out | ios::binary | ios::app);
+
+	hosp_finances.write( (char*) (transaction( (-1)*amt, reason )) , sizeof(transaction) )
+
+	hosp_finances.close();
+}
+
+void hospital::add_money(float amt, char* reason){
+	hospital::balance += amt;
+
+	ofstream hosp_finances ("transactions.dat", ios::out | ios::binary | ios::app);
+
+	hosp_finances.write( (char*) (transaction( amt, reason )) , sizeof(transaction) )
+
+	hosp_finances.close();
+}
+
+transaction* hospital::get_transaction(int a){
+	transaction a[10]; 
+
+	ifstream hosp_finances ("transactions.dat", ios::in | ios::binary);
+
+	hosp_finances.seekg( (-1) * sizeof(transaction) , hosp_finances.end );
+
+	for(int i = 0; i < 10; i++){
+		hosp_finances.read( (char *) a[i] , sizeof(transaction) );
+		hosp_finances.seekg( hosp_finances.tellg() - ( 2 * sizeof(transaction) ) );
+	}
+}
+
+//////////////////////////////////
 /// Function definitions for class employee
 
 employee::employee(str inp1, int inp2, Date inp3, address inp4, phone inp5, unsigned long inp6, Time inp7, Time inp8, int inp9, str inp10, str inp11) : person(inp1, inp2, inp3, inp4, inp5), account(inp10, inp11)
@@ -103,11 +156,24 @@ receptionist::receptionist(str inp1, int inp2, Date inp3, address inp4, phone in
 
 void pharmacy::sale(int pat_id, int code, int quantity){
 	patient a = get_pat(pat_id);
-	for(int i = 1; i < 50; i++){
-		if(a.get_med(i, 0) == 0 && a.get_med(i - 1, 0) != 0){
-				a.set_med(i, code, quantity);
-	    }
+	for(int i = 0; i < 50; i++){
+		if(a.get_med(i,0) == code){
+			quantity += a.get_med(i,1);
+			a.set_med(i, code, quantity);
+		}
+		if(i>0){
+			if(a.get_med(i, 0) == 0 &&
+				a.get_med(i - 1, 0) != 0){
+					a.set_med(i, code, quantity);
+				}
+		}
 	}
+}
+
+void pharmacy::purchase(int code, int quantity){
+	medicine &a = get_med_by_code(code);
+	str b = strcat( strcat("Medicine (", a.name) , ") Purchase" );
+	hospital::deduct_money( (a.price * quantity) , b );
 }
 
 ////////////////////////////////////////////////////////////

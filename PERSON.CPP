@@ -46,15 +46,15 @@ char* person::get_address(int inp)
 {
 	switch(inp){
 		case HOUSE_NO:
-			return address.house_no;
+			return adr.house_no;
 		case STREET:
-			return address.street;
+			return adr.street;
 		case CITY:
-			return address.city;
+			return adr.city;
 		case DISTRICT:
-			return address.district;
+			return adr.district;
 		case STATE:
-			return address.state;
+			return adr.state;
 		default:
 			return 0;
 	}
@@ -62,7 +62,7 @@ char* person::get_address(int inp)
 
 char* person::get_phn()
 {
-	return phone;
+	return phone_no;
 }
 
 void person::calc_age()
@@ -98,7 +98,7 @@ void person::set_dob(Date a)
 
 void person::set_address(address a)
 {
-	address = a;
+	adr = a;
 }
 
 void person::set_phone(char* a)
