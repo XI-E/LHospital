@@ -8,7 +8,7 @@ class patient : public person
 	protected:
 		disease dis;  		//patient's afflictions
 		str allergies[2];   //patient's known allergies
-		int med[50][2]		//patient's purchased meds & quantities
+		int med[50][2];		//patient's purchased meds & quantities
 		str guardian_name;
 		str emergency_contact;
 		phone emer_contact_no;

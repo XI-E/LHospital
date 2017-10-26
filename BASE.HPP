@@ -63,12 +63,14 @@ struct medicine{
 	str name;
 	float dosage;
 	long stock;
-}
+};
 
 struct transaction{
 	float amount;
 	str reason;
-}
+	transaction(float, char*);
+	transaction();
+};
 
 class person{
 	public:

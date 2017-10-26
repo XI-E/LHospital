@@ -1,7 +1,7 @@
 #include "patient.hpp"
 
 ///////FUNCTION DEFINITIONS FOR CLASS PATIENT/////////
-patient::patient(str inp1, int inp2 , date inp3, adr inp4, phn inp5, disease inp6, str inp7, str inp8, phn inp9, insurance inp10) : person(inp1, inp2, inp3, inp4, inp5)
+patient::patient(str inp1, int inp2 , Date inp3, address inp4, phone inp5, disease inp6, str inp7, str inp8, phone inp9, insurance inp10) : person(inp1, inp2, inp3, inp4, inp5)
 {
 	dis = inp6;
 	strcpy(guardian_name, inp7);
@@ -11,13 +11,13 @@ patient::patient(str inp1, int inp2 , date inp3, adr inp4, phn inp5, disease inp
 
 	time_t t = time(0);
 	struct tm *now = localtime(&t);
-	date dnow(now->tm_mday, (now->tm_mon + 1) ,(now->tm_year + 1900));
+	Date dnow(now->tm_mday, (now->tm_mon + 1) ,(now->tm_year + 1900));
 	admission_date = dnow;
 
 	bill_amt = 0;   //bill_amt will be set by doctor after treatment
 }
 
-patient::patient(str inp1, int inp2 , date inp3, adr inp4, phn inp5, disease inp6, str inp7, str inp8, phn inp9, insurance inp10, date inp11) : person(inp1, inp2, inp3, inp4, inp5)    //if date_of_admission is not the current system date
+patient::patient(str inp1, int inp2 , Date inp3, address inp4, phone inp5, disease inp6, str inp7, str inp8, phone inp9, insurance inp10, Date inp11) : person(inp1, inp2, inp3, inp4, inp5)    //if date_of_admission is not the current system date
 {
 	dis = inp6;
 	strcpy(guardian_name, inp7);
@@ -34,32 +34,32 @@ patient::patient(str inp1, int inp2 , date inp3, adr inp4, phn inp5, disease inp
 	bill_amt = 0;   //bill_amt will be set by doctor after treatment
 }
 
-disease patient::getdis()
+disease patient::get_dis()
 {
 	return dis;
 }
 
-char* patient::getguardian_name()
+char* patient::get_guardian_name()
 {
 	return guardian_name;
 }
 
-char* patient::getemergency_contact()
+char* patient::get_emergency_contact()
 {
 	return emergency_contact;
 }
 
-char* patient::getemer_contact_no()
+char* patient::get_emer_contact_no()
 {
 	return emer_contact_no;
 }
 
-insurance patient::getinsur_info()
+insurance patient::get_insur_info()
 {
 	return insur_info;
 }
 
-int patient::getadmission_date(int inp)
+int patient::get_admission_date(int inp)
 {
 	switch(inp)
 	{
@@ -74,7 +74,7 @@ int patient::getadmission_date(int inp)
 	}
 }
 
-unsigned long patient::getbill_amt()
+unsigned long patient::get_bill_amt()
 {
 	return bill_amt;
 }
@@ -83,37 +83,37 @@ int patient::get_med(int a, int b){
 	return med[a][b];
 }
 
-void patient::setdis(disease a)
+void patient::set_dis(disease a)
 {
 	dis = a;
 }
 
-void patient::setguardian_name(char *a)
+void patient::set_guardian_name(char *a)
 {
-	guardian_name = a;
+	strcpy(guardian_name, a);
 }
 
-void patient::setemergency_contact(char *a)
+void patient::set_emergency_contact(char *a)
 {
-	emergency_contact = a;
+	strcpy(emergency_contact, a);
 }
 
-void patient::setemer_contact_no(char *a)
+void patient::set_emer_contact_no(char *a)
 {
-	emer_contact_no = a;
+	strcpy(emer_contact_no, a);
 }
 
-void patient::setinsur_info(insurance a)
+void patient::set_insur_info(insurance a)
 {
 	insur_info = a;
 }
 
-void patient::setadmission_date(date a)
+void patient::set_admission_date(Date a)
 {
 	admission_date = a;
 }
 
-void patient::setbill_amt(unsigned long a)
+void patient::set_bill_amt(unsigned long a)
 {
 	bill_amt = a;
 }

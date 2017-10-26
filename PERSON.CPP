@@ -60,7 +60,7 @@ char* person::get_address(int inp)
 	}
 }
 
-char* person::get_phn()
+char* person::get_phone()
 {
 	return phone_no;
 }
