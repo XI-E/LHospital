@@ -37,7 +37,7 @@ void ui::init()
 
 void ui::clrscr()
 {
-	clrscr();
+	::clrscr();
 }
 
 coord::coord(int X, int Y)
