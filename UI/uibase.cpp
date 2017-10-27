@@ -22,6 +22,8 @@ manipulator ui::endl,
 
 void ui::init()
 {
+	ui::clrscr();
+
 	textcolor(ui::tcolor);
 	textbackground(ui::bcolor);
 
@@ -31,6 +33,11 @@ void ui::init()
 	//height and width of screen
 	scr_width = (int) info.screenwidth;
 	scr_height = (int) info.screenheight;
+}
+
+void ui::clrscr()
+{
+	clrscr();
 }
 
 coord::coord(int X, int Y)

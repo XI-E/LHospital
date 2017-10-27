@@ -34,6 +34,7 @@ class ui
 		static int scr_height;
 		static int scr_width;
 		static void init();
+		static void clrscr();
 		static int tcolor;
 		static int bcolor;
 		static manipulator endl;
