@@ -2,7 +2,7 @@
 
 ///////FUNCTION DEFINITIONS FOR CLASS PATIENT/////////
 
-patient::patient(str inp1, int inp2 , Date inp3, address inp4, phone inp5, disease inp6, str inp7, str inp8, phone inp9, insurance inp10, Date inp11 = system::get_date()) : person(inp1, inp2, inp3, inp4, inp5)    //if date_of_admission is the current system date, last argument is not needed
+patient::patient(str inp1, int inp2 , Date inp3, address inp4, phone inp5, disease inp6, str inp7, str inp8, phone inp9, insurance inp10, Date inp11) : person(inp1, inp2, inp3, inp4, inp5)    //if date_of_admission is the current system date, last argument is not needed
 {
 	dis = inp6;
 	strcpy(guardian_name, inp7);
@@ -11,14 +11,18 @@ patient::patient(str inp1, int inp2 , Date inp3, address inp4, phone inp5, disea
 	insur_info = inp10;
 
 	admission_date = inp11;
-	
-	if(admission_date != system::get_date())
-	    set_dob(inp3, inp11);
+	Date dnow = system::get_date();
+
+	if(admission_date.day != dnow.day &&
+	   admission_date.month != dnow.month &&
+	   admission_date.year != dnow.year   )
+
+		set_dob(inp3, inp11);
 
 	for(int i = 0; i < 50; i++){
 		med[i][1] = med[i][2] = 0;
 	}
-	
+
 	bill_amt = 0;   //bill_amt will be set by doctor after treatment
 }
 

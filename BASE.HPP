@@ -79,8 +79,8 @@ struct transaction{
 	str reason;
 	Date _date;
 	Time _time;
-	transaction(float, Date, Time, char*);
-//	transaction();
+	transaction(float, Date = Date(), Time = Time(), char* = "NA");
+	transaction();
 };
 
 struct procedure{
@@ -103,7 +103,7 @@ class person{
 		//Updating functions
 		void set_name(char*);
 		void set_sex(int);
-		void set_dob(Date, Date);
+		void set_dob(Date, Date = system::get_date());
 		void set_address(address);
 		void set_phone(char*);
 
@@ -116,7 +116,7 @@ class person{
 		phone phone_no;
 
 	private:
-		void calc_age(Date);
+		void calc_age(Date = system::get_date());
 };
 
 class userid

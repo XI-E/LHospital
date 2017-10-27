@@ -65,7 +65,7 @@ char* person::get_phone()
 	return phone_no;
 }
 
-void person::calc_age(Date dnow = system::get_date())
+void person::calc_age(Date dnow)
 {
     if(dnow.month > dob.month || dnow.month == dob.month && dnow.day >= dob.day)
     {
@@ -87,7 +87,7 @@ void person::set_sex(int a)
     sex = a;
 }
 
-void person::set_dob(Date bday, Date dnow = system::get_date())
+void person::set_dob(Date bday, Date dnow)
 {
 	dob = bday;
 	calc_age(dnow);
@@ -230,10 +230,18 @@ int userid::login(char * password)
 		return 0;
 }
 
-transaction::transaction(float a = 0, Date d = Date(), Time t = Time(), char * b = "NA")
+transaction::transaction(float a, Date d, Time t, char * b)
 {
 	amount = a;
 	strcpy(reason, b);
 	_date = d;
 	_time = t;
+}
+
+transaction::transaction()
+{
+    amount = 0;
+    strcpy(reason, "NA");
+    _date = Date();
+    _time = Time();
 }
