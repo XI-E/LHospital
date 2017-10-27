@@ -136,6 +136,12 @@ void box::set_tbox(int data_type, void *ptr)
     text_box *new_tbox = 
         (text_box *) layout.settext_box(pos_pointer);
     
+    if(default_toggle)
+    {
+        default_toggle = 0;
+        new_tbox -> setstr(default_text);
+    }
+
     pos_pointer.y++;
     pos_pointer.x = layout.getcorner_top_left().x;
 
@@ -182,6 +188,8 @@ box::box(coord c, int w, int h) : f(c, w, h)
     exit_btn = NULL;
     index_interactive = index_tbox = 0;
     center_toggle = 0;
+    default_toggle = 0;
+    strcpy(default_text, "");
 
     f.display();
 }
@@ -439,6 +447,44 @@ void box::setexit_button(char *str)
     list_interactive[index_interactive]
         = (interactive *) new_btn;
     index_interactive++;
+}
+
+void box::setdefault(char *s)
+{
+    default_toggle = 1;
+    strcpy(default_text, s);
+}
+
+void box::setdefault(char c)
+{
+    char s[] = {c, '\0'};
+    setdefault(s);
+}
+
+void box::setdefault(int i)
+{
+    setdefault( (long) i);
+}
+
+void box::setdefault(long l)
+{
+    char s[100];
+    sprintf(s, "%ld", l);
+    setdefault(s);
+}
+
+void box::setdefault(double d)
+{
+    char s[100];
+    sprintf(s, "%g", d);
+    setdefault(s);
+}
+
+void box::setdefault(float f)
+{
+    char s[100];
+    sprintf(s, "%f", f);
+    setdefault(s);
 }
 
 void box::loop()

@@ -9,6 +9,7 @@ void test_all()
 	int age;
 	long phn;
 	float amt;
+	char date[30];
 		 
 	box window;
 	window.settcolor(CYAN);
@@ -25,6 +26,9 @@ void test_all()
 	  << "Name: "; b >> name;
 	b << "Age: "; b >> age;
 	b << "Phone num: "; b >> phn;
+	b << "Date: "; 
+	b.setdefault("27/10/2017");
+	b >> date;
 	b << "Amount: "; b >> amt;
 	
 	b.f.setvisibility_mode(frame::nosides);
@@ -39,6 +43,7 @@ void test_all()
 	  << "Name: " << name << ui::endl
 	  << "Age: " << age << ui::endl
 	  << "Phone num: " << phn << ui::endl
+	  << "Date: " << date << ui::endl
 	  << "Amount: " << amt << ui::endl;
 }
 

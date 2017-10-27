@@ -314,7 +314,10 @@ class box
 	info_tbox list_tbox[30];
 	int index_interactive;
 	int index_tbox;	
+
 	int center_toggle;
+	int default_toggle;
+	char default_text[100];
 
 	public:
 		frame f;
@@ -355,6 +358,16 @@ class box
 		box & operator>>(float &);
 
 		void setexit_button(char *);
+
+		//Sets default for the next text box and
+		//clears it after the next text box has been
+		//set
+		void setdefault(char *);
+		void setdefault(char);
+		void setdefault(int);
+		void setdefault(long);
+		void setdefault(double);
+		void setdefault(float);
 
 		//Sets the box to loop, effectively enabling
 		//all the text boxes and buttons. Also enables
