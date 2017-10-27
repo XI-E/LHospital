@@ -4,6 +4,17 @@
 
 patient::patient(str inp1, int inp2 , Date inp3, address inp4, phone inp5, disease inp6, str inp7, str inp8, phone inp9, insurance inp10, Date inp11) : person(inp1, inp2, inp3, inp4, inp5)    //if date_of_admission is the current system date, last argument is not needed
 {
+	fstream pat ("patient/id.dat", ios::in | ios::binary | ios::out);
+	long max_id;
+	pat.read( (char*) &max_id, sizeof(long) );
+	max_id++;
+
+	id = max_id;
+
+	pat.seekp(0);
+	pat.write( (char*) &max_id, sizeof(long) );
+	pat.close();
+
 	dis = inp6;
 	strcpy(guardian_name, inp7);
 	strcpy(emergency_contact, inp8);
@@ -24,6 +35,10 @@ patient::patient(str inp1, int inp2 , Date inp3, address inp4, phone inp5, disea
 	}
 
 	bill_amt = 0;   //bill_amt will be set by doctor after treatment
+}
+
+patient::patient(){
+	id = 0;
 }
 
 disease patient::get_dis()

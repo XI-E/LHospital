@@ -60,11 +60,11 @@ class hospital{
 		static transaction* get_transaction();
 		static void read_balance();
 
-		static void pay_salary(employee, Date, Time);
-		static void pay_salary(doctor, Date, Time);
-		static void pay_salary(nurse, Date, Time);
-		static void pay_salary(receptionist, Date, Time);
+		static patient get_patient_by_id(int);
+		static patient write_patient(patient);
+		static void charge_patient(int, transaction);
 
+		static void pay_salary(employee, Date, Time);
 //		static void pay_all_salaries();
 	private:
 		hospital();
@@ -138,9 +138,9 @@ receptionist::receptionist(str inp1, int inp2, Date inp3, address inp4, phone in
 /////////////////////////////////////////
 //// Pharmacy function definitions
 
-/*
+
 void pharmacy::sale(int pat_id, int code, int quantity){
-	patient a = get_pat(pat_id);
+	patient a = hospital::get_patient_by_id(pat_id);
 	for(int i = 0; i < 50; i++){
 		if(a.get_med(i,0) == code){
 			quantity += a.get_med(i,1);
@@ -154,7 +154,7 @@ void pharmacy::sale(int pat_id, int code, int quantity){
 		}
 	}
 }
-
+/*
 void pharmacy::purchase(int code, int quantity){
 	medicine &a = get_med_by_code(code);
 	str b = strcat( strcat("Medicine (", a.name) , ") Purchase" );
@@ -196,91 +196,40 @@ transaction hospital::add_money(float amt, char* reason, Date d, Time t){
 	return temp;
 }
 
+patient hospital::get_patient_by_id(int id){
+	str temp;
+	sprintf(temp, "patient/%d/base.dat", id);
+	ifstream patient_file ( temp , ios::in | ios::binary );
+
+	patient a;
+	patient_file.read( (char*) &a , sizeof(patient) );
+	patient_file.close();
+
+	return a;
+}
+
+void hospital::write_patient(patient a){
+	str temp;
+	sprintf(temp, "patient/%d/base.dat", a.id);
+	ofstream patient_file ( temp , ios::out | ios::binary );
+
+	patient a;
+	patient_file.write( (char*) &a , sizeof(patient) );
+	patient_file.close();
+}
+
+void hospital::charge_patient(int pat_id, transaction trans){
+	patient temp_pat = hospital::get_patient_by_id(pat_id);
+
+	str temp;
+	sprintf(temp, "patient/%d/trans.dat", temp_pat.id);
+	ofstream patient_file ( temp , ios::out | ios::binary | ios::app );
+	patient_file.close();
+
+	hospital::write_patient(temp_pat);
+}
+
 void hospital::pay_salary(employee x, Date d1, Time t1)
-{
-	 unsigned long inp1 = x.get_salary();
-	 char inp2[100] = "Salary paid to ";
-	 strcat(inp2, x.get_name());
-	 transaction t = hospital::deduct_money(inp1, inp2, d1, t1);
-	 for(int i = 0; i < 10; ++i)
-	 {
-		  if( ( *(x.get_last_10_transactions() + i) ).amount == 0 &&
-			  !strcmp( ( *(x.get_last_10_transactions() + i) ).reason, "NA") &&
-			  ( *(x.get_last_10_transactions() + i) )._date.day == 0 &&
-			  ( *(x.get_last_10_transactions() + i) )._date.month == 0 &&
-			  ( *(x.get_last_10_transactions() + i) )._date.year == 0 &&
-			  ( *(x.get_last_10_transactions() + i) )._time.hour == 0 &&
-			  ( *(x.get_last_10_transactions() + i) )._time.minute == 0 &&
-			  ( *(x.get_last_10_transactions() + i) )._time.second == 0		)
-		  {
-				*(x.get_last_10_transactions() + i) = t;
-				return;
-		  }
-	 }
-	 for(i = 0; i < 10; ++i)
-	 {
-		  *(x.get_last_10_transactions() + i) = *(x.get_last_10_transactions() + i + 1);
-	 }
-	 *(x.get_last_10_transactions() + i) = t;
-}
-
-void hospital::pay_salary(doctor x, Date d1, Time t1)
-{
-	 unsigned long inp1 = x.get_salary();
-	 char inp2[100] = "Salary paid to ";
-	 strcat(inp2, x.get_name());
-	 transaction t = hospital::deduct_money(inp1, inp2, d1, t1);
-	 for(int i = 0; i < 10; ++i)
-	 {
-		  if( ( *(x.get_last_10_transactions() + i) ).amount == 0 &&
-			  !strcmp( ( *(x.get_last_10_transactions() + i) ).reason, "NA") &&
-			  ( *(x.get_last_10_transactions() + i) )._date.day == 0 &&
-			  ( *(x.get_last_10_transactions() + i) )._date.month == 0 &&
-			  ( *(x.get_last_10_transactions() + i) )._date.year == 0 &&
-			  ( *(x.get_last_10_transactions() + i) )._time.hour == 0 &&
-			  ( *(x.get_last_10_transactions() + i) )._time.minute == 0 &&
-			  ( *(x.get_last_10_transactions() + i) )._time.second == 0		)
-		  {
-				*(x.get_last_10_transactions() + i) = t;
-				return;
-		  }
-	 }
-	 for(i = 0; i < 10; ++i)
-	 {
-		  *(x.get_last_10_transactions() + i) = *(x.get_last_10_transactions() + i + 1);
-	 }
-	 *(x.get_last_10_transactions() + i) = t;
-}
-
-void hospital::pay_salary(nurse x, Date d1, Time t1)
-{
-	 unsigned long inp1 = x.get_salary();
-	 char inp2[100] = "Salary paid to ";
-	 strcat(inp2, x.get_name());
-	 transaction t = hospital::deduct_money(inp1, inp2, d1, t1);
-	 for(int i = 0; i < 10; ++i)
-	 {
-		  if( ( *(x.get_last_10_transactions() + i) ).amount == 0 &&
-			  !strcmp( ( *(x.get_last_10_transactions() + i) ).reason, "NA") &&
-			  ( *(x.get_last_10_transactions() + i) )._date.day == 0 &&
-			  ( *(x.get_last_10_transactions() + i) )._date.month == 0 &&
-			  ( *(x.get_last_10_transactions() + i) )._date.year == 0 &&
-			  ( *(x.get_last_10_transactions() + i) )._time.hour == 0 &&
-			  ( *(x.get_last_10_transactions() + i) )._time.minute == 0 &&
-			  ( *(x.get_last_10_transactions() + i) )._time.second == 0		)
-		  {
-				*(x.get_last_10_transactions() + i) = t;
-				return;
-		  }
-	 }
-	 for(i = 0; i < 10; ++i)
-	 {
-		  *(x.get_last_10_transactions() + i) = *(x.get_last_10_transactions() + i + 1);
-	 }
-	 *(x.get_last_10_transactions() + i) = t;
-}
-
-void hospital::pay_salary(receptionist x, Date d1, Time t1)
 {
 	 unsigned long inp1 = x.get_salary();
 	 char inp2[100] = "Salary paid to ";

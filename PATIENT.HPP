@@ -6,6 +6,7 @@
 class patient : public person
 {
 	protected:
+		long id;
 		disease dis;  		//patient's afflictions
 		str allergies[2];   //patient's known allergies
 		int med[50][2];		//patient's purchased meds & quantities
@@ -17,6 +18,7 @@ class patient : public person
 		unsigned long bill_amt;
 	public:
         patient(str, int, Date, address, phone, disease, str, str, phone, insurance, Date = system::get_date()); //if date_of_admission is the current system date, last argument is not needed
+		patient();	// Default constructor
 		//'get's
 		disease get_dis();
 		char* get_guardian_name();
