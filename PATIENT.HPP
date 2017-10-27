@@ -16,8 +16,7 @@ class patient : public person
 		Date admission_date;
 		unsigned long bill_amt;
 	public:
-		patient(str, int, Date, address, phone, disease, str, str, phone, insurance);
-        patient(str, int, Date, address, phone, disease, str, str, phone, insurance, Date); //if date_of_admission is not the current system date
+        patient(str, int, Date, address, phone, disease, str, str, phone, insurance, Date); //if date_of_admission is the current system date, last argument is not needed
 		//'get's
 		disease get_dis();
 		char* get_guardian_name();

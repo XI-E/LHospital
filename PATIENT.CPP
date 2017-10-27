@@ -1,23 +1,8 @@
 #include "patient.hpp"
 
 ///////FUNCTION DEFINITIONS FOR CLASS PATIENT/////////
-patient::patient(str inp1, int inp2 , Date inp3, address inp4, phone inp5, disease inp6, str inp7, str inp8, phone inp9, insurance inp10) : person(inp1, inp2, inp3, inp4, inp5)
-{
-	dis = inp6;
-	strcpy(guardian_name, inp7);
-	strcpy(emergency_contact, inp8);
-	strcpy(emer_contact_no, inp9);
-	insur_info = inp10;
 
-	time_t t = time(0);
-	struct tm *now = localtime(&t);
-	Date dnow(now->tm_mday, (now->tm_mon + 1) ,(now->tm_year + 1900));
-	admission_date = dnow;
-
-	bill_amt = 0;   //bill_amt will be set by doctor after treatment
-}
-
-patient::patient(str inp1, int inp2 , Date inp3, address inp4, phone inp5, disease inp6, str inp7, str inp8, phone inp9, insurance inp10, Date inp11) : person(inp1, inp2, inp3, inp4, inp5)    //if date_of_admission is not the current system date
+patient::patient(str inp1, int inp2 , Date inp3, address inp4, phone inp5, disease inp6, str inp7, str inp8, phone inp9, insurance inp10, Date inp11 = system::get_date()) : person(inp1, inp2, inp3, inp4, inp5)    //if date_of_admission is the current system date, last argument is not needed
 {
 	dis = inp6;
 	strcpy(guardian_name, inp7);
@@ -26,11 +11,14 @@ patient::patient(str inp1, int inp2 , Date inp3, address inp4, phone inp5, disea
 	insur_info = inp10;
 
 	admission_date = inp11;
+	
+	if(admission_date != system::get_date())
+	    set_dob(inp3, inp11);
 
 	for(int i = 0; i < 50; i++){
 		med[i][1] = med[i][2] = 0;
 	}
-
+	
 	bill_amt = 0;   //bill_amt will be set by doctor after treatment
 }
 
@@ -111,6 +99,7 @@ void patient::set_insur_info(insurance a)
 void patient::set_admission_date(Date a)
 {
 	admission_date = a;
+	set_dob(dob, admission_date);
 }
 
 void patient::set_bill_amt(unsigned long a)

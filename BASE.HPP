@@ -37,6 +37,15 @@ struct Date{
 	Date(unsigned d, unsigned m, unsigned y);
 };
 
+class system
+{
+    private:
+        system();
+    public:    
+        static Date get_date();
+        static Time get_time();
+};
+
 struct address{
 	str house_no;
 	str street;
@@ -68,8 +77,10 @@ struct medicine{
 struct transaction{
 	float amount;
 	str reason;
-	transaction(float, char*);
-	transaction();
+	Date _date;
+	Time _time;
+	transaction(float, Date, Time, char*);
+//	transaction();
 };
 
 class person{
@@ -87,7 +98,7 @@ class person{
 		//Updating functions
 		void set_name(char*);
 		void set_sex(int);
-		void set_dob(Date);
+		void set_dob(Date, Date);
 		void set_address(address);
 		void set_phone(char*);
 
@@ -100,7 +111,7 @@ class person{
 		phone phone_no;
 
 	private:
-		void calc_age();
+		void calc_age(Date);
 };
 
 class userid

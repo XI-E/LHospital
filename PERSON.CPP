@@ -65,11 +65,8 @@ char* person::get_phone()
 	return phone_no;
 }
 
-void person::calc_age()
+void person::calc_age(Date dnow = system::get_date())
 {
-    time_t t = time(0);
-    struct tm *now = localtime(&t);
-    Date dnow(now->tm_mday, (now->tm_mon + 1) ,(now->tm_year + 1900));
     if(dnow.month > dob.month || dnow.month == dob.month && dnow.day >= dob.day)
     {
         age = dnow.year - dob.year;
@@ -90,10 +87,10 @@ void person::set_sex(int a)
     sex = a;
 }
 
-void person::set_dob(Date a)
+void person::set_dob(Date bday, Date dnow = system::get_date())
 {
-	dob = a;
-	calc_age();
+	dob = bday;
+	calc_age(dnow);
 }
 
 void person::set_address(address a)
@@ -150,6 +147,22 @@ Date::Date(unsigned d, unsigned m, unsigned y)
 		month = 0;
 		year = 0;
 	}
+}
+
+Date system::get_date()
+{
+    time_t t = time(0);
+    struct tm *now = localtime(&t);
+    Date dnow(now->tm_mday, (now->tm_mon + 1) ,(now->tm_year + 1900));
+    return dnow;
+}
+
+Time system::get_time()
+{
+    time_t t = time(0);
+    struct tm *now = localtime(&t);
+    Time tnow(now->tm_hour, now->tm_min ,now->tm_sec);
+    return tnow;
 }
 
 userid::userid(str name ,str plaintext)	//plaintext is the unencrypted password
@@ -215,4 +228,12 @@ int userid::login(char * password)
 		return 1;
 	else
 		return 0;
+}
+
+transaction::transaction(float a = 0, Date d = Date(), Time t = Time(), char * b = "NA")
+{
+	amount = a;
+	strcpy(reason, b);
+	_date = d;
+	_time = t;
 }
