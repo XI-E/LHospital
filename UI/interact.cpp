@@ -61,6 +61,9 @@ int interactive::getkey()
         case 77:    return RIGHT;
         case 15:    if (key_state & 2) return SHIFT_TAB;
         //           ^^ Checks if shift was pressed
+        case 83:    return DELETE;
+        case 71:    return HOME;
+        case 79:    return END;
     }
 
     return -1;

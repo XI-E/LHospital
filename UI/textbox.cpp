@@ -47,11 +47,11 @@ int text_box::input(int a)
 
             switch((int)ch)
             {
-                case interactive::TAB :
-                case interactive::ENTER :
+                case TAB :
+                case ENTER :
                     state_to_return = GOTONEXT;
                     goto convert_to_str;
-                case interactive::BACKSPACE :
+                case BACKSPACE :
                     if(current)
                     {
                         if(!current->prev)  break; //No character to be deleted
@@ -68,6 +68,36 @@ int text_box::input(int a)
                         gotoxy(wherex() - 1, wherey());
 
                         print_str(head);
+                    }
+                    break;
+                case DELETE:
+                    if(current)
+                    {
+                        if(current->data == '\0') break; //No character to be deleted
+
+                        string_node *node_to_delete = current;
+
+                        if(current->prev) current->prev->next = current->next;
+                        else              head = current->next;
+
+                        if(current->next) current->next->prev = current->prev;
+
+                        current = current->next;
+                        delete node_to_delete;
+
+                        print_str(head);
+
+                    }
+                    break;
+                case HOME:
+                    gotoxy(c.x, c.y);
+                    current = head;
+                    break;
+                case END:
+                    while(current->next)
+                    {
+                        current = current->next;
+                        gotoxy(wherex()+1, wherey());
                     }
                     break;
                 case SHIFT_TAB:
