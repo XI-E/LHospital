@@ -83,6 +83,11 @@ struct transaction{
 //	transaction();
 };
 
+struct procedure{
+	str name;
+	float cost;
+};
+
 class person{
 	public:
 		person(str, int, Date, address, phone);	// Explicit constructor
