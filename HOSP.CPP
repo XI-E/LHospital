@@ -1,49 +1,62 @@
-#include <iostream.h>
 #include <fstream.h>
 #include <string.h>
 #include <dir.h>
-#include "base.hpp"
+#include <stdio.h>
 #include "patient.hpp"
 
-//enum access_level {OTHERS, DOCTOR, NURSE, RECEPTIONIST};
+enum emp_type {null, others, doctor, nurse, receptionist};
+
+class id_to_emp
+{
+		unsigned long id;
+		int employee_type;
+	public:
+		id_to_emp(unsigned long, int);
+		id_to_emp();
+		static int convert(unsigned long);
+};
 
 class employee : public person{
+		int generate_id();
+		static int generate_id_status;
 	public:
-	employee(str, int, Date, address, phone, unsigned long, Time, Time, int, str = "", str = "");  //for all those with user accounts(doctors, nurses, receptionists), last 2 arguments are to be provided as well
-	unsigned long get_salary();
-	Time get_shift(int);
-	transaction * get_last_10_transactions();
-	void set_last_10_transactions(transaction *);
-	userid account;
+		employee(str, int, Date, address, phone, unsigned long, Time, Time, str = "", str = "");	//for all those with user accounts(doctors, nurses, receptionists), last 2 arguments are to be provided as well
+		employee();	//default constructor
+		unsigned long get_salary();
+		Time get_shift(int);
+		unsigned long get_id();
+		transaction * get_last_10_transactions();
+		static int get_generate_id_status();
+		userid account;
 	protected:
-		unsigned id;
+		unsigned long id;
 		unsigned long salary;
-		transaction last_10_transactions[10];
 		Time shift_start;
 		Time shift_end;
 };
 
 class doctor : public employee{
 	public:
-	doctor(str, int, Date, address, phone, unsigned long, Time, Time, int, int, int, str, str);
-
+		doctor(str, int, Date, address, phone, unsigned long, Time, Time, int, int, str, str);
+		doctor();	//default constructor
 	private:
 		int speciality[2];				// Doctor's specialization
-		int patient[10];				// Patients currently under care, can take only 10 at once
+		int patients[10];				// Patients currently under care, can take only 10 at once
 };
 
 class nurse : public employee{
 	public:
-	nurse(str, int, Date, address, phone, unsigned long, Time, Time, int, str, str);
-
+		nurse(str, int, Date, address, phone, unsigned long, Time, Time, str, str);
+		nurse();		//default constructor
 	private:
-		int patient[5];
+		int patients[5];
 };
 
 class receptionist : public employee
 {
 	public:
-		receptionist(str, int, Date, address, phone, unsigned long, Time, Time, int, str, str);
+		receptionist(str, int, Date, address, phone, unsigned long, Time, Time, str, str);
+		receptionist();
 //		doctor assign_doctor(patient);
 };
 
@@ -53,7 +66,8 @@ class pharmacy{
 		static void purchase(int, int);
 };
 
-class hospital{
+class hospital
+{
 	public:
 		static float get_bal();
 		static transaction deduct_money(float, char*, Date, Time);
@@ -62,30 +76,147 @@ class hospital{
 		static void read_balance();
 
 		static patient get_patient_by_id(int);
-		static patient write_patient(patient);
+		static void write_patient(patient);
 		static void charge_patient(int, transaction);
+		static void descharge_patient(int);
 
-		static void pay_salary(employee, Date, Time);
-//		static void pay_all_salaries();
+		static int get_employee_by_id(unsigned long, employee &);
+		static int get_employee_by_id(unsigned long, doctor &);
+		static int get_employee_by_id(unsigned long, nurse &);
+		static int get_employee_by_id(unsigned long, receptionist &);
+		static int write_employee(employee);
+		static int write_employee(doctor);
+		static int write_employee(nurse);
+		static int write_employee(receptionist);
+		static int pay_salary(unsigned long, Date, Time);
+		static int pay_all_salaries();
 	private:
 		hospital();
+		static int read_from(unsigned long, char *, int, char *);
 		static double balance;
 
 };
 
 //////////////////////////////////
+/// Function definitions for class id_to_emp
+
+id_to_emp::id_to_emp(unsigned long inp1, int inp2)
+{
+	id = inp1;
+	if(!id)
+	{
+		employee_type = null;
+	}
+	else
+	{
+		employee_type = inp2;
+	}
+	mkdir("employee");
+	ofstream fout;
+	fout.open("employee/id_list.dat", ios::binary | ios::ate);
+	if(!fout)
+	{
+//		cerr<<"File id_list.dat couldn't be opened...";
+	}
+	else
+	{
+		fout.seekp(id * sizeof(id_to_emp), ios::beg);
+		fout.write((char *) this, sizeof(id_to_emp));
+		if(fout.fail())
+		{
+//			cerr<<"Error while writing to id_list.dat";
+		}
+	}
+}
+
+id_to_emp::id_to_emp()
+{
+	id = employee_type = 0;
+}
+
+int id_to_emp::convert(unsigned long ID)
+{
+	id_to_emp a;
+	ifstream fin;
+	fin.open("employee/id_list.dat", ios::binary);
+	if(!fin)
+	{
+//		cerr<<"File id_list.dat not found!!";
+		return null;
+	}
+	fin.seekg( (ID * sizeof(id_to_emp)) );
+	fin.read((char *) &a, sizeof(id_to_emp));
+	if(fin.fail())
+	{
+//		cerr<<"Error while reading from file id_list.dat";
+		return null;
+	}
+	fin.close();
+	if(a.id != ID)
+	{
+//		cerr<<"(For dev only)Error in the code... Recheck it!!";
+		return null;
+	}
+	return a.employee_type;
+}
+
+//////////////////////////////////
 /// Function definitions for class employee
 
-employee::employee(str inp1, int inp2, Date inp3, address inp4, phone inp5, unsigned long inp6, Time inp7, Time inp8, int inp9, str inp10, str inp11) : person(inp1, inp2, inp3, inp4, inp5), account(inp10, inp11)
+int employee::generate_id()
 {
-	salary = inp6;
-	shift_start = inp7;
-	shift_end = inp8;
-	id = inp9;
+	mkdir("employee");
+	unsigned long max_id;
+	ifstream fin;
+	fin.open("employee/max_id.dat", ios::binary);
+	if(!fin)
+		max_id = 0;
+	else
+	{
+		fin.read((char *) &max_id, sizeof(unsigned long));
+		if(fin.fail())
+		{
+//			cerr<<"ERROR WHILE READING FROM FILE!!! ";
+			id = 0;
+			return 0;
+		}
+	}
+	fin.close();
+	++max_id;
+	id = max_id;
+	ofstream fout;
+	fout.open("employee/max_id.dat", ios::binary);
+	fout.write((char *) &max_id, sizeof(unsigned long));
+	if(fout.fail())
+	{
+//		cerr<<"ERROR WHILE WRITING TO FILE!!! ";
+		return 0;
+	}
+	else
+		return 1;
+}
 
-	transaction null;
-	for(int i = 0; i < 10; ++i)
-		 last_10_transactions[i] = null;
+int employee::generate_id_status = 1;
+
+employee::employee(str inp1, int inp2, Date inp3, address inp4, phone inp5, unsigned long inp6, Time inp7, Time inp8, str inp9, str inp10) : person(inp1, inp2, inp3, inp4, inp5), account(inp9, inp10)
+{
+	if(!generate_id_status)
+	{
+//		cerr<<"ID cannot be generated for this employee..";
+	}
+	else
+	{
+		employee::generate_id_status = generate_id();
+		id_to_emp i1(id, others);
+		salary = inp6;
+		shift_start = inp7;
+		shift_end = inp8;
+	}
+}
+
+employee::employee() : person()
+{
+	id = 0;
 }
 
 unsigned long employee::get_salary(){
@@ -103,37 +234,64 @@ Time employee::get_shift(int inp){
 	}
 }
 
-transaction * employee::get_last_10_transactions()
+unsigned long employee::get_id()
 {
-	return last_10_transactions;
+	return id;
 }
 
-void employee::set_last_10_transactions(transaction * t)
+transaction * employee::get_last_10_transactions()
 {
+	transaction t[10];
+	str temp;
+	sprintf(temp, "employee/%d/trans.dat", id);
+	ifstream fin ( temp ,ios::binary | ios::ate );
+	fin.seekg(( (-10) * sizeof(transaction) ), ios::end);
 	for(int i = 0; i < 10; ++i)
-		last_10_transactions[i] = t[i];
+	{
+		fin.read((char *) &t[i], sizeof(transaction));
+	}
+	return t;
 }
+
+int employee::get_generate_id_status()
+{
+	return generate_id_status;
+}
+
 /////////////////////////////////////////
 //// Doctor, Nurse and Receptionist class member defs
 
-doctor::doctor(str inp1, int inp2, Date inp3, address inp4, phone inp5, unsigned long inp6, Time inp7, Time inp8, int inp9, int inp10, int inp11, str inp12, str inp13) : employee(inp1, inp2, inp3, inp4, inp5, inp6, inp7, inp8, inp9, inp12, inp13)
+doctor::doctor(str inp1, int inp2, Date inp3, address inp4, phone inp5, unsigned long inp6, Time inp7, Time inp8, int inp10, int inp11, str inp12, str inp13) : employee(inp1, inp2, inp3, inp4, inp5, inp6, inp7, inp8, inp12, inp13)
 {
+	id_to_emp i1(get_id(), doctor);
 	speciality[0] = inp10;
 	speciality[1] = inp11;
 
 	for(int i = 0; i < 10; i++){
-		patient[i] = 0;
+		patients[i] = 0;
 	}
 }
 
-nurse::nurse(str inp1, int inp2, Date inp3, address inp4, phone inp5, unsigned long inp6, Time inp7, Time inp8, int inp9, str inp10, str inp11) : employee(inp1, inp2, inp3, inp4, inp5, inp6, inp7, inp8, inp9, inp10, inp11)
+doctor::doctor() : employee()
+{}
+
+nurse::nurse(str inp1, int inp2, Date inp3, address inp4, phone inp5, unsigned long inp6, Time inp7, Time inp8, str inp10, str inp11) : employee(inp1, inp2, inp3, inp4, inp5, inp6, inp7, inp8, inp10, inp11)
 {
+	id_to_emp i1(get_id(), nurse);
 	for(int i = 0; i < 5; i++){
-		patient[i] = 0;
+		patients[i] = 0;
 	}
 }
 
-receptionist::receptionist(str inp1, int inp2, Date inp3, address inp4, phone inp5, unsigned long inp6, Time inp7, Time inp8, int inp9, str inp10, str inp11) : employee(inp1, inp2, inp3, inp4, inp5, inp6, inp7, inp8, inp9, inp10, inp11)
+nurse::nurse() : employee()
+{}
+
+receptionist::receptionist(str inp1, int inp2, Date inp3, address inp4, phone inp5, unsigned long inp6, Time inp7, Time inp8, str inp10, str inp11) : employee(inp1, inp2, inp3, inp4, inp5, inp6, inp7, inp8, inp10, inp11)
+{
+	id_to_emp i1(get_id(), receptionist);
+}
+
+receptionist::receptionist() : employee()
 {}
 
 /////////////////////////////////////////
@@ -217,8 +375,8 @@ patient hospital::get_patient_by_id(int id){
 
 void hospital::write_patient(patient a){
 	str temp, temp2;
-	sprintf(temp, "patient/%d/base.dat", a.id);
-	sprintf(temp2, "patient/%d", a.id);
+	sprintf(temp, "patient/%d/base.dat", a.get_id());
+	sprintf(temp2, "patient/%d", a.get_id());
 	mkdir(temp2);
 	ofstream patient_file ( temp , ios::out | ios::binary );
 
@@ -236,7 +394,7 @@ void hospital::charge_patient(int pat_id, transaction trans){
 	patient temp_pat = hospital::get_patient_by_id(pat_id);
 
 	str temp;
-	sprintf(temp, "patient/%d/trans.dat", temp_pat.id);
+	sprintf(temp, "patient/%d/trans.dat", temp_pat.get_id());
 	ofstream patient_file ( temp , ios::out | ios::binary | ios::app );
 	patient_file.write( (char*) &trans , sizeof(transaction) );
 	patient_file.close();
@@ -297,32 +455,223 @@ void hospital::discharge_patient(int pat_id){
 	temp.discharge_date = system::get_date();
 }
 
-void hospital::pay_salary(employee x, Date d1, Time t1)
+int hospital::get_employee_by_id(unsigned long ID, employee &target)
 {
-	 unsigned long inp1 = x.get_salary();
-	 char inp2[100] = "Salary paid to ";
-	 strcat(inp2, x.get_name());
-	 transaction t = hospital::deduct_money(inp1, inp2, d1, t1);
-	 for(int i = 0; i < 10; ++i)
-	 {
-		  if( ( *(x.get_last_10_transactions() + i) ).amount == 0 &&
-			  !strcmp( ( *(x.get_last_10_transactions() + i) ).reason, "NA") &&
-			  ( *(x.get_last_10_transactions() + i) )._date.day == 0 &&
-			  ( *(x.get_last_10_transactions() + i) )._date.month == 0 &&
-			  ( *(x.get_last_10_transactions() + i) )._date.year == 0 &&
-			  ( *(x.get_last_10_transactions() + i) )._time.hour == 0 &&
-			  ( *(x.get_last_10_transactions() + i) )._time.minute == 0 &&
-			  ( *(x.get_last_10_transactions() + i) )._time.second == 0		)
-		  {
-				*(x.get_last_10_transactions() + i) = t;
-				return;
-		  }
-	 }
-	 for(i = 0; i < 10; ++i)
-	 {
-		  *(x.get_last_10_transactions() + i) = *(x.get_last_10_transactions() + i + 1);
-	 }
-	 *(x.get_last_10_transactions() + i) = t;
+	employee null;
+	str temp;
+	sprintf(temp, "employee/%lu/base.dat", ID);
+	int i = hospital::read_from( ID, (char*) &target, sizeof(employee), temp );
+	if(!i)
+	{
+		target = null;
+		return 0;
+	}
+	return 1;
+}
+
+int hospital::get_employee_by_id(unsigned long ID, doctor &target)
+{
+	doctor null;
+	str temp;
+	sprintf(temp, "employee/doctor/%lu/base.dat", ID);
+	int i = hospital::read_from( ID, (char*) &target, sizeof(doctor), temp );
+	if(!i)
+	{
+		target = null;
+		return 0;
+	}
+	return 1;
+}
+
+int hospital::get_employee_by_id(unsigned long ID, nurse &target)
+{
+	nurse null;
+	str temp;
+	sprintf(temp, "employee/nurse/%lu/base.dat", ID);
+	int i = hospital::read_from( ID, (char*) &target, sizeof(nurse), temp );
+	if(!i)
+	{
+		target = null;
+		return 0;
+	}
+	return 1;
+}
+
+int hospital::get_employee_by_id(unsigned long ID, receptionist &target)
+{
+	receptionist null;
+	str temp;
+	sprintf(temp, "employee/receptionist/%lu/base.dat", ID);
+	int i = hospital::read_from( ID, (char*) &target, sizeof(receptionist), temp );
+	if(!i)
+	{
+		target = null;
+		return 0;
+	}
+	return 1;
+}
+
+int hospital::write_employee(employee a)
+{
+	mkdir("employee");
+	str temp;
+	sprintf(temp, "employee/%lu", a.get_id());
+	mkdir(temp);
+	strcat(temp, "/base.dat");
+	ofstream fout ( temp , ios::out | ios::binary);
+	if(!fout)
+	{
+//		cerr<<"Employee data file could not be created or accessed";
+		return 0;
+	}
+	fout.write( (char*) &a , sizeof(employee) );
+	if(fout.fail())
+	{
+//		cerr<<"Error while writing to file";
+		return 0;
+	}
+	return 1;
+}
+
+int hospital::write_employee(doctor a)
+{
+	mkdir("employee");
+	mkdir("employee/doctor");
+	str temp;
+	sprintf(temp, "employee/doctor/%lu", a.get_id());
+	mkdir(temp);
+	strcat(temp, "/base.dat");
+	ofstream fout ( temp , ios::out | ios::binary);
+	if(!fout)
+	{
+//		cerr<<"Employee data file could not be created or accessed";
+		return 0;
+	}
+	fout.write( (char*) &a , sizeof(doctor) );
+	if(fout.fail())
+	{
+//		cerr<<"Error while writing to file";
+		return 0;
+	}
+	return 1;
+}
+
+int hospital::write_employee(nurse a)
+{
+	mkdir("employee");
+	mkdir("employee/nurse");
+	str temp;
+	sprintf(temp, "employee/nurse/%lu", a.get_id());
+	mkdir(temp);
+	strcat(temp, "/base.dat");
+	ofstream fout ( temp , ios::out | ios::binary);
+	if(!fout)
+	{
+//		cerr<<"Employee data file could not be created or accessed";
+		return 0;
+	}
+	fout.write( (char*) &a , sizeof(nurse) );
+	if(fout.fail())
+	{
+//		cerr<<"Error while writing to file";
+		return 0;
+	}
+	return 1;
+}
+
+int hospital::write_employee(receptionist a)
+{
+	mkdir("employee");
+	mkdir("employee/receptionist");
+	str temp;
+	sprintf(temp, "employee/receptionist/%lu", a.get_id());
+	mkdir(temp);
+	strcat(temp, "/base.dat");
+	ofstream fout ( temp , ios::out | ios::binary);
+	if(!fout)
+	{
+//		cerr<<"Employee data file could not be created or accessed";
+		return 0;
+	}
+	fout.write( (char*) &a , sizeof(receptionist) );
+	if(fout.fail())
+	{
+//		cerr<<"Error while writing to file";
+		return 0;
+	}
+	return 1;
+}
+
+int hospital::pay_salary(unsigned long id, Date d1, Time t1)
+{
+	employee x;
+	int i = hospital::get_employee_by_id(id, x);
+	if(!i)
+	{
+//		cerr<<"Employee not found or error while reading file";
+		return 0;
+	}
+	unsigned long inp1 = x.get_salary();
+	char inp2[100] = "Salary paid to ";
+	strcat(inp2, x.get_name());
+	transaction t = hospital::deduct_money(inp1, inp2, d1, t1);
+	
+	str temp;
+	sprintf(temp, "employee/%lu", x.get_id());
+	mkdir(temp);
+	strcat(temp, "/trans.dat");
+	ofstream fout ( temp ,ios::binary | ios::app );
+	if(!fout)
+	{
+//		cerr<<"Employee data file could not be created or accessed";
+		return 0;
+	}
+	fout.write((char *) &t, sizeof(transaction));
+	if(fout.fail())
+	{
+//		cerr<<"Error while writing to file";
+		return 0;
+	}
+	return 1;
+}
+
+int hospital::pay_all_salaries()
+{
+	Date d1;
+	d1 = system::get_date();
+	Time t1;
+	t1 = system::get_time();
+	unsigned long max_id;
+	ifstream fin;
+	fin.open("employee/max_id.dat", ios::binary);
+	if(!fin)
+	{
+//		cerr<<"No employees found or cannot access file";
+		return 0;
+	}
+	else
+	{
+		fin.read((char *) &max_id, sizeof(unsigned long));
+		if(fin.fail())
+		{
+//			cerr<<"Error while reading file!!";
+			return 0;
+		}
+		if(!employee::get_generate_id_status())
+		{
+			++max_id;
+		}
+		for(unsigned long i = 1; i <= max_id; ++i)
+		{
+			int a = hospital::pay_salary(i, d1, t1);
+			if(!a)
+			{
+//				cerr<<"Failed to pay all salaries...";
+				return 0;
+			}
+		}
+	}
+	return 1;
 }
 
 transaction* hospital::get_transaction(){
@@ -378,7 +727,23 @@ int get_date_difference(Date dt1, Date dt2)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 double hospital::balance = 1000.0;
-void main()
+int hospital::read_from(unsigned long ID, char * dest, int size, char * temp)
 {
+	ifstream fin ( temp , ios::in | ios::binary );
+	if(!fin)
+	{
+//		cerr<<"Employee with id "<<ID<<" not found...";
+		return 0;
+	}
+	fin.read( (char*) dest, size );
+	if(fin.fail())
+	{
+//		cerr<<"Error while reading from file";
+		return 0;
+	}
+	fin.close();
 
+	return 1;
 }
+void main()
+{}

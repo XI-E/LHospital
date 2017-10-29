@@ -1,8 +1,9 @@
 #include "patient.hpp"
+#include <fstream.h>
 
 ///////FUNCTION DEFINITIONS FOR CLASS PATIENT/////////
 
-patient::patient(str inp1, int inp2 , Date inp3, address inp4, phone inp5, disease inp6, str inp7, str inp8, phone inp9, insurance inp10, Date inp11) : person(inp1, inp2, inp3, inp4, inp5)    //if date_of_admission is the current system date, last argument is not needed
+patient::patient(str inp1, int inp2 , Date inp3, address inp4, phone inp5, disease inp6, str inp7, str inp8, phone inp9, insurance inp10, Date inp11) : person(inp1, inp2, inp3, inp4, inp5)	//if date_of_admission is the current system date, last argument is not needed
 {
 	fstream pat ("patient/max_id.dat", ios::in | ios::binary | ios::out);
 	long max_id;
@@ -24,9 +25,9 @@ patient::patient(str inp1, int inp2 , Date inp3, address inp4, phone inp5, disea
 	admission_date = inp11;
 	Date dnow = system::get_date();
 
-	if(admission_date.day != dnow.day &&
-	   admission_date.month != dnow.month &&
-	   admission_date.year != dnow.year   )
+	if(	admission_date.day != dnow.day &&
+		admission_date.month != dnow.month &&
+		admission_date.year != dnow.year		)
 
 		set_dob(inp3, inp11);
 
@@ -34,12 +35,18 @@ patient::patient(str inp1, int inp2 , Date inp3, address inp4, phone inp5, disea
 		med[i][1] = med[i][2] = 0;
 	}
 
-	bill_amt = 0;   //bill_amt will be set by doctor after treatment
+	bill_amt = 0;	//bill_amt will be set by doctor after treatment
 	discharged = 0;
 }
 
-patient::patient(){
+patient::patient()
+{
 	id = 0;
+}
+
+long patient::get_id()
+{
+	return id;
 }
 
 disease patient::get_dis()

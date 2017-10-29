@@ -3,7 +3,7 @@
 
 #include <string.h>
 #include <time.h>
-#include <stdlib.h> //for random() and randomize()
+#include <stdlib.h>			//for random() and randomize()
 
 const int K = 14;
 typedef char str[80];
@@ -15,7 +15,7 @@ enum time_type {HOUR, MINUTE, SECOND};
 enum body_parts {BRAIN, HEART, SKIN,
 	LUNG, BONE, EYE,
 	THROAT, TEETH, STOMACH,
-	BLOOD, ASSMAN, GEN}; // GEN for general problems
+	BLOOD, ASSMAN, GEN};	// GEN for general problems
 enum address_parts {HOUSE_NO, STREET, CITY, DISTRICT, STATE};
 enum times_of {START, END};
 
@@ -39,11 +39,11 @@ struct Date{
 
 class system
 {
-    private:
-        system();
-    public:    
-        static Date get_date();
-        static Time get_time();
+	private:
+		system();
+	public:
+		static Date get_date();
+		static Time get_time();
 };
 
 struct address{
@@ -56,8 +56,8 @@ struct address{
 
 struct disease{
 	str name;
-	int type;  		    //refers to body part affected (LUNG, HEART, etc)
-	str symptoms[4];    //symptoms reported by patient
+	int type;			//refers to body part affected (LUNG, HEART, etc)
+	str symptoms[4];	//symptoms reported by patient
 };
 
 struct insurance{
@@ -91,7 +91,7 @@ struct procedure{
 class person{
 	public:
 		person(str, int, Date, address, phone);	// Explicit constructor
-
+		person();
 		// 'Get's
 		char* get_name();
 		int get_age();
@@ -122,14 +122,15 @@ class person{
 class userid
 {
 		str username;
-		str passcipher;             //encrypted password
-		str default_key;            //key for making the vigenere cipher
-		void makecipher(char *);    //makes the vigenere cipher
-		void set_key(char *);       //sets default_key
-		char * decipher();          //deciphers the cipher 'passcipher'
+		str passcipher;				//encrypted password
+		str default_key;			//key for making the vigenere cipher
+		void makecipher(char *);	//makes the vigenere cipher
+		void set_key(char *);		//sets default_key
+		char * decipher();			//deciphers the cipher 'passcipher'
 
 	public:
 		userid(char *, char *);
+		userid();	//default constructor;
 		char * getusername();
 		int login(char *);
 };
