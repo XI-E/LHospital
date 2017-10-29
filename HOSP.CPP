@@ -1,6 +1,7 @@
 #include <iostream.h>
 #include <fstream.h>
 #include <string.h>
+#include <dir.h>
 #include "base.hpp"
 #include "patient.hpp"
 
@@ -201,6 +202,12 @@ patient hospital::get_patient_by_id(int id){
 	sprintf(temp, "patient/%d/base.dat", id);
 	ifstream patient_file ( temp , ios::in | ios::binary );
 
+	if(!patient_file){
+		// pass an error ---------------------------------------------------
+		patient b;
+		return b;
+	}
+
 	patient a;
 	patient_file.read( (char*) &a , sizeof(patient) );
 	patient_file.close();
@@ -209,12 +216,19 @@ patient hospital::get_patient_by_id(int id){
 }
 
 void hospital::write_patient(patient a){
-	str temp;
+	str temp, temp2;
 	sprintf(temp, "patient/%d/base.dat", a.id);
+	sprintf(temp2, "patient/%d", a.id);
+	mkdir(temp2);
 	ofstream patient_file ( temp , ios::out | ios::binary );
 
-	patient a;
-	patient_file.write( (char*) &a , sizeof(patient) );
+	if(patient_file){
+		patient a;
+		patient_file.write( (char*) &a , sizeof(patient) );
+	}
+	if(patient_file.fail()){
+		// pass an error ---------------------------------------------------
+	}
 	patient_file.close();
 }
 
@@ -224,9 +238,63 @@ void hospital::charge_patient(int pat_id, transaction trans){
 	str temp;
 	sprintf(temp, "patient/%d/trans.dat", temp_pat.id);
 	ofstream patient_file ( temp , ios::out | ios::binary | ios::app );
+	patient_file.write( (char*) &trans , sizeof(transaction) );
 	patient_file.close();
 
 	hospital::write_patient(temp_pat);
+}
+
+void hospital::discharge_patient(int pat_id){
+	patient temp = hospital::get_patient_by_id(pat_id);
+
+	if(temp.id == 0){
+		// pass an error ---------------------------------------------------
+	}
+
+	
+	header.clear();
+
+	str temp_string;
+	sprintf(temp_string, "Discharging patient #%d :: %s", temp.id, temp.name);
+	header << ui::centeralign << temp_string;
+
+	str temp_path;
+	sprintf(temp_path, "patient/%d/trans.dat", temp.id);
+	ofstream patient_file ( temp_path , ios::out | ios::binary | ios::app );
+
+	long bal;
+	
+	int i = 1;
+
+	while(!patient_file.eof()){
+		patient_file.read( (char*) &trans , sizeof(transaction) );
+		body.clear();
+		if(trans.amount != 0){
+			str temp_string2;
+			sprintf(temp_string2, "$%d", trans.amount);
+			body << ui::leftalign << i << ". " << trans.reason << ui::rightalign << temp_string2;
+		}
+		bal += trans.amount;
+	}
+
+	i++;
+	
+	int stay_length = get_date_difference(temp.admission_date, temp.discharge_date)
+	float stay_charge = 200 * (stay_length);
+
+	str temp_string3;
+	sprintf(temp_string2\3, "$%d", stay_charge);
+	body << ui::leftalign << i << ". " << "Stay for " << stay_length << " days" << ui::rightalign << temp_string3;
+
+
+	body << ui::endl << ui::rightalign << "Final amount : $" << bal;
+
+	if(patient_file.fail()){
+		// pass an error ---------------------------------------------------
+	}
+
+	temp.discharged = 1;
+	temp.discharge_date = system::get_date();
 }
 
 void hospital::pay_salary(employee x, Date d1, Time t1)
@@ -272,9 +340,45 @@ transaction* hospital::get_transaction(){
 	return a;
 }
 
+const int monthDays[12] = {31, 28, 31, 30, 31, 30,
+	31, 31, 30, 31, 30, 31};
+
+int count_leap_years(Date d)
+{
+	int years = d.year;
+
+	if (d.month <= 2){
+		years--;		// checking whether to count the current year
+	}
+
+	return (years / 4) - (years / 100) + (years / 400);
+}
+
+int get_date_difference(Date dt1, Date dt2)
+{
+
+	long int n1 = dt1.year*365 + dt1.day;
+
+	for (int i=0; i<dt1.month - 1; i++){
+		n1 += monthDays[i];
+	}
+	n1 += count_leap_years(dt1);
+		
+	long int n2 = dt2.year*365 + dt2.day;
+	
+	for (int i=0; i<dt2.month - 1; i++){
+			n2 += monthDays[i];
+	}
+	n2 += count_leap_years(dt2);
+
+	return (n2 - n1);
+}
+
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 double hospital::balance = 1000.0;
 void main()
-{}
+{
+
+}

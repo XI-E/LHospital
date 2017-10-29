@@ -16,6 +16,8 @@ class patient : public person
 		insurance insur_info;
 		Date admission_date;
 		unsigned long bill_amt;
+		int discharged;
+		Date discharge_date;
 	public:
         patient(str, int, Date, address, phone, disease, str, str, phone, insurance, Date = system::get_date()); //if date_of_admission is the current system date, last argument is not needed
 		patient();	// Default constructor
