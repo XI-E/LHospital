@@ -3,8 +3,9 @@
 #include <dir.h>
 #include <stdio.h>
 #include "patient.hpp"
+#include "ui/ui.hpp"
 
-enum emp_type {null, others, doctor, nurse, receptionist};
+enum emp_type {INVALID, OTHERS, DOCTOR, NURSE, RECEPTIONIST};
 
 class id_to_emp
 {
@@ -78,7 +79,7 @@ class hospital
 		static patient get_patient_by_id(int);
 		static void write_patient(patient);
 		static void charge_patient(int, transaction);
-		static void descharge_patient(int);
+		static void discharge_patient(int);
 
 		static int get_employee_by_id(unsigned long, employee &);
 		static int get_employee_by_id(unsigned long, doctor &);
@@ -105,7 +106,7 @@ id_to_emp::id_to_emp(unsigned long inp1, int inp2)
 	id = inp1;
 	if(!id)
 	{
-		employee_type = null;
+		employee_type = INVALID;
 	}
 	else
 	{
@@ -142,20 +143,20 @@ int id_to_emp::convert(unsigned long ID)
 	if(!fin)
 	{
 //		cerr<<"File id_list.dat not found!!";
-		return null;
+		return INVALID;
 	}
 	fin.seekg( (ID * sizeof(id_to_emp)) );
 	fin.read((char *) &a, sizeof(id_to_emp));
 	if(fin.fail())
 	{
 //		cerr<<"Error while reading from file id_list.dat";
-		return null;
+		return INVALID;
 	}
 	fin.close();
 	if(a.id != ID)
 	{
 //		cerr<<"(For dev only)Error in the code... Recheck it!!";
-		return null;
+		return INVALID;
 	}
 	return a.employee_type;
 }
@@ -207,7 +208,7 @@ employee::employee(str inp1, int inp2, Date inp3, address inp4, phone inp5, unsi
 	else
 	{
 		employee::generate_id_status = generate_id();
-		id_to_emp i1(id, others);
+		id_to_emp i1(id, OTHERS);
 		salary = inp6;
 		shift_start = inp7;
 		shift_end = inp8;
@@ -263,7 +264,7 @@ int employee::get_generate_id_status()
 
 doctor::doctor(str inp1, int inp2, Date inp3, address inp4, phone inp5, unsigned long inp6, Time inp7, Time inp8, int inp10, int inp11, str inp12, str inp13) : employee(inp1, inp2, inp3, inp4, inp5, inp6, inp7, inp8, inp12, inp13)
 {
-	id_to_emp i1(get_id(), doctor);
+	id_to_emp i1(get_id(), DOCTOR);
 	speciality[0] = inp10;
 	speciality[1] = inp11;
 
@@ -277,7 +278,7 @@ doctor::doctor() : employee()
 
 nurse::nurse(str inp1, int inp2, Date inp3, address inp4, phone inp5, unsigned long inp6, Time inp7, Time inp8, str inp10, str inp11) : employee(inp1, inp2, inp3, inp4, inp5, inp6, inp7, inp8, inp10, inp11)
 {
-	id_to_emp i1(get_id(), nurse);
+	id_to_emp i1(get_id(), NURSE);
 	for(int i = 0; i < 5; i++){
 		patients[i] = 0;
 	}
@@ -288,7 +289,7 @@ nurse::nurse() : employee()
 
 receptionist::receptionist(str inp1, int inp2, Date inp3, address inp4, phone inp5, unsigned long inp6, Time inp7, Time inp8, str inp10, str inp11) : employee(inp1, inp2, inp3, inp4, inp5, inp6, inp7, inp8, inp10, inp11)
 {
-	id_to_emp i1(get_id(), receptionist);
+	id_to_emp i1(get_id(), RECEPTIONIST);
 }
 
 receptionist::receptionist() : employee()
@@ -405,23 +406,23 @@ void hospital::charge_patient(int pat_id, transaction trans){
 void hospital::discharge_patient(int pat_id){
 	patient temp = hospital::get_patient_by_id(pat_id);
 
-	if(temp.id == 0){
+	if(temp.get_id() == 0){
 		// pass an error ---------------------------------------------------
 	}
 
-	
+
 	header.clear();
 
 	str temp_string;
-	sprintf(temp_string, "Discharging patient #%d :: %s", temp.id, temp.name);
+	sprintf(temp_string, "Discharging patient #%d :: %s", temp.get_id(), temp.get_name());
 	header << ui::centeralign << temp_string;
 
 	str temp_path;
-	sprintf(temp_path, "patient/%d/trans.dat", temp.id);
+	sprintf(temp_path, "patient/%d/trans.dat", temp.get_id());
 	ofstream patient_file ( temp_path , ios::out | ios::binary | ios::app );
 
 	long bal;
-	
+
 	int i = 1;
 
 	while(!patient_file.eof()){
@@ -715,7 +716,7 @@ int get_date_difference(Date dt1, Date dt2)
 		
 	long int n2 = dt2.year*365 + dt2.day;
 	
-	for (int i=0; i<dt2.month - 1; i++){
+	for (i=0; i<dt2.month - 1; i++){
 			n2 += monthDays[i];
 	}
 	n2 += count_leap_years(dt2);
