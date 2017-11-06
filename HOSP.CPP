@@ -91,6 +91,10 @@ class hospital
 		static int write_employee(receptionist);
 		static int pay_salary(unsigned long, Date, Time);
 		static int pay_all_salaries();
+
+		static int get_date_difference(Date, Date);
+		static int count_leap_years(Date);
+
 	private:
 		hospital();
 		static int read_from(unsigned long, char *, int, char *);
@@ -411,49 +415,57 @@ void hospital::discharge_patient(int pat_id){
 	}
 
 
-	header.clear();
+	//header.clear();
 
 	str temp_string;
 	sprintf(temp_string, "Discharging patient #%d :: %s", temp.get_id(), temp.get_name());
-	header << ui::centeralign << temp_string;
+	//header << ui::centeralign << temp_string;
 
 	str temp_path;
 	sprintf(temp_path, "patient/%d/trans.dat", temp.get_id());
-	ofstream patient_file ( temp_path , ios::out | ios::binary | ios::app );
+	ifstream patient_file ( temp_path , ios::in | ios::binary);
 
 	long bal;
 
 	int i = 1;
 
+	transaction trans;
+
 	while(!patient_file.eof()){
 		patient_file.read( (char*) &trans , sizeof(transaction) );
-		body.clear();
+		//body.clear();
 		if(trans.amount != 0){
 			str temp_string2;
 			sprintf(temp_string2, "$%d", trans.amount);
-			body << ui::leftalign << i << ". " << trans.reason << ui::rightalign << temp_string2;
+		//	body << ui::leftalign << i << ". " << trans.reason << ui::rightalign << temp_string2;
 		}
 		bal += trans.amount;
 	}
 
 	i++;
-	
-	int stay_length = get_date_difference(temp.admission_date, temp.discharge_date)
+
+	Date adm_date = Date(temp.get_admission_date(DAY),
+			     temp.get_admission_date(MONTH),
+			     temp.get_admission_date(YEAR) );
+
+	int stay_length = hospital::get_date_difference(adm_date, system::get_date() );
 	float stay_charge = 200 * (stay_length);
 
 	str temp_string3;
-	sprintf(temp_string2\3, "$%d", stay_charge);
-	body << ui::leftalign << i << ". " << "Stay for " << stay_length << " days" << ui::rightalign << temp_string3;
+	sprintf(temp_string3, "$%d", stay_charge);
+	//body << ui::leftalign << i << ". " << "Stay for " << stay_length << " days" << ui::rightalign << temp_string3;
 
 
-	body << ui::endl << ui::rightalign << "Final amount : $" << bal;
+	//body << ui::endl << ui::rightalign << "Final amount : $" << bal;
 
 	if(patient_file.fail()){
 		// pass an error ---------------------------------------------------
 	}
 
-	temp.discharged = 1;
-	temp.discharge_date = system::get_date();
+	temp.discharge();
+	temp.set_discharge_date( system::get_date() );
+
+	hospital::write_patient(temp);
 }
 
 int hospital::get_employee_by_id(unsigned long ID, employee &target)
@@ -616,7 +628,7 @@ int hospital::pay_salary(unsigned long id, Date d1, Time t1)
 	char inp2[100] = "Salary paid to ";
 	strcat(inp2, x.get_name());
 	transaction t = hospital::deduct_money(inp1, inp2, d1, t1);
-	
+
 	str temp;
 	sprintf(temp, "employee/%lu", x.get_id());
 	mkdir(temp);
@@ -693,7 +705,7 @@ transaction* hospital::get_transaction(){
 const int monthDays[12] = {31, 28, 31, 30, 31, 30,
 	31, 31, 30, 31, 30, 31};
 
-int count_leap_years(Date d)
+int hospital::count_leap_years(Date d)
 {
 	int years = d.year;
 
@@ -704,7 +716,7 @@ int count_leap_years(Date d)
 	return (years / 4) - (years / 100) + (years / 400);
 }
 
-int get_date_difference(Date dt1, Date dt2)
+int hospital::get_date_difference(Date dt1, Date dt2)
 {
 
 	long int n1 = dt1.year*365 + dt1.day;
@@ -712,10 +724,10 @@ int get_date_difference(Date dt1, Date dt2)
 	for (int i=0; i<dt1.month - 1; i++){
 		n1 += monthDays[i];
 	}
-	n1 += count_leap_years(dt1);
-		
+	n1 += hospital::count_leap_years(dt1);
+
 	long int n2 = dt2.year*365 + dt2.day;
-	
+
 	for (i=0; i<dt2.month - 1; i++){
 			n2 += monthDays[i];
 	}

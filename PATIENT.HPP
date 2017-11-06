@@ -31,6 +31,7 @@ class patient : public person
 		int get_admission_date(int);
 		unsigned long get_bill_amt();
 		int get_med(int, int);
+		int get_discharge_date(int);
 
 		//updating functions
 		void set_dis(disease);
@@ -41,6 +42,8 @@ class patient : public person
 		void set_admission_date(Date);
 		void set_bill_amt(unsigned long);
 		void set_med(int, int, int);
+		void set_discharge_date(Date);
+		void discharge();
 };
 
 #endif

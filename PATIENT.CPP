@@ -89,6 +89,21 @@ int patient::get_admission_date(int inp)
 	}
 }
 
+int patient::get_discharge_date(int inp)
+{
+	switch(inp)
+	{
+		case DAY:
+			return discharge_date.day;
+		case MONTH:
+			return discharge_date.month;
+		case YEAR:
+			return discharge_date.year;
+		default:
+			return 0;
+	}
+}
+
 unsigned long patient::get_bill_amt()
 {
 	return bill_amt;
@@ -137,4 +152,12 @@ void patient::set_bill_amt(unsigned long a)
 void patient::set_med(int a, int b, int c){
 	med[a][0] = b;
 	med[a][1] = c;
+}
+
+void patient::set_discharge_date(Date inp){
+	discharge_date = inp;
+}
+
+void patient::discharge(){
+	discharged = 1;
 }
