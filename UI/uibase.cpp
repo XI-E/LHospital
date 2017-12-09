@@ -31,8 +31,6 @@ manipulator ui::endl,
 			ui::centeralign,
 			ui::rightalign;
 
-init_lib_ui init_obj_ui;
-
 void ui::init()
 {
 	ui::clrscr();

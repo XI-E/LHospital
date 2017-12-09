@@ -16,6 +16,8 @@ class init_lib_ui
 		init_lib_ui();
 };
 
+static init_lib_ui init_obj_ui;
+
 class manipulator
 {
 	static int index;
@@ -334,6 +336,7 @@ struct line
 	line();
 	void display();
 	void hide();
+	void clear();
 
 	private:
 		void print(int);

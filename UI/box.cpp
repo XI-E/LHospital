@@ -71,6 +71,13 @@ void line::hide()
     print(0);
 }
 
+void line::clear()
+{
+    strcpy(left, "");
+    strcpy(middle, "");
+    strcpy(right, "");
+}
+
 void line::print(int mode)
 {
     coord curr_pos = coord(wherex(), wherey()),
