@@ -73,9 +73,11 @@ void line::hide()
 
 void line::clear()
 {
+    hide();
     strcpy(left, "");
     strcpy(middle, "");
     strcpy(right, "");
+    display();
 }
 
 void line::print(int mode)
