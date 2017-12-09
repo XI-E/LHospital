@@ -32,7 +32,7 @@ patient::patient(str inp1, int inp2 , Date inp3, address inp4, phone inp5, disea
 		set_dob(inp3, inp11);
 
 	for(int i = 0; i < 50; i++){
-		med[i][1] = med[i][2] = 0;
+		med[i][0] = med[i][1] = 0;
 	}
 
 	bill_amt = 0;	//bill_amt will be set by doctor after treatment

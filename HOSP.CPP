@@ -81,6 +81,8 @@ class hospital
 		static void charge_patient(int, transaction);
 		static void discharge_patient(int);
 
+		static medicine get_med_by_code(int);
+
 		static int get_employee_by_id(unsigned long, employee &);
 		static int get_employee_by_id(unsigned long, doctor &);
 		static int get_employee_by_id(unsigned long, nurse &);
@@ -100,6 +102,21 @@ class hospital
 		static int read_from(unsigned long, char *, int, char *);
 		static double balance;
 
+};
+
+static class interface{
+	public:
+		static void interface_init();
+		static int menu();
+		static void patient_management();
+		static void employee_management();
+		static void stock_management();
+
+		static void error(char*);
+		static void clear_error();
+
+	private:
+		interface();
 };
 
 //////////////////////////////////
@@ -468,6 +485,33 @@ void hospital::discharge_patient(int pat_id){
 	hospital::write_patient(temp);
 }
 
+medicine get_med_by_code(int inp_code){
+	fstream meds ("hospital/medicine.dat", ios::in | ios::binary);
+
+	medicine temp;
+	
+	if(inp_code < 1 || inp_code > 100){
+		temp.code = 0;
+		temp.price = 0;
+		temp.dosage = 0;
+		temp.stock = 0;
+		strcpy(temp.name, "Shell Medicine");
+
+		interface::error("Invalid medicine code!!");
+
+		return temp;
+	}
+
+	for(int i = 0; i<100; i++){
+		meds.read((char*) &temp, sizeof(medicine));
+		if(temp.code == inp_code){
+			break;
+		}
+	}
+
+	return temp;
+}
+
 int hospital::get_employee_by_id(unsigned long ID, employee &target)
 {
 	employee null;
@@ -702,6 +746,25 @@ transaction* hospital::get_transaction(){
 	return a;
 }
 
+int hospital::read_from(unsigned long ID, char * dest, int size, char * temp)
+{
+	ifstream fin ( temp , ios::in | ios::binary );
+	if(!fin)
+	{
+//		cerr<<"Employee with id "<<ID<<" not found...";
+		return 0;
+	}
+	fin.read( (char*) dest, size );
+	if(fin.fail())
+	{
+//		cerr<<"Error while reading from file";
+		return 0;
+	}
+	fin.close();
+
+	return 1;
+}
+
 const int monthDays[12] = {31, 28, 31, 30, 31, 30,
 	31, 31, 30, 31, 30, 31};
 
@@ -736,27 +799,279 @@ int hospital::get_date_difference(Date dt1, Date dt2)
 	return (n2 - n1);
 }
 
-////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
-double hospital::balance = 1000.0;
-int hospital::read_from(unsigned long ID, char * dest, int size, char * temp)
-{
-	ifstream fin ( temp , ios::in | ios::binary );
-	if(!fin)
-	{
-//		cerr<<"Employee with id "<<ID<<" not found...";
-		return 0;
-	}
-	fin.read( (char*) dest, size );
-	if(fin.fail())
-	{
-//		cerr<<"Error while reading from file";
-		return 0;
-	}
-	fin.close();
+////////////////////////////////////////////
+//////// Function definitions for interface
 
-	return 1;
+void interface::interface_init(){
+	box window;
+	window.settcolor(WHITE);
+	window << ui::centeralign << "LHOSPITAL";
+	window.settcolor(ui::tcolor);
+	window.setfooter_tcolor(GREEN);
+
+	Date current_date = system::get_date();
+	Time current_time = system::get_time();
+
+	window << box::setheader << current_date.day << "/" << current_date.month
+		   << "/" << current_date.year
+		   << box::setheader << ui::rightalign << current_time.hour << ":"
+		   << current_time.minute << ":" << current_time.second;
+		   << box::setfooter << ui::centeralign
+		   << "Everything looks OK";
+
+	int choice = 0;
+
+	while(choice < 1 || choice > 3){
+		choice = interface::menu();
+		if(choice < 1 || choice > 3){
+			interface::error("Invalid choice!!");
+		}
+		else{
+			interface::clear_error();
+		}
+	}
+
+	switch(choice){
+		case 1:
+			interface::patient_management();
+			break;
+		case 2:
+			interface::employee_management();
+			break;
+		case 3:
+			interface::stock_management();
+			break;
+	}
+
 }
+
+int interface::menu(){
+	coord c(ui::scr_width / 3, ui::scr_height / 3);
+	box menu (c, ui::scr_width / 3, ui::scr_height / 2.2);
+
+	int ch;
+
+	menu << "1. Patient management"
+			<< ui::endl << "2. Employee management"
+			<< ui::endl << "3. Stock management"
+			<< ui::endl << ui::endl << "Choice : ";
+	menu.setdefault(1);
+	menu.settcolor_input(YELLOW);
+	menu >> ch;
+
+	menu << ui::endl;
+	menu.setexit_button("Submit");
+
+	menu.loop();
+	menu.hide();
+
+	return ch;
+}
+
+void interface::patient_management(){}
+
+void interface::employee_management(){}
+
+void interface::stock_management(){
+	coord c(ui::scr_width / 3, ui::scr_height / 3);
+	box menu (c, ui::scr_width / 3, ui::scr_height / 2.2);
+
+	int ch = 0;
+
+	while (ch < 1 || ch > 3){
+		menu << "1. Sale"
+				<< ui::endl << "2. Purchase"
+				<< ui::endl << "3. Stock check"
+				<< ui::endl << ui::endl << "Choice : ";
+		menu.setdefault(1);
+		menu.settcolor_input(YELLOW);
+		menu >> ch;
+
+		menu << ui::endl;
+		menu.setexit_button("Submit");
+
+		menu.loop();
+		menu.hide();
+
+		interface::error("Invalid choice!!");
+	}
+
+	interface::clear_error();
+
+	switch(ch){
+		case 1:
+
+			medicine temp;
+			temp.code = 0;
+
+			while(temp.code == 0){
+				coord c(ui::scr_width / 3, ui::scr_height / 3);
+				box sale_menu (c, ui::scr_width / 3, ui::scr_height / 3);
+				sale_menu.settcolor_input(YELLOW);
+				sale_menu << ui::centeralign << "Medicine Sale";
+				sale_menu << ui::leftalign << "Code : ";
+				sale_menu.setdefault(42);
+				sale_menu >> med_code;
+				sale_menu << ui::endl;
+				sale_menu.setexit_button("Submit");
+				sale_menu.loop();
+				sale_menu.hide();
+
+				temp = get_med_by_code(med_code);
+			}
+			
+			int quantity = -2;
+			patient temp_patient;
+
+			while(quantity < 0 || quantity > 100){
+				coord c(ui::scr_width / 3, ui::scr_height / 3);
+				box sale_menu (c, ui::scr_width / 3, ui::scr_height / 2);
+				sale_menu.settcolor_input(YELLOW);
+				sale_menu << ui::centeralign << "Medicine Sale";
+				sale_menu << ui::leftalign << "Name : " << temp.name
+							<< ui::endl << "Price : $" << temp.price
+							<< ui::endl << ui::endl
+							<< "Patient ID : ";
+				sale_menu.setdefault(786);
+				sale_menu >> pat_id;
+				sale_menu << ui::endl << "Quantity : ";
+				sale_menu.setdefault(1);
+				sale_menu >> quantity;
+				sale_menu.setexit_button("Submit");
+				sale_menu.loop();
+				sale_menu.hide();
+
+				temp_patient = hospital::get_patient_by_id(pat_id);
+				if(temp_patient.get_id() == 0){
+					quantity = -1;
+					interface::error("Invalid patient ID!!");
+					continue;
+				}
+				interface::error("Invalid quantity!!");
+			}
+
+			interface::clear_error();
+
+			temp.stock -= quantity;
+
+			for(int i = 0; i < 50; i++){
+				if(temp_patient.get_med(i, 0) == temp.code ||
+						temp_patient.get_med(i,0) == 0){
+							temp_patient.set_med(i, temp.code, temp.get_med(i, 1) + quantity);
+						}
+			}
+
+			hospital::write_patient(temp_patient);		
+			hospital::write_med(temp);
+
+			break;
+
+		case 2:
+			
+			medicine temp;
+			temp.code = 0;
+
+			while(temp.code == 0){
+				coord c(ui::scr_width / 3, ui::scr_height / 3);
+				box purchase_menu (c, ui::scr_width / 3, ui::scr_height / 3);
+				purchase_menu.settcolor_input(YELLOW);
+				purchase_menu << ui::centeralign << "Medicine Purchase";
+				purchase_menu << ui::leftalign << "Code : ";
+				purchase_menu.setdefault(42);
+				purchase_menu >> med_code;
+				purchase_menu << ui::endl;
+				purchase_menu.setexit_button("Submit");
+				purchase_menu.loop();
+				purchase_menu.hide();
+
+				temp = get_med_by_code(med_code);
+			}
+
+			int quantity;
+
+			while(quantity < 0 || quantity > 5000){
+				coord c(ui::scr_width / 3, ui::scr_height / 3);
+				box purchase_menu (c, ui::scr_width / 3, ui::scr_height / 2);
+				purchase_menu.settcolor_input(YELLOW);
+				purchase_menu << ui::centeralign << "Medicine Sale";
+				purchase_menu << ui::leftalign << "Name : " << temp.name
+							<< ui::endl << "Price : $" << temp.price
+							<< ui::endl << ui::endl << "Quantity : ";
+				purchase_menu.setdefault(1);
+				purchase_menu >> quantity;
+				purchase_menu.setexit_button("Submit");
+				purchase_menu.loop();
+				purchase_menu.hide();
+
+				interface::error("Invalid quantity!!");
+			}
+
+			interface::clear_error();
+
+			temp.stock += quantity;
+			hospital::deduct_money(temp.price * quantity, "Medicine purchase", system::get_date(), system::get_time());
+			hospital::write_med(temp);
+
+		case 3:
+		
+			medicine temp;
+			temp.code = 0;
+
+			while(temp.code == 0){
+				coord c(ui::scr_width / 3, ui::scr_height / 3);
+				box stock_menu (c, ui::scr_width / 3, ui::scr_height / 3);
+				stock_menu.settcolor_input(YELLOW);
+				stock_menu << ui::centeralign << "Medicine Sale";
+				stock_menu << ui::leftalign << "Code : ";
+				stock_menu.setdefault(42);
+				stock_menu >> med_code;
+				stock_menu << ui::endl;
+				stock_menu.setexit_button("Submit");
+				stock_menu.loop();
+				stock_menu.hide();
+
+				temp = get_med_by_code(med_code);
+			}
+
+			coord c(ui::scr_width / 3, ui::scr_height / 3);
+			box stock_menu (c, ui::scr_width / 3, ui::scr_height / 2);
+			stock_menu.settcolor_input(YELLOW);
+			stock_menu << ui::centeralign << "Medicine Details";
+			stock_menu << ui::leftalign << "Name : " << temp.name
+						<< ui::endl << "Price : $" << temp.price
+						<< ui::endl << "Dosage : " << temp.dosage << " ml"
+						<< ui::endl << "Quantity in stock : " << temp.stock
+						<< ui::endl;
+			stock_menu.setexit_button("Okay");
+			stock_menu.loop();
+			stock_menu.hide();
+		}
+	}
+
+}
+
+void interface::error(char* err){
+	window.setfooter_tcolor(RED);
+	window << box::setfooter << ui::centeralign
+		<< err;
+}
+
+void interface::clear_error(){
+	window.setfooter_tcolor(GREEN);
+	window << box::setfooter << ui::centeralign
+		<< "Everything looks OK";
+}
+
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+
+double hospital::balance = 1000.0;
+
 void main()
-{}
+{
+	clrscr();
+		ui::init();
+		interface::interface_init();
+	getch();
+}

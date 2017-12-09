@@ -3,12 +3,12 @@
 #include "ui/ui.hpp"
 #include "ui/test.hpp"
 
-void main()
+/*void main()
 {
 	test_all();
 
 	getch();
-}
+} */
 
 void test_all()
 {
@@ -31,7 +31,7 @@ void test_all()
 		   << "Everything looks OK";
 
 	window << "Fill the following form: " << ui::endl;
-	
+
 	coord c(ui::scr_width/4, ui::scr_height/3);
 	box b(c, ui::scr_width / 3, 10);
 
@@ -40,12 +40,12 @@ void test_all()
 	  << "Name: "; b >> name;
 	b << "Age: "; b >> age;
 	b << "Phone num: "; b >> phn;
-	b << "Date: "; 
+	b << "Date: ";
 	b.setdefault("27/10/2017");
 	b >> date;
 	b << "Amount: "; b >> amt;
 	b << "Password: "; b >> box::setpassword >> pwd;
-	
+
 	b.f.setvisibility_mode(frame::nosides);
 
 	b.f.display();
@@ -69,9 +69,9 @@ void test_listlayout()
 	list_layout l;
 	l.setpos(coord(2,1));
 	l.setheight(6);
-	
+
 	interactive *list[10];
-	
+
 	//Setting the text boxes
 	for(int i = 0; i < 9; i++)
 	{
@@ -196,5 +196,5 @@ void test_frame()
 	f.setcorner_top_left(coord( (ui::scr_width-f.getwidth()) / 2, (ui::scr_height-f.getheight()) / 2));
 	getch();
 
-	f.setvisibility_mode(frame::nosides);	
+	f.setvisibility_mode(frame::nosides);
 }
