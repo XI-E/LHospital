@@ -444,6 +444,8 @@ class box
 
 		void setheader_tcolor(int);
 		void setfooter_tcolor(int);
+		void clear_header();
+		void clear_footer();
 };
 
 #endif /* UI_HPP */

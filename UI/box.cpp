@@ -775,3 +775,13 @@ void box::setfooter_tcolor(int c)
 {
     footer.tcolor = c;
 }
+
+void box::clear_header()
+{
+    header.clear();
+}
+
+void box::clear_footer()
+{
+    footer.clear();
+}
