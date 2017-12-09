@@ -107,6 +107,7 @@ class hospital
 static class interface{
 	public:
 		static void interface_init();
+		static int login_screen();
 		static int menu();
 		static void patient_management();
 		static void employee_management();
@@ -843,6 +844,34 @@ void interface::interface_init(){
 			break;
 	}
 
+}
+
+int interface::login_screen(){
+	coord c(ui::scr_width / 3, ui::scr_height / 3);
+	box login_box (c, ui::scr_width / 3, ui::scr_height / 2);
+
+	long id, pwd;
+	int auth = 0;
+
+	while(auth == 0){
+		login_box.settcolor_input(YELLOW);
+		login_box << "User ID : ";
+		login_box >> id;
+		login_box << ui::endl << "Password : ";
+		login_box >> box::setpassword >> pwd;
+
+		login_box.setexit_button("Login");
+		login_box.loop();
+		login_box.hide();
+
+		if(1=1){
+			auth++;
+			break;
+		}
+		interface::error("Invalid login details!!");
+	}
+	interface::clear_error();
+	return 1;
 }
 
 int interface::menu(){
