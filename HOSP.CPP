@@ -117,6 +117,7 @@ static class interface{
 
 	private:
 		interface();
+		static box window;
 };
 
 //////////////////////////////////
@@ -454,7 +455,7 @@ void hospital::discharge_patient(int pat_id){
 		if(trans.amount != 0){
 			str temp_string2;
 			sprintf(temp_string2, "$%d", trans.amount);
-		//	body << ui::leftalign << i << ". " << trans.reason << ui::rightalign << temp_string2;
+		//	body << i << ". " << trans.reason << ui::rightalign << temp_string2;
 		}
 		bal += trans.amount;
 	}
@@ -470,7 +471,7 @@ void hospital::discharge_patient(int pat_id){
 
 	str temp_string3;
 	sprintf(temp_string3, "$%d", stay_charge);
-	//body << ui::leftalign << i << ". " << "Stay for " << stay_length << " days" << ui::rightalign << temp_string3;
+	//body << i << ". " << "Stay for " << stay_length << " days" << ui::rightalign << temp_string3;
 
 
 	//body << ui::endl << ui::rightalign << "Final amount : $" << bal;
@@ -803,7 +804,6 @@ int hospital::get_date_difference(Date dt1, Date dt2)
 //////// Function definitions for interface
 
 void interface::interface_init(){
-	box window;
 	window.settcolor(WHITE);
 	window << ui::centeralign << "LHOSPITAL";
 	window.settcolor(ui::tcolor);
@@ -812,10 +812,10 @@ void interface::interface_init(){
 	Date current_date = system::get_date();
 	Time current_time = system::get_time();
 
-	window << box::setheader << current_date.day << "/" << current_date.month
-		   << "/" << current_date.year
-		   << box::setheader << ui::rightalign << current_time.hour << ":"
-		   << current_time.minute << ":" << current_time.second;
+	window << box::setheader << (int) current_date.day << "/" << (int) current_date.month
+		   << "/" << (int) current_date.year
+		   << box::setheader << ui::rightalign << (int) current_time.hour << ":"
+		   << (int) current_time.minute << ":" << (int) current_time.second
 		   << box::setfooter << ui::centeralign
 		   << "Everything looks OK";
 
@@ -900,6 +900,7 @@ void interface::stock_management(){
 
 	switch(ch){
 		case 1:
+		{
 
 			medicine temp;
 			temp.code = 0;
@@ -909,26 +910,27 @@ void interface::stock_management(){
 				box sale_menu (c, ui::scr_width / 3, ui::scr_height / 3);
 				sale_menu.settcolor_input(YELLOW);
 				sale_menu << ui::centeralign << "Medicine Sale";
-				sale_menu << ui::leftalign << "Code : ";
+				sale_menu << "Code : ";
 				sale_menu.setdefault(42);
-				sale_menu >> med_code;
+				sale_menu >> temp.code;
 				sale_menu << ui::endl;
 				sale_menu.setexit_button("Submit");
 				sale_menu.loop();
 				sale_menu.hide();
 
-				temp = get_med_by_code(med_code);
+				temp = get_med_by_code(temp.code);
 			}
 			
 			int quantity = -2;
 			patient temp_patient;
+			long pat_id;
 
 			while(quantity < 0 || quantity > 100){
 				coord c(ui::scr_width / 3, ui::scr_height / 3);
 				box sale_menu (c, ui::scr_width / 3, ui::scr_height / 2);
 				sale_menu.settcolor_input(YELLOW);
 				sale_menu << ui::centeralign << "Medicine Sale";
-				sale_menu << ui::leftalign << "Name : " << temp.name
+				sale_menu << "Name : " << temp.name
 							<< ui::endl << "Price : $" << temp.price
 							<< ui::endl << ui::endl
 							<< "Patient ID : ";
@@ -957,17 +959,18 @@ void interface::stock_management(){
 			for(int i = 0; i < 50; i++){
 				if(temp_patient.get_med(i, 0) == temp.code ||
 						temp_patient.get_med(i,0) == 0){
-							temp_patient.set_med(i, temp.code, temp.get_med(i, 1) + quantity);
+							temp_patient.set_med(i, temp.code, temp_patient.get_med(i, 1) + quantity);
 						}
 			}
 
 			hospital::write_patient(temp_patient);		
-			hospital::write_med(temp);
+			//hospital::write_med(temp);
 
 			break;
+		}
 
 		case 2:
-			
+		{
 			medicine temp;
 			temp.code = 0;
 
@@ -976,15 +979,15 @@ void interface::stock_management(){
 				box purchase_menu (c, ui::scr_width / 3, ui::scr_height / 3);
 				purchase_menu.settcolor_input(YELLOW);
 				purchase_menu << ui::centeralign << "Medicine Purchase";
-				purchase_menu << ui::leftalign << "Code : ";
+				purchase_menu << "Code : ";
 				purchase_menu.setdefault(42);
-				purchase_menu >> med_code;
+				purchase_menu >> temp.code;
 				purchase_menu << ui::endl;
 				purchase_menu.setexit_button("Submit");
 				purchase_menu.loop();
 				purchase_menu.hide();
 
-				temp = get_med_by_code(med_code);
+				temp = get_med_by_code(temp.code);
 			}
 
 			int quantity;
@@ -994,7 +997,7 @@ void interface::stock_management(){
 				box purchase_menu (c, ui::scr_width / 3, ui::scr_height / 2);
 				purchase_menu.settcolor_input(YELLOW);
 				purchase_menu << ui::centeralign << "Medicine Sale";
-				purchase_menu << ui::leftalign << "Name : " << temp.name
+				purchase_menu << "Name : " << temp.name
 							<< ui::endl << "Price : $" << temp.price
 							<< ui::endl << ui::endl << "Quantity : ";
 				purchase_menu.setdefault(1);
@@ -1010,10 +1013,11 @@ void interface::stock_management(){
 
 			temp.stock += quantity;
 			hospital::deduct_money(temp.price * quantity, "Medicine purchase", system::get_date(), system::get_time());
-			hospital::write_med(temp);
-
-		case 3:
+			//hospital::write_med(temp);
+		}
 		
+		case 3:
+		{
 			medicine temp;
 			temp.code = 0;
 
@@ -1022,22 +1026,22 @@ void interface::stock_management(){
 				box stock_menu (c, ui::scr_width / 3, ui::scr_height / 3);
 				stock_menu.settcolor_input(YELLOW);
 				stock_menu << ui::centeralign << "Medicine Sale";
-				stock_menu << ui::leftalign << "Code : ";
+				stock_menu << "Code : ";
 				stock_menu.setdefault(42);
-				stock_menu >> med_code;
+				stock_menu >> temp.code;
 				stock_menu << ui::endl;
 				stock_menu.setexit_button("Submit");
 				stock_menu.loop();
 				stock_menu.hide();
 
-				temp = get_med_by_code(med_code);
+				temp = get_med_by_code(temp.code);
 			}
 
 			coord c(ui::scr_width / 3, ui::scr_height / 3);
 			box stock_menu (c, ui::scr_width / 3, ui::scr_height / 2);
 			stock_menu.settcolor_input(YELLOW);
 			stock_menu << ui::centeralign << "Medicine Details";
-			stock_menu << ui::leftalign << "Name : " << temp.name
+			stock_menu << "Name : " << temp.name
 						<< ui::endl << "Price : $" << temp.price
 						<< ui::endl << "Dosage : " << temp.dosage << " ml"
 						<< ui::endl << "Quantity in stock : " << temp.stock
@@ -1067,6 +1071,7 @@ void interface::clear_error(){
 ////////////////////////////////////////////////////////////
 
 double hospital::balance = 1000.0;
+box interface::window;
 
 void main()
 {
