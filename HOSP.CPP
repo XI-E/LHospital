@@ -1,9 +1,9 @@
+#include "ui/ui.hpp"
 #include <fstream.h>
 #include <string.h>
 #include <dir.h>
 #include <stdio.h>
 #include "patient.hpp"
-#include "ui/ui.hpp"
 
 enum emp_type {INVALID, OTHERS, DOCTOR, NURSE, RECEPTIONIST};
 
@@ -104,7 +104,7 @@ class hospital
 
 };
 
-static class interface{
+class interface{
 	public:
 		static void interface_init();
 		static int login_screen();
@@ -805,6 +805,8 @@ int hospital::get_date_difference(Date dt1, Date dt2)
 //////// Function definitions for interface
 
 void interface::interface_init(){
+	window.hide();
+	window.display();
 	window.settcolor(WHITE);
 	window << ui::centeralign << "LHOSPITAL";
 	window.settcolor(ui::tcolor);
@@ -813,12 +815,15 @@ void interface::interface_init(){
 	Date current_date = system::get_date();
 	Time current_time = system::get_time();
 
-	window << box::setheader << (int) current_date.day << "/" << (int) current_date.month
-		   << "/" << (int) current_date.year
-		   << box::setheader << ui::rightalign << (int) current_time.hour << ":"
-		   << (int) current_time.minute << ":" << (int) current_time.second
-		   << box::setfooter << ui::centeralign
-		   << "Everything looks OK";
+	str curr_date, curr_time;
+	sprintf(curr_date, "%d/%d/%d", current_date.day, current_date.month, current_date.year);
+	sprintf(curr_time, "%d:%d", current_time.hour, current_time.minute);
+
+	window << box::setheader << curr_date << box::setheader << ui::rightalign 
+			<< curr_time << box::setfooter << ui::centeralign
+		    << "Everything looks OK";
+
+	int access_level = interface::login_screen();
 
 	int choice = 0;
 
@@ -848,7 +853,7 @@ void interface::interface_init(){
 
 int interface::login_screen(){
 	coord c(ui::scr_width / 3, ui::scr_height / 3);
-	box login_box (c, ui::scr_width / 3, ui::scr_height / 2);
+	box login_box (c, ui::scr_width / 3, ui::scr_height / 3);
 
 	long id, pwd;
 	int auth = 0;
@@ -859,12 +864,13 @@ int interface::login_screen(){
 		login_box >> id;
 		login_box << ui::endl << "Password : ";
 		login_box >> box::setpassword >> pwd;
+		login_box << ui::endl;
 
 		login_box.setexit_button("Login");
 		login_box.loop();
 		login_box.hide();
 
-		if(1=1){
+		if(1==1){
 			auth++;
 			break;
 		}
@@ -1084,12 +1090,14 @@ void interface::stock_management(){
 }
 
 void interface::error(char* err){
+	window.clear_footer();
 	window.setfooter_tcolor(RED);
 	window << box::setfooter << ui::centeralign
 		<< err;
 }
 
 void interface::clear_error(){
+	window.clear_footer();
 	window.setfooter_tcolor(GREEN);
 	window << box::setfooter << ui::centeralign
 		<< "Everything looks OK";
