@@ -3,19 +3,33 @@
 #include "ui/ui.hpp"
 #include "ui/test.hpp"
 
+void main()
+{
+	test_all();
+
+	getch();
+}
+
 void test_all()
 {
-	char name[40];
+	char name[40], pwd[40];
 	int age;
 	long phn;
 	float amt;
 	char date[30];
-		 
+
 	box window;
 	window.settcolor(CYAN);
 	window << ui::centeralign << "LHOSPITAL";
 	window << ui::endl << ui::endl;
 	window.settcolor(ui::tcolor);
+	window.setfooter_tcolor(GREEN);
+
+	window << box::setheader << "28/10/2017"
+		   << box::setheader << ui::rightalign << "11:45 PM"
+		   << box::setfooter << ui::centeralign
+		   << "Everything looks OK";
+
 	window << "Fill the following form: " << ui::endl;
 	
 	coord c(ui::scr_width/4, ui::scr_height/3);
@@ -30,6 +44,7 @@ void test_all()
 	b.setdefault("27/10/2017");
 	b >> date;
 	b << "Amount: "; b >> amt;
+	b << "Password: "; b >> box::setpassword >> pwd;
 	
 	b.f.setvisibility_mode(frame::nosides);
 
@@ -44,7 +59,8 @@ void test_all()
 	  << "Age: " << age << ui::endl
 	  << "Phone num: " << phn << ui::endl
 	  << "Date: " << date << ui::endl
-	  << "Amount: " << amt << ui::endl;
+	  << "Amount: " << amt << ui::endl
+	  << "Password: " << pwd << ui::endl;
 }
 
 

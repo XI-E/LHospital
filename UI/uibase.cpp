@@ -1,5 +1,15 @@
 #include "ui/ui.hpp"
 
+int init_lib_ui::counter = 0;
+
+init_lib_ui::init_lib_ui()
+{
+	if(counter++ == 0)
+	{
+		ui::init();
+	}
+}
+
 int manipulator::index = 0;
 
 manipulator::manipulator()
@@ -18,7 +28,10 @@ int ui::scr_height = 0,
 	ui::tcolor = LIGHTGRAY,
 	ui::bcolor = BLACK;
 manipulator ui::endl,
-			ui::centeralign;
+			ui::centeralign,
+			ui::rightalign;
+
+init_lib_ui init_obj_ui;
 
 void ui::init()
 {
@@ -64,10 +77,12 @@ coord & coord::operator-=(coord b)
 
 coord coord::operator+(coord b)
 {
-	return coord(*this) += b ;
+	coord temp = *this;
+	return temp += b ;
 }
 
 coord coord::operator-(coord b)
 {
-	return coord(*this) -= b;
+	coord temp = *this;
+	return temp -= b;
 }

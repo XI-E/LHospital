@@ -23,6 +23,7 @@ void info_tbox::setdata()
             break;
         }
         case STRING:
+        case PASSWORD:
         {
             char *s = (char *) data_store;
             strcpy(s, tbox->getstr());
@@ -48,6 +49,74 @@ void info_tbox::setdata()
     }
 
     sscanf(tbox->getstr(), fstr, data_store);
+}
+
+line::line()
+{
+    strcpy(left, "");
+    strcpy(middle, "");
+    strcpy(right, "");
+    width = ui::scr_width - 2;
+    tcolor = ui::tcolor;
+    corner_top_left = coord(0,0);
+}
+
+void line::display()
+{
+    print(1);
+}
+
+void line::hide()
+{
+    print(0);
+}
+
+void line::print(int mode)
+{
+    coord curr_pos = coord(wherex(), wherey()),
+    &ctl = corner_top_left;
+    gotoxy(ctl.x, ctl.y);
+    textcolor(tcolor);
+    if(mode == 1)
+    {
+        cprintf("%s", left);
+    }
+    else
+    {
+        for(int i = 0; i < strlen(left); i++)
+        {
+            cprintf(" ");
+        }
+    }
+
+    gotoxy(ctl.x + (width - strlen(middle)) / 2,
+                wherey());
+    if(mode == 1)
+    {
+        cprintf("%s", middle);
+    }
+    else
+    {
+        for(int i = 0; i < strlen(middle); i++)
+        {
+            cprintf(" ");
+        }
+    }
+
+    gotoxy(ctl.x + width - strlen(right), wherey());
+    if(mode == 1)
+    {
+        cprintf("%s", right);
+    }
+    else
+    {
+        for(int i = 0; i < strlen(right); i++)
+        {
+            cprintf(" ");
+        }
+    }
+
+    gotoxy(curr_pos.x, curr_pos.y);
 }
 
 /*
@@ -133,8 +202,18 @@ int box::wrap(char str[], int length, int return_one_line)
 
 void box::set_tbox(int data_type, void *ptr)
 {
-    text_box *new_tbox = 
-        (text_box *) layout.settext_box(pos_pointer);
+    text_box *new_tbox;
+
+    if(data_type == info_tbox::PASSWORD)
+    {
+        new_tbox = 
+            (text_box *) layout.settext_box(pos_pointer, 1);
+    }
+    else
+    {
+        new_tbox = 
+            (text_box *) layout.settext_box(pos_pointer);
+    }
     
     if(default_toggle)
     {
@@ -155,6 +234,10 @@ void box::set_tbox(int data_type, void *ptr)
     t.type = data_type;
     t.data_store = ptr;
 }
+
+manipulator box::setheader,
+            box::setfooter,
+            box::setpassword;
 
 box::box(coord c, int w, int h) : f(c, w, h)
 {
@@ -189,7 +272,15 @@ box::box(coord c, int w, int h) : f(c, w, h)
     index_interactive = index_tbox = 0;
     center_toggle = 0;
     default_toggle = 0;
+    right_toggle = 0;
+    header_toggle = 0;
+    footer_toggle = 0;
+    password_toggle = 0;
     strcpy(default_text, "");
+
+    header.width = footer.width = w - 2;
+    header.corner_top_left = c + coord(1,0);
+    footer.corner_top_left = c + coord(0, h-1);
 
     f.display();
 }
@@ -233,7 +324,10 @@ void box::setheight(int h)
 
 void box::setpadding(int p)
 {
+    hide();
     padding = p;
+    setheight(height);
+    display();
 }
 
 void box::settcolor(int c)
@@ -274,17 +368,92 @@ box & box::operator<< (char *inp_str)
 
     coord c = layout.getcorner_top_left();
 
+    if(header_toggle || footer_toggle)
+    {
+        line *lp;
+        if(header_toggle)
+        {
+            header_toggle = 0;
+            lp = &header;
+        }        
+        if(footer_toggle)
+        {
+            footer_toggle = 0;
+            lp = &footer;
+        }
+        line &l = *lp;
+
+        int len = strlen(string);
+        if(center_toggle)
+        {
+            center_toggle = 0;
+            if(len <= l.width)
+            {
+                if((l.width - len) / 2 > strlen(l.left))
+                {
+                    strcpy(l.middle, string);
+                }
+            }
+        }
+        else if(right_toggle)
+        {
+            right_toggle = 0;
+            if(len <= l.width)
+            {
+                if(len < (l.width - strlen(l.middle)) / 2)
+                {
+                    strcpy(l.right, string);
+                }
+            }
+        }
+        else
+        {
+            if(len < (l.width - strlen(l.middle)) / 2)
+            {
+                strcpy(l.left, string);
+            }
+        }
+
+        //Printing the newly set line
+        l.hide();
+        l.display();
+
+        return *this;
+    }
+
     if(center_toggle)
     {
         int len = strlen(string);
         center_toggle = 0;
         if(len <= layout.getwidth())
         {
-            if(pos_pointer.x != c.x)
+            int x_center_pos = 
+                c.x + (layout.getwidth() - len) / 2;
+            
+            if(pos_pointer.x > x_center_pos)
             {
                 pos_pointer.y++;
             }
-            pos_pointer.x = c.x + (layout.getwidth() - len)/2;
+            pos_pointer.x = x_center_pos;
+            layout << pos_pointer << str;
+            pos_pointer.x += len;
+            return *this;
+        }
+    }
+    else if(right_toggle)
+    {
+        int len = strlen(string);
+        right_toggle = 0;
+        if(len <= layout.getwidth())
+        {
+            int x_right_pos =
+                c.x + (layout.getwidth() - len);
+            
+            if(pos_pointer.x > x_right_pos)
+            {
+                pos_pointer.y++;
+            }
+            pos_pointer.x = x_right_pos;
             layout << pos_pointer << str;
             pos_pointer.y++;
             pos_pointer.x = c.x;
@@ -390,12 +559,32 @@ box & box::operator<<(manipulator m)
     {
         center_toggle = 1;
     }
+    else if(m == ui::rightalign)
+    {
+        right_toggle = 1;
+    }
+    else if(m == box::setheader)
+    {
+        header_toggle = 1;
+    }
+    else if(m == box::setfooter)
+    {
+        footer_toggle = 1;
+    }
     return *this;
 }
 
 box & box::operator>>(char *&s)
 {
-    set_tbox(info_tbox::STRING, (void *) s);
+    if(password_toggle)
+    {
+        password_toggle = 0;
+        set_tbox(info_tbox::PASSWORD, (void *) s);
+    }
+    else
+    {
+        set_tbox(info_tbox::STRING, (void *) s);
+    }
     return *this;
 }
 
@@ -426,6 +615,15 @@ box & box::operator>>(double &d)
 box & box::operator>>(float &f)
 {
     set_tbox(info_tbox::FLOAT, (void *) &f);
+    return *this;
+}
+
+box & box::operator>>(manipulator m)
+{
+    if(m == box::setpassword)
+    {
+        password_toggle = 1;
+    }
     return *this;
 }
 
@@ -537,12 +735,16 @@ void box::display()
 {
     layout.display();
     f.display();
+    header.display();
+    footer.display();
 }
 
 void box::hide()
 {
     layout.hide();
     f.hide();
+    header.display();
+    footer.display();
 }
 
 void box::clear()
@@ -553,4 +755,14 @@ void box::clear()
     index_interactive = index_tbox = 0;
     exit_btn = NULL;
     f.display();
+}
+
+void box::setheader_tcolor(int c)
+{
+    header.tcolor = c;
+}
+
+void box::setfooter_tcolor(int c)
+{
+    footer.tcolor = c;
 }

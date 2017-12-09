@@ -9,6 +9,13 @@
 #include <ctype.h>
 #include <stdlib.h>
 
+class init_lib_ui
+{
+	static int counter;
+	public:
+		init_lib_ui();
+};
+
 class manipulator
 {
 	static int index;
@@ -39,6 +46,7 @@ class ui
 		static int bcolor;
 		static manipulator endl;
 		static manipulator centeralign;
+		static manipulator rightalign;
 };
 
 struct coord
@@ -59,7 +67,9 @@ class list_layout_node
     coord pos;                  //Position where to print
     int tcolor;                 //Text colour
     int bcolor;                 //Background colour
-    char str[100];              //String to print
+	char str[100];              //String to print
+	int print_type;				//How to print the string
+								//Mainly for passwords
 
     public:
         list_layout_node();     //Ctor
@@ -70,14 +80,22 @@ class list_layout_node
         void setpos(coord);
         void settcolor(int);
         void setbcolor(int);
-        void setstr(const char *);
+		void setstr(const char *);
+		void setprint_type(int);
 
         //Getters
         list_layout_node * getnext();
         coord getpos();
         int gettcolor();
         int getbcolor();
-        const char * getstr();
+		const char * getstr();
+		int getprint_type();
+		
+		enum print_types
+		{
+			DEFAULT,
+			PASSWORD
+		};
 };
 
 struct string_node
@@ -129,12 +147,15 @@ class interactive : public list_layout_node
 
 class text_box : public interactive
 {
-    public:
+	int is_password;
+	public:
+		text_box();
         int input(int = 0);   //Takes input,stores it
                        //& returns GOTONEXT or
 					   //GOTOPREV; parameter is offset
 					   //y coordinate
 		void print_str(string_node*); //Prints string
+		void setis_password(int);
 };
 
 class button : public interactive
@@ -194,7 +215,8 @@ class list_layout
 
 		//Sets a text box at the position indicated by
 		//coord and returns a pointer to it
-		interactive * settext_box(coord);
+		interactive * settext_box(coord, int = 0);
+		//								 ^is_password
 
 		interactive * setbutton(coord, const char *);
 		//								^text the btn displays
@@ -276,7 +298,7 @@ struct info_tbox
 {
 	text_box * tbox;
 	int type;
-	void * data_store; //Need a new var name
+	void * data_store; 
 
 	enum data_types
 	{					//Stored as (void * is actually)
@@ -286,6 +308,7 @@ struct info_tbox
 		CHAR,			//char *
 		DOUBLE,			//double *
 		FLOAT,			//float *
+		PASSWORD,		//char *
 		OTHER //Not supported at the moment
 	};
 
@@ -294,9 +317,30 @@ struct info_tbox
 
 };
 
+/*
+* Represents a line with the three strings depiciting
+* left, middle and right aligned stuff respectively
+*/
+struct line
+{
+	char left[100];
+	char middle[100];
+	char right[100];
+
+	int width;
+	int tcolor;
+	coord corner_top_left;
+
+	line();
+	void display();
+	void hide();
+
+	private:
+		void print(int);
+};
+
 class box
 {
-	coord corner_top_left;
 	int height;
 	int width;
 	int padding;
@@ -305,11 +349,6 @@ class box
 	//                    ^It will set first parameter
 	//					  to have only one line
 	void set_tbox(int, void *);
-
-	list_layout layout;
-
-	//Pos of the pointer in the box
-	coord pos_pointer;
 
 	//List of text boxes and buttons
 	interactive * list_interactive[30]; 
@@ -321,9 +360,26 @@ class box
 
 	int center_toggle;
 	int default_toggle;
+	int right_toggle;
+	int header_toggle;
+	int footer_toggle;
+	int password_toggle;
 	char default_text[100];
 
+	line header;
+	line footer;
+
+	protected:
+		//Pos of the pointer in the box
+		coord pos_pointer;
+		list_layout layout;
+		coord corner_top_left;
+
 	public:
+		static manipulator setheader;
+		static manipulator setfooter;
+		static manipulator setpassword;
+
 		frame f;
 
 		box(coord = coord(1,1), int = ui::scr_width,
@@ -360,6 +416,7 @@ class box
 		box & operator>>(long &);
 		box & operator>>(double &);
 		box & operator>>(float &);
+		box & operator>>(manipulator);
 
 		void setexit_button(char *);
 
@@ -381,6 +438,9 @@ class box
 		void display();
 		void hide();
 		void clear();
+
+		void setheader_tcolor(int);
+		void setfooter_tcolor(int);
 };
 
 #endif /* UI_HPP */

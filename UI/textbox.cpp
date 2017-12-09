@@ -1,5 +1,10 @@
 #include "ui/ui.hpp"
 
+text_box::text_box()
+{
+    is_password = 0;
+}
+
 /*
 * Despite trying, this function has grown quite large
 * Basically, it allows the user to enter text in the box
@@ -141,6 +146,7 @@ int text_box::input(int a)
                         current->prev = new_node;
 
                         gotoxy(wherex()+1, wherey());
+
                         print_str(head);
                     }
             }
@@ -187,7 +193,23 @@ void text_box::print_str(string_node *head)
     textbackground(getbcolor());
     for(string_node *current = head; current; current = current->next)
     {
-        cprintf("%c", current->data);
+        if(is_password)
+        {
+            if(current->data != '\0')
+            {
+                cprintf("*");
+            }
+            else
+            {
+                cprintf(" ");
+            }
+        }
+        else            cprintf("%c", current->data);
     }
     gotoxy(init.x, init.y);
+}
+
+void text_box::setis_password(int a)
+{
+    is_password = a;
 }

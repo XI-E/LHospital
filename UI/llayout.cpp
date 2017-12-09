@@ -6,6 +6,7 @@ list_layout_node::list_layout_node()
     tcolor = ui::tcolor;
     bcolor = ui::bcolor;
     strcpy(str, "");
+    print_type = DEFAULT;
 }
 
 list_layout_node::~list_layout_node()
@@ -40,6 +41,11 @@ void list_layout_node::setstr(const char * s)
     strcpy(str, s);
 }
 
+void list_layout_node::setprint_type(int p)
+{
+    print_type = p;
+}
+
 //Getters
 list_layout_node * list_layout_node::getnext()
 {
@@ -66,6 +72,11 @@ const char * list_layout_node::getstr()
     return str;
 }
 
+int list_layout_node::getprint_type()
+{
+    return print_type;
+}
+
 void list_layout::print(int print_mode)
 {
     coord init_pos(wherex(), wherey());
@@ -82,7 +93,20 @@ void list_layout::print(int print_mode)
         textbackground(curr->getbcolor());
         if(print_mode == DISPLAY)
         {
-            cprintf("%s", curr->getstr());
+            if(curr->getprint_type() ==
+                 list_layout_node::PASSWORD)
+            {
+                int len = strlen(curr->getstr());
+                for(int i = 0; i < len; i++)
+                {
+                    cprintf("*");
+                }
+            }
+            else if(current->getprint_type() == 
+                        list_layout_node::DEFAULT)
+            {
+                cprintf("%s", curr->getstr());
+            }
         }
         else if(print_mode == HIDE)
         {
@@ -143,12 +167,18 @@ list_layout& list_layout::operator<<(const char *str)
     return *this;
 }
 
-interactive * list_layout::settext_box(coord c)
+interactive * list_layout::settext_box(coord c, int is_pwd)
 {
     interactive *new_node = new text_box;
     new_node->setpos(c);
     new_node->settcolor(tcolor_input);
     new_node->setbcolor(bcolor_input);
+
+    if(is_pwd) 
+    {
+        ((text_box *) new_node)->setis_password(1);
+        new_node->setprint_type(list_layout_node::PASSWORD);
+    }
 
     current->setnext(new_node);
     current = current->getnext();
