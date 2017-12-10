@@ -8,6 +8,8 @@
 #include <iostream.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <limits.h>
+#include <errno.h>
 
 class init_lib_ui
 {
@@ -302,7 +304,8 @@ struct info_tbox
 {
 	text_box * tbox;
 	int type;
-	void * data_store; 
+	void * data_store;
+	int (*validator)(const char *);
 
 	enum data_types
 	{					//Stored as (void * is actually)
@@ -317,8 +320,30 @@ struct info_tbox
 	};
 
 	info_tbox();
-	void setdata();
+	int setdata(); //Returns 1 on success; 0 on failure
 
+};
+
+typedef int (*validator_f)(const char *);
+
+/*
+* Contains default validation functions of type
+* int f(char *)
+* that take in a string and return 1 if the string
+* is valid and 0, otherwise
+*/
+class validation
+{
+	validation(); //Object of this class is not allowed
+	public:	
+		static int vint(const char *);
+		static int vlong(const char *);
+		static int vstring(const char *);
+		static int vchar(const char *);
+		static int vdouble(const char *);
+		static int vfloat(const char *);
+
+		static validator_f getvalidator(int, validator_f);
 };
 
 /*
@@ -370,6 +395,7 @@ class box
 	int footer_toggle;
 	int password_toggle;
 	char default_text[100];
+	int (*temp_validator)(const char *); //A function pointer
 
 	line header;
 	line footer;
@@ -422,6 +448,10 @@ class box
 		box & operator>>(double &);
 		box & operator>>(float &);
 		box & operator>>(manipulator);
+		box & operator>>(int (*)(const char *));
+		//Function pointer that takes in a char* and outputs int
+		//Basically supposed to be a validation function for
+		//the input field
 
 		void setexit_button(char *);
 

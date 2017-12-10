@@ -1,4 +1,5 @@
 #include "ui/ui.hpp"
+#include "if.hpp"
 
 line::line()
 {
@@ -191,6 +192,9 @@ void box::set_tbox(int data_type, void *ptr)
     t.tbox = new_tbox;
     t.type = data_type;
     t.data_store = ptr;
+    t.validator = validation::getvalidator(data_type, temp_validator);
+
+    temp_validator = NULL;
 }
 
 manipulator box::setheader,
@@ -235,6 +239,7 @@ box::box(coord c, int w, int h) : f(c, w, h)
     footer_toggle = 0;
     password_toggle = 0;
     strcpy(default_text, "");
+    temp_validator = NULL;
 
     header.width = footer.width = w - 2;
     header.corner_top_left = c + coord(1,0);
@@ -585,6 +590,12 @@ box & box::operator>>(manipulator m)
     return *this;
 }
 
+box & box::operator>>(int (*f)(const char *))
+{
+    temp_validator = f;
+    return *this;
+}
+
 void box::setexit_button(char *str)
 {
     coord c = layout.getcorner_top_left();
@@ -650,7 +661,9 @@ void box::loop()
     height = layout.getheight(),
     index_last_interactive = index_interactive - 1,
     &ili = index_last_interactive;
+    int temp_tbox_color, temp_index = -1;
 
+    inf_loop:
     while(1)
     {
         coord c = list_interactive[j]->getpos(),
@@ -683,9 +696,21 @@ void box::loop()
         }
     }
 
+    interface::clear_error();
+    if(temp_index != -1)
+    {
+        list_tbox[temp_index].tbox->settcolor(temp_tbox_color);
+    }
     for(int i = 0; i < index_tbox; i++)
     {
-        list_tbox[i].setdata();
+        if(list_tbox[i].setdata() == 0)
+        {
+            interface::error("INVALID INPUT!");
+            temp_tbox_color = list_tbox[i].tbox->gettcolor();
+            list_tbox[i].tbox->settcolor(RED);
+            temp_index = i;
+            goto inf_loop;
+        }
     }
 }
 

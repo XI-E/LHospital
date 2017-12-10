@@ -6,10 +6,16 @@ info_tbox::info_tbox()
     tbox = NULL;
     data_store = NULL;
     type = OTHER;
+    validator = NULL;
 }
 
-void info_tbox::setdata()
+int info_tbox::setdata()
 {
+    if(validator(tbox->getstr()) == 0)
+    {
+        return 0;
+    }
+
     char *fstr;
     switch(type)
     {
@@ -28,7 +34,7 @@ void info_tbox::setdata()
         {
             char *s = (char *) data_store;
             strcpy(s, tbox->getstr());
-            return;
+            return 1;
         }
         case CHAR:
         {
@@ -46,8 +52,10 @@ void info_tbox::setdata()
             break;
         }
         default:
-            return;
+            return 0;
     }
 
     sscanf(tbox->getstr(), fstr, data_store);
+
+    return 1;
 }
