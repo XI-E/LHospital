@@ -4,8 +4,10 @@
 #include <dir.h>
 #include <stdio.h>
 #include "patient.hpp"
+#include <math.h>
 
 enum emp_type {INVALID, OTHERS, DOCTOR, NURSE, RECEPTIONIST};
+const int monthDays[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 class id_to_emp
 {
@@ -24,7 +26,9 @@ class employee : public person{
 		employee(str, int, Date, address, phone, unsigned long, Time, Time, str = "", str = "");	//for all those with user accounts(doctors, nurses, receptionists), last 2 arguments are to be provided as well
 		employee();	//default constructor
 		unsigned long get_salary();
+		void set_salary(unsigned long);
 		Time get_shift(int);
+		void set_shift(int, Time);
 		unsigned long get_id();
 		transaction * get_last_10_transactions();
 		static int get_generate_id_status();
@@ -98,13 +102,12 @@ class hospital
 		static int count_leap_years(Date);
 		static int date_validity(char *);
 		static int date_validity(Date);
-		static int str_to_date(char *);
+		static Date str_to_date(char *);
 
 	private:
 		hospital();
 		static int read_from(unsigned long, char *, int, char *);
 		static double balance;
-
 };
 
 class interface{
@@ -250,6 +253,11 @@ unsigned long employee::get_salary(){
 	return salary;
 }
 
+void employee::set_salary(unsigned long inp)
+{
+	salary = inp;
+}
+
 Time employee::get_shift(int inp){
 	switch(inp){
 		case START:
@@ -258,6 +266,21 @@ Time employee::get_shift(int inp){
 			return shift_end;
 		default:
 			return Time(0,0,0);
+	}
+}
+
+void employee::set_shift(int inp1, Time inp2)
+{
+	switch (inp1)
+	{
+		case START:
+			shift_start = inp2;
+			return;
+		case END:
+			shift_end = inp2;
+			return;
+		default:
+			return;
 	}
 }
 
@@ -666,21 +689,40 @@ int hospital::write_employee(receptionist a)
 
 int hospital::pay_salary(unsigned long id, Date d1, Time t1)
 {
-	employee x;
-	int i = hospital::get_employee_by_id(id, x);
-	if(!i)
+	employee e;
+	doctor d;
+	nurse n;
+	receptionist r;
+	if(!hospital::get_employee_by_id(id, e))
 	{
 //		cerr<<"Employee not found or error while reading file";
 		return 0;
 	}
-	unsigned long inp1 = x.get_salary();
+	str temp;
+	switch(id_to_emp::convert(id))
+	{
+		case INVALID:
+//			cerr<<"Invalid id";
+			return 0;
+		case OTHERS:
+			sprintf(temp, "employee/%lu", id);
+			break;
+		case DOCTOR:
+			sprintf(temp, "employee/doctor/%lu", id);
+			break;
+		case NURSE:
+			sprintf(temp, "employee/nurse/%lu", id);
+			break;
+		case RECEPTIONIST:
+			sprintf(temp, "employee/receptionist/%lu", id);
+			break;
+	}
+	unsigned long inp1;
 	char inp2[100] = "Salary paid to ";
-	strcat(inp2, x.get_name());
+	inp1 = e.get_salary();
+	strcat(inp2, e.get_name());
 	transaction t = hospital::deduct_money(inp1, inp2, d1, t1);
 
-	str temp;
-	sprintf(temp, "employee/%lu", x.get_id());
-	mkdir(temp);
 	strcat(temp, "/trans.dat");
 	ofstream fout ( temp ,ios::binary | ios::app );
 	if(!fout)
@@ -770,9 +812,6 @@ int hospital::read_from(unsigned long ID, char * dest, int size, char * temp)
 	return 1;
 }
 
-const int monthDays[12] = {31, 28, 31, 30, 31, 30,
-	31, 31, 30, 31, 30, 31};
-
 int hospital::count_leap_years(Date d)
 {
 	int years = d.year;
@@ -831,18 +870,18 @@ Date hospital::str_to_date(char * inp_date){
 		for(int i = 0; i < 9; i++){
 			ch[i] = inp_date[count];
 			count++;
-			if(ch[i] == '/' || ch[i] == '\\' || ch[i] = 0){
+			if(ch[i] == '/' || ch[i] == '\\' || ch[i] == 0){
 				if(ch[i] == 0 && count < 10){
 					interface::error("Invalid date entry!!");
 					return system::get_date();
 				}
-				temp = i;
+				int temp = i;
 				while(temp){
-					input += pow(10, temp)*ch[i-temp]
+					input[counter] += ( pow(10, temp) * ch[i-temp] );
 					temp--;
 				}
 				counter++;
-			} 
+			}
 		}
 	}
 	return Date(input[0], input[1], input[2]);
@@ -870,7 +909,7 @@ void interface::interface_init(){
 			<< curr_time << box::setfooter << ui::centeralign
 		    << "Everything looks OK";
 
-	int access_level = interface::login_screen();
+	int id = interface::login_screen();
 
 	int choice = 0;
 
@@ -902,13 +941,12 @@ int interface::login_screen(){
 	coord c(ui::scr_width / 3, ui::scr_height / 3);
 	box login_box (c, ui::scr_width / 3, ui::scr_height / 3);
 
-	long id, pwd;
-	int auth = 0;
-
-	while(auth == 0){
+	str uid, pwd;
+	while(1)
+	{
 		login_box.settcolor_input(YELLOW);
 		login_box << "User ID : ";
-		login_box >> id;
+		login_box >> uid;
 		login_box << ui::endl << "Password : ";
 		login_box >> box::setpassword >> pwd;
 		login_box << ui::endl;
@@ -917,14 +955,55 @@ int interface::login_screen(){
 		login_box.loop();
 		login_box.hide();
 
-		if(1==1){
-			auth++;
-			break;
+		unsigned long max_id;
+		ifstream fin;
+		fin.open("employee/max_id.dat", ios::binary);
+		if(!fin)
+			max_id = 1;
+		else
+		{
+			fin.read((char *) &max_id, sizeof(unsigned long));
+			if(fin.fail())
+			{
+				interface::error("ERROR WHILE READING FROM FILE!!! ");
+				continue;
+			}
 		}
+		fin.close();
+
+		str temp;
+		for(unsigned long id = 1; id <= max_id; ++id)
+		{
+			switch(id_to_emp::convert(id))
+			{
+				case INVALID:
+					break;
+				case OTHERS:
+					sprintf(temp, "employee/%lu/base.dat", id);
+					break;
+				case DOCTOR:
+					sprintf(temp, "employee/doctor/%lu/base.dat", id);
+					break;
+				case NURSE:
+					sprintf(temp, "employee/nurse/%lu/base.dat", id);
+					break;
+				case RECEPTIONIST:
+					sprintf(temp, "employee/receptionist/%lu/base.dat", id);
+					break;
+			}
+			employee x;
+			ifstream fin;
+			fin.open(temp, ios::binary);
+			fin.read((char *) &x, sizeof(employee));
+			if(!strcmp(x.account.get_username(), uid) && x.account.login(pwd))
+			{
+				interface::clear_error();
+				return id;
+			}
+		}
+
 		interface::error("Invalid login details!!");
 	}
-	interface::clear_error();
-	return 1;
 }
 
 int interface::menu(){
@@ -978,7 +1057,7 @@ void interface::patient_management(){
 
 		case 2:
 		{}
-		
+
 		case 3:
 		{
 			int choice;
@@ -986,7 +1065,7 @@ void interface::patient_management(){
 			while(choice < 1 || choice > 5){
 				coord c(ui::scr_width / 3, ui::scr_height / 3);
 				box menu (c, ui::scr_width / 3, ui::scr_height / 1.5);
-		
+
 				menu << "Choose item to edit:"
 						<< ui::endl << "1. Disease/condition"
 						<< ui::endl << "2. Guardian name"
@@ -997,21 +1076,21 @@ void interface::patient_management(){
 				menu.setdefault(1);
 				menu.settcolor_input(YELLOW);
 				menu >> choice;
-		
+
 				menu << ui::endl;
 				menu.setexit_button("Submit");
-		
+
 				menu.loop();
 				menu.hide();
 			}
-
+			patient temp_patient;
 			switch(choice){
 				case 1:
 				{
 					coord c(ui::scr_width / 3, ui::scr_height / 3);
 					box edit_screen (c, ui::scr_width / 3, ui::scr_height / 1.5);
 
-					edit_screen <<  "Enter disease/condition for " << temp_patient.name
+					edit_screen <<  "Enter disease/condition for " << temp_patient.get_name()
 								<< ui::endl << "Disease : ";
 					disease temp = temp_patient.get_dis();
 					edit_screen.setdefault(temp.name);
@@ -1044,13 +1123,13 @@ void interface::patient_management(){
 					temp_patient.set_dis(temp);
 					hospital::write_patient(temp_patient);
 				}
-				
+
 				case 2:
 				{
 					coord c(ui::scr_width / 3, ui::scr_height / 3);
 					box edit_screen (c, ui::scr_width / 3, ui::scr_height / 3);
 
-					edit_screen <<  "Enter name of guardian for " << temp_patient.name
+					edit_screen <<  "Enter name of guardian for " << temp_patient.get_name()
 								<< ui::endl << "Guardian Name : ";
 					str temp;
 					edit_screen.setdefault(temp_patient.get_guardian_name());
@@ -1064,7 +1143,7 @@ void interface::patient_management(){
 					coord c(ui::scr_width / 3, ui::scr_height / 3);
 					box edit_screen (c, ui::scr_width / 3, ui::scr_height / 3);
 
-					edit_screen <<  "Enter emergency contact no. for " << temp_patient.name
+					edit_screen <<  "Enter emergency contact no. for " << temp_patient.get_name()
 								<< ui::endl << "Contact no. : ";
 					str temp;
 					edit_screen.setdefault(temp_patient.get_emergency_contact());
@@ -1078,7 +1157,7 @@ void interface::patient_management(){
 					coord c(ui::scr_width / 3, ui::scr_height / 3);
 					box edit_screen (c, ui::scr_width / 3, ui::scr_height / 3);
 
-					edit_screen <<  "Enter emergency contact no. for " << temp_patient.name
+					edit_screen <<  "Enter emergency contact no. for " << temp_patient.get_name()
 								<< ui::endl << "Contact no. : ";
 					phone temp;
 					edit_screen.setdefault(temp_patient.get_emer_contact_no());
@@ -1092,29 +1171,33 @@ void interface::patient_management(){
 					coord c(ui::scr_width / 3, ui::scr_height / 3);
 					box edit_screen (c, ui::scr_width / 3, ui::scr_height / 3);
 
-					edit_screen <<  "Enter insurance information for " << temp_patient.name
+					edit_screen <<  "Enter insurance information for " << temp_patient.get_name()
 								<< ui::endl << "Provider : ";
 					insurance temp = temp_patient.get_insur_info();
 					edit_screen.setdefault(temp.provider);
 					edit_screen >> temp.provider;
 					edit_screen << ui::endl << "Amount (in $) :";
-					edit_screen.setdefault(temp.amount);
-					edit_screen >> temp.amount;
+					edit_screen.setdefault((int)temp.amount);	//'(int)' is placed here for the time being
+					edit_screen >> (int)temp.amount;             //'(int)' is placed here for the time being
 					edit_screen << ui::endl << "Expiry date (MM/DD/YYYY):";
 					char temp_date[11];
-					edit_screen >> hospital::date_validity >> temp_date;
+//					int (*f)(char *) = &hospital::date_validity;	//This is used for the time being
+					edit_screen >>/* f >>*/ temp_date;
 					temp.expiry = hospital::str_to_date(temp_date);
 					temp_patient.set_insur_info(temp);
 					hospital::write_patient(temp_patient);
 				}
-														
+
 			}
 		}
 	}
 
 }
 
-void interface::employee_management(){}
+void interface::employee_management()
+{
+	
+}
 
 void interface::stock_management(){
 	coord c(ui::scr_width / 3, ui::scr_height / 3);
@@ -1317,12 +1400,17 @@ void interface::clear_error(){
 ////////////////////////////////////////////////////////////
 
 double hospital::balance = 1000.0;
+
 box interface::window;
 
 void main()
 {
 	clrscr();
-		ui::init();
-		interface::interface_init();
+/*/////Administrator object creator////////////////
+	address yay = {0, 0, 0, 0, 0};
+	employee x("Administrator", 3, Date(), yay, "", 0, Time(), Time(), "admin", "password");
+	hospital::write_employee(x);
+/////////////////////////////////////////////*/
+	interface::interface_init();
 	getch();
 }
