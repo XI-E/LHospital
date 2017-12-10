@@ -4,7 +4,6 @@
 #include <dir.h>
 #include <stdio.h>
 #include "patient.hpp"
-#include "if.hpp"
 
 enum emp_type {INVALID, OTHERS, DOCTOR, NURSE, RECEPTIONIST};
 
@@ -97,12 +96,32 @@ class hospital
 
 		static int get_date_difference(Date, Date);
 		static int count_leap_years(Date);
+		static int date_validity(char *);
+		static int date_validity(Date);
+		static int str_to_date(char *);
 
 	private:
 		hospital();
 		static int read_from(unsigned long, char *, int, char *);
 		static double balance;
 
+};
+
+class interface{
+	public:
+		static void interface_init();
+		static int login_screen();
+		static int menu();
+		static void patient_management();
+		static void employee_management();
+		static void stock_management();
+
+		static void error(char*);
+		static void clear_error();
+
+	private:
+		interface();
+		static box window;
 };
 
 //////////////////////////////////
@@ -785,6 +804,50 @@ int hospital::get_date_difference(Date dt1, Date dt2)
 	return (n2 - n1);
 }
 
+int hospital::date_validity(char * inp_date){
+	return hospital::date_validity(hospital::str_to_date(inp_date));
+}
+
+int hospital::date_validity(Date inp_date){
+	if (
+		inp_date.month > 12 || 
+		inp_date.day > monthDays[inp_date.month - 1]
+	)
+	{
+		return 0;
+	}
+	else{
+		return 1;
+	}
+}
+
+Date hospital::str_to_date(char * inp_date){
+	int counter = 0;
+	int count = 0;
+	int input[3];
+	input[0] = input[1] = input[2] = 0;
+	while(counter < 3){
+		char ch[10];
+		for(int i = 0; i < 9; i++){
+			ch[i] = inp_date[count];
+			count++;
+			if(ch[i] == '/' || ch[i] == '\\' || ch[i] = 0){
+				if(ch[i] == 0 && count < 10){
+					interface::error("Invalid date entry!!");
+					return system::get_date();
+				}
+				temp = i;
+				while(temp){
+					input += pow(10, temp)*ch[i-temp]
+					temp--;
+				}
+				counter++;
+			} 
+		}
+	}
+	return Date(input[0], input[1], input[2]);
+}
+
 ////////////////////////////////////////////
 //////// Function definitions for interface
 
@@ -839,8 +902,7 @@ int interface::login_screen(){
 	coord c(ui::scr_width / 3, ui::scr_height / 3);
 	box login_box (c, ui::scr_width / 3, ui::scr_height / 3);
 
-	long id;
-	str pwd;
+	long id, pwd;
 	int auth = 0;
 
 	while(auth == 0){
@@ -888,7 +950,169 @@ int interface::menu(){
 	return ch;
 }
 
-void interface::patient_management(){}
+void interface::patient_management(){
+	int ch = 0;
+
+	while(ch < 1 || ch > 3){
+		coord c(ui::scr_width / 3, ui::scr_height / 3);
+		box menu (c, ui::scr_width / 3, ui::scr_height / 2.2);
+
+		menu << "1. Patient admission"
+				<< ui::endl << "2. Patient discharge"
+				<< ui::endl << "3. Edit patient details"
+				<< ui::endl << ui::endl << "Choice : ";
+		menu.setdefault(1);
+		menu.settcolor_input(YELLOW);
+		menu >> ch;
+
+		menu << ui::endl;
+		menu.setexit_button("Submit");
+
+		menu.loop();
+		menu.hide();
+	}
+
+	switch(ch){
+		case 1:
+		{}
+
+		case 2:
+		{}
+		
+		case 3:
+		{
+			int choice;
+
+			while(choice < 1 || choice > 5){
+				coord c(ui::scr_width / 3, ui::scr_height / 3);
+				box menu (c, ui::scr_width / 3, ui::scr_height / 1.5);
+		
+				menu << "Choose item to edit:"
+						<< ui::endl << "1. Disease/condition"
+						<< ui::endl << "2. Guardian name"
+						<< ui::endl << "3. Emergency contact"
+						<< ui::endl << "4. Emergency contact no."
+						<< ui::endl << "5. Insurance information"
+						<< ui::endl << ui::endl << "Choice : ";
+				menu.setdefault(1);
+				menu.settcolor_input(YELLOW);
+				menu >> choice;
+		
+				menu << ui::endl;
+				menu.setexit_button("Submit");
+		
+				menu.loop();
+				menu.hide();
+			}
+
+			switch(choice){
+				case 1:
+				{
+					coord c(ui::scr_width / 3, ui::scr_height / 3);
+					box edit_screen (c, ui::scr_width / 3, ui::scr_height / 1.5);
+
+					edit_screen <<  "Enter disease/condition for " << temp_patient.name
+								<< ui::endl << "Disease : ";
+					disease temp = temp_patient.get_dis();
+					edit_screen.setdefault(temp.name);
+					edit_screen >> temp.name;
+					edit_screen << ui::endl << "Type : ";
+					edit_screen.setdefault(temp.type);
+					edit_screen >> temp.type;
+					edit_screen << ui::endl << "Type key : " << ui::endl
+								<< "0 - Brain\t1 - Heart" << ui::endl
+								<< "2 - Skin\t3 - Lung" << ui::endl
+								<< "4 - Bone\t5 - Eye" << ui::endl
+								<< "6 - Throat\t7 - Teeth" << ui::endl
+								<< "8 - Stomach\t9 - Blood" << ui::endl
+								<< "10 - General/full body condition"
+								<< ui::endl << ui::endl
+								<< "Symptoms" << ui::endl
+								<< "Symptom 1 : ";
+					edit_screen.setdefault(temp.symptoms[0]);
+					edit_screen >> temp.symptoms[0];
+					edit_screen << ui::endl << "Symptom 2 : ";
+					edit_screen.setdefault(temp.symptoms[1]);
+					edit_screen >> temp.symptoms[1];
+					edit_screen << ui::endl << "Symptom 3 : ";
+					edit_screen.setdefault(temp.symptoms[2]);
+					edit_screen >> temp.symptoms[2];
+					edit_screen << ui::endl << "Symptom 4 : ";
+					edit_screen.setdefault(temp.symptoms[3]);
+					edit_screen >> temp.symptoms[3];
+
+					temp_patient.set_dis(temp);
+					hospital::write_patient(temp_patient);
+				}
+				
+				case 2:
+				{
+					coord c(ui::scr_width / 3, ui::scr_height / 3);
+					box edit_screen (c, ui::scr_width / 3, ui::scr_height / 3);
+
+					edit_screen <<  "Enter name of guardian for " << temp_patient.name
+								<< ui::endl << "Guardian Name : ";
+					str temp;
+					edit_screen.setdefault(temp_patient.get_guardian_name());
+					edit_screen >> temp;
+					temp_patient.set_guardian_name(temp);
+					hospital::write_patient(temp_patient);
+				}
+				
+				case 3:
+				{
+					coord c(ui::scr_width / 3, ui::scr_height / 3);
+					box edit_screen (c, ui::scr_width / 3, ui::scr_height / 3);
+
+					edit_screen <<  "Enter emergency contact no. for " << temp_patient.name
+								<< ui::endl << "Contact no. : ";
+					str temp;
+					edit_screen.setdefault(temp_patient.get_emergency_contact());
+					edit_screen >> temp;
+					temp_patient.set_emergency_contact(temp);
+					hospital::write_patient(temp_patient);
+				}
+				
+				case 4:
+				{
+					coord c(ui::scr_width / 3, ui::scr_height / 3);
+					box edit_screen (c, ui::scr_width / 3, ui::scr_height / 3);
+
+					edit_screen <<  "Enter emergency contact no. for " << temp_patient.name
+								<< ui::endl << "Contact no. : ";
+					phone temp;
+					edit_screen.setdefault(temp_patient.get_emer_contact_no());
+					edit_screen >> temp;
+					temp_patient.set_emer_contact_no(temp);
+					hospital::write_patient(temp_patient);
+				}
+				
+				case 5:
+				{
+					coord c(ui::scr_width / 3, ui::scr_height / 3);
+					box edit_screen (c, ui::scr_width / 3, ui::scr_height / 3);
+
+					edit_screen <<  "Enter insurance information for " << temp_patient.name
+								<< ui::endl << "Provider : ";
+					insurance temp = temp_patient.get_insur_info();
+					edit_screen.setdefault(temp.provider);
+					edit_screen >> temp.provider;
+					edit_screen << ui::endl << "Amount (in $) :";
+					edit_screen.setdefault(temp.amount);
+					edit_screen >> temp.amount;
+					edit_screen << ui::endl << "Expiry date (MM/DD/YYYY):";
+					char temp_date[11];
+					edit_screen >> hospital::date_validity >> temp_date;
+					temp.expiry = hospital::str_to_date(temp_date);
+					temp_patient.set_insur_info(temp);
+					hospital::write_patient(temp_patient);
+				}
+														
+			}
+		}
+	}
+
+}
 
 void interface::employee_management(){}
 
@@ -1098,7 +1322,7 @@ box interface::window;
 void main()
 {
 	clrscr();
+		ui::init();
 		interface::interface_init();
-		
 	getch();
 }
