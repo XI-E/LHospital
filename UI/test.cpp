@@ -1,4 +1,4 @@
-//You need to use ui::init() first before using any of these functions
+//No need to use ui::init() explicitly
 
 #include "ui/ui.hpp"
 #include "ui/test.hpp"

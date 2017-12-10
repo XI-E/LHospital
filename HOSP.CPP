@@ -4,6 +4,7 @@
 #include <dir.h>
 #include <stdio.h>
 #include "patient.hpp"
+#include "if.hpp"
 
 enum emp_type {INVALID, OTHERS, DOCTOR, NURSE, RECEPTIONIST};
 
@@ -102,23 +103,6 @@ class hospital
 		static int read_from(unsigned long, char *, int, char *);
 		static double balance;
 
-};
-
-class interface{
-	public:
-		static void interface_init();
-		static int login_screen();
-		static int menu();
-		static void patient_management();
-		static void employee_management();
-		static void stock_management();
-
-		static void error(char*);
-		static void clear_error();
-
-	private:
-		interface();
-		static box window;
 };
 
 //////////////////////////////////
@@ -855,7 +839,8 @@ int interface::login_screen(){
 	coord c(ui::scr_width / 3, ui::scr_height / 3);
 	box login_box (c, ui::scr_width / 3, ui::scr_height / 3);
 
-	long id, pwd;
+	long id;
+	str pwd;
 	int auth = 0;
 
 	while(auth == 0){
@@ -1113,7 +1098,7 @@ box interface::window;
 void main()
 {
 	clrscr();
-		ui::init();
 		interface::interface_init();
+		
 	getch();
 }

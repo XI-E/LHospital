@@ -293,9 +293,11 @@ class frame
 		void setcorner_top_left(coord);
 };
 
-//Stores information related to a text box
-//Such as what type to convert it's data to
-//and where to store it
+/*
+* Stores information related to a text box
+* Such as what type to convert it's data to
+* and where to store it
+*/
 struct info_tbox
 {
 	text_box * tbox;
