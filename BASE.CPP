@@ -230,9 +230,14 @@ char * userid::decipher()
 	return decryptedpass;
 }
 
-char * userid::getusername()
+char * userid::get_username()
 {
 	return username;
+}
+
+void userid::set_username(char * inp)
+{
+	strcpy(username, inp);
 }
 
 int userid::login(char * password)
