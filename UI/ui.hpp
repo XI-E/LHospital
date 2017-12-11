@@ -11,6 +11,8 @@
 #include <limits.h>
 #include <errno.h>
 
+typedef int (*validator_f)(const char *);
+
 class init_lib_ui
 {
 	static int counter;
@@ -323,8 +325,6 @@ struct info_tbox
 	int setdata(); //Returns 1 on success; 0 on failure
 
 };
-
-typedef int (*validator_f)(const char *);
 
 /*
 * Contains default validation functions of type

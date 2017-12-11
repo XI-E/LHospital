@@ -100,9 +100,9 @@ class hospital
 
 		static int get_date_difference(Date, Date);
 		static int count_leap_years(Date);
-		static int date_validity(char *);
+		static int date_validity(const char *);
 		static int date_validity(Date);
-		static Date str_to_date(char *);
+		static Date str_to_date(const char *);
 
 	private:
 		hospital();
@@ -843,7 +843,7 @@ int hospital::get_date_difference(Date dt1, Date dt2)
 	return (n2 - n1);
 }
 
-int hospital::date_validity(char * inp_date){
+int hospital::date_validity(const char * inp_date){
 	return hospital::date_validity(hospital::str_to_date(inp_date));
 }
 
@@ -860,7 +860,7 @@ int hospital::date_validity(Date inp_date){
 	}
 }
 
-Date hospital::str_to_date(char * inp_date){
+Date hospital::str_to_date(const char * inp_date){
 	int counter = 0;
 	int count = 0;
 	int input[3];
@@ -1181,8 +1181,7 @@ void interface::patient_management(){
 					edit_screen >> (int)temp.amount;             //'(int)' is placed here for the time being
 					edit_screen << ui::endl << "Expiry date (MM/DD/YYYY):";
 					char temp_date[11];
-//					int (*f)(char *) = &hospital::date_validity;	//This is used for the time being
-					edit_screen >>/* f >>*/ temp_date;
+					edit_screen >> hospital::date_validity >> temp_date;
 					temp.expiry = hospital::str_to_date(temp_date);
 					temp_patient.set_insur_info(temp);
 					hospital::write_patient(temp_patient);
