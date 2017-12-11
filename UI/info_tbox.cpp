@@ -29,6 +29,11 @@ int info_tbox::setdata()
             fstr = "%ld";
             break;
         }
+        case UNSIGNED_LONG:
+        {
+            fstr = "%lu";
+            break;
+        }
         case STRING:
         case PASSWORD:
         {

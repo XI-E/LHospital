@@ -497,6 +497,13 @@ box & box::operator<<(long l)
     return (*this) << str;
 }
 
+box & box::operator<<(unsigned long ul)
+{
+    char str[100];
+    sprintf(str, "%lu", ul);
+    return (*this) << str;
+}
+
 box & box::operator<<(double d)
 {
     char str[100];
@@ -569,6 +576,12 @@ box & box::operator>>(long &l)
     return *this;
 }
 
+box & box::operator>>(unsigned long &ul)
+{
+    set_tbox(info_tbox::UNSIGNED_LONG, (void *) &ul);
+    return *this;
+}
+
 box & box::operator>>(double &d)
 {
     set_tbox(info_tbox::DOUBLE, (void *) &d);
@@ -637,6 +650,13 @@ void box::setdefault(long l)
 {
     char s[100];
     sprintf(s, "%ld", l);
+    setdefault(s);
+}
+
+void box::setdefault(unsigned long ul)
+{
+    char s[100];
+    sprintf(s, "%lu", ul);
     setdefault(s);
 }
 

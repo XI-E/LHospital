@@ -313,6 +313,7 @@ struct info_tbox
 	{					//Stored as (void * is actually)
 		INT, 			//int *
 		LONG,			//long *
+		UNSIGNED_LONG,  //unsigned long *
 		STRING,			//char *
 		CHAR,			//char *
 		DOUBLE,			//double *
@@ -338,6 +339,7 @@ class validation
 	public:	
 		static int vint(const char *);
 		static int vlong(const char *);
+		static int vunsigned_long(const char *);
 		static int vstring(const char *);
 		static int vchar(const char *);
 		static int vdouble(const char *);
@@ -437,6 +439,7 @@ class box
 		box & operator<<(char);
 		box & operator<<(int);
 		box & operator<<(long);
+		box & operator<<(unsigned long);
 		box & operator<<(double);
 		box & operator<<(float);
 		box & operator<<(manipulator);
@@ -445,6 +448,7 @@ class box
 		box & operator>>(char &);
 		box & operator>>(int &);
 		box & operator>>(long &);
+		box & operator>>(unsigned long &);
 		box & operator>>(double &);
 		box & operator>>(float &);
 		box & operator>>(manipulator);
@@ -462,6 +466,7 @@ class box
 		void setdefault(char);
 		void setdefault(int);
 		void setdefault(long);
+		void setdefault(unsigned long);
 		void setdefault(double);
 		void setdefault(float);
 

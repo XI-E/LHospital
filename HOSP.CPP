@@ -1177,8 +1177,8 @@ void interface::patient_management(){
 					edit_screen.setdefault(temp.provider);
 					edit_screen >> temp.provider;
 					edit_screen << ui::endl << "Amount (in $) :";
-					edit_screen.setdefault((int)temp.amount);	//'(int)' is placed here for the time being
-					edit_screen >> (int)temp.amount;             //'(int)' is placed here for the time being
+					edit_screen.setdefault(temp.amount);	
+					edit_screen >> temp.amount;            
 					edit_screen << ui::endl << "Expiry date (MM/DD/YYYY):";
 					char temp_date[11];
 					edit_screen >> hospital::date_validity >> temp_date;

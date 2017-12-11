@@ -35,6 +35,28 @@ int validation::vlong(const char *str)
     return *end == '\0';
 }
 
+int validation::vunsigned_long(const char *str)
+{
+    char *end;
+    unsigned long val = strtoul(str, &end, 10);
+
+    if (errno == ERANGE || (errno != 0 && val == 0))
+    {
+        return 0;
+    }
+    if (end == str || end != '\0')
+    {
+        return 0;
+    }
+
+    int len = strlen(str);
+    for(int i = 0; i < len && isspace(str[i]); i++);
+
+    if(str[i] == '-')  return 0;
+
+    return 1;
+}
+
 int validation::vstring(const char *str)
 {
     return 1;
