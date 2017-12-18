@@ -1067,7 +1067,145 @@ void interface::patient_management(){
 
 	switch(ch){
 		case 1:
-		{}
+		{
+			coord c(ui::scr_width / 2, ui::scr_height / 3);
+			box form (c, ui::scr_width / 2, ui::scr_height / 1.5);
+			form.settcolor_input(YELLOW);
+
+			str inp_name, inp_sex_str, inp_dob_str
+				, inp_phone, inp_guard_name, inp_emer_contact
+				, inp_emer_phone, inp_insur_expiry, inp_admdate_str;
+			
+			address inp_adr;
+			disease inp_dis;
+			insurance inp_insur;
+
+			form << "Enter data for the patient :" << ui::endl
+					<< ui::endl << "Name : ";
+			form >> inp_name;
+			
+			form << ui::endl << "Sex : ";
+			form >> inp_sex_str;
+			form << ui::endl << "Key - M/F/T = Male/Female/Trans"
+					<< ui::endl << "Date of Birth : ";
+			
+			form.setdefault("25/12/1991");
+			form >> inp_dob_str;
+			
+			
+			form << ui::endl << "Address"
+					<< ui::endl << ui::endl
+					<< "\tHouse # : ";
+			form.setdefault("221B");
+			form >> inp_adr.house_no;
+			
+			form << ui::endl << "\tStreet : ";
+			form.setdefault("Baker Street");
+			form >> inp_adr.street;
+			
+			form << ui::endl << "\tDistrict : ";
+			form.setdefault("Idk");
+			form >> inp_adr.district;
+			
+			form << ui::endl << "/tState : ";
+			form.setdefault("London(?)");
+			form >> inp_adr.state;
+			
+			
+			form << ui::endl << ui::endl
+					<< "Phone : ";
+			form.setdefault("1234567890");
+			form >> inp_phone;
+			
+			
+			form << ui::endl << "Disease"
+					<< ui::endl << ui::endl
+					<< "\tName : ";
+			form.setdefault("Melanoma");
+			form >> inp_dis.name;
+			
+			form << ui::endl << "Type : ";
+			form.setdefault(0);
+			form >> inp_dis.type;
+			
+			form << ui::endl << "\tType key : " << ui::endl
+					<< "\t0 - Brain\t1 - Heart" << ui::endl
+					<< "\t2 - Skin\t3 - Lung" << ui::endl
+					<< "\t4 - Bone\t5 - Eye" << ui::endl
+					<< "\t6 - Throat\t7 - Teeth" << ui::endl
+					<< "\t8 - Stomach\t9 - Blood" << ui::endl
+					<< "\t10 - General/full body condition"
+					<< ui::endl << "\tSymptoms"
+					<< ui::endl << "\tSymptom 1 : ";
+			
+			form >> inp_dis.symptoms[0];
+			
+			form << ui::endl << "\tSymptom 2 : ";
+			form >> inp_dis.symptoms[1];
+			
+			form << ui::endl << "\tSymptom 3 : ";
+			form >> inp_dis.symptoms[2];
+			
+			form << ui::endl << "\tSymptom 4 : ";
+			form >> inp_dis.symptoms[3];
+			
+			
+			form << ui::endl << ui::endl
+					<< "Guardian name : ";
+			form.setdefault("Dr. John Watson");
+			form >> inp_guard_name;
+			
+			form << ui::endl << "Emergency Contact : ";
+			form.setdefault("Irene Adler");
+			form >> inp_emer_contact;
+			
+			form << ui::endl << "Emer. Cont. Phone : ";
+			form.setdefault("1234567890");
+			form >> inp_emer_phone;
+			
+			
+			form << ui::endl << "Insurance"
+					<< ui::endl << ei::endl
+					<< "\tProvder : ";
+			form.setdefault("LIC");
+			form >> inp_insur.provider;
+			
+			form << ui::endl << "\tAmount ($) : ";
+			form.setdefault(30000);
+			form >> inp_insur.amount;
+			
+			form << ui::endl << "\tExpiry";
+			form.setdefault("25/12/2022");
+			form >> inp_insur_expiry;
+			inp_insur.expiry = hospital::str_to_date(inp_insur_expiry);
+			
+			
+			form << ui::endl << ui::endl
+					<< "Admission Date : ";
+			char dnow[11];
+			Date current_date = system::get_date();
+			sprintf(dnow, "%d/%d/%d", current_date.day 
+									, current_date.month
+									, current_date.year);
+			form.setdefault(dnow);
+			form >> inp_admdate_str;
+
+			form << ui::endl << ui::endl;
+			form.setexit_button("Submit");
+
+			form.loop();
+
+			form.hide();
+
+			patient temp_pat = patient(inp_name, hospital::str_to_sex(inp_sex_str)
+										, hospital::str_to_date(inp_dob_str), inp_adr
+										, inp_phone, inp_dis, inp_guard_name
+										, inp_emer_contact, inp_emer_phone
+										, inp_insur, hospital::str_to_date(inp_admdate_str));
+
+			hospital::write_patient(temp_pat);
+
+		}
 
 		case 2:
 		{}
@@ -1134,8 +1272,17 @@ void interface::patient_management(){
 					edit_screen.setdefault(temp.symptoms[3]);
 					edit_screen >> temp.symptoms[3];
 
+					edit_screen << ui::endl << ui::endl;
+					edit_screen.setexit_button("Submit");
+
+					edit_screen.loop();
+
+					edit_screen.hide();
+
 					temp_patient.set_dis(temp);
 					hospital::write_patient(temp_patient);
+
+					break;
 				}
 
 				case 2:
@@ -1148,8 +1295,18 @@ void interface::patient_management(){
 					str temp;
 					edit_screen.setdefault(temp_patient.get_guardian_name());
 					edit_screen >> temp;
+
+					edit_screen << ui::endl << ui::endl;
+					edit_screen.setexit_button("Submit");
+
+					edit_screen.loop();
+
+					edit_screen.hide();
+
 					temp_patient.set_guardian_name(temp);
 					hospital::write_patient(temp_patient);
+
+					break;
 				}
 				
 				case 3:
@@ -1162,8 +1319,18 @@ void interface::patient_management(){
 					str temp;
 					edit_screen.setdefault(temp_patient.get_emergency_contact());
 					edit_screen >> temp;
+
+					edit_screen << ui::endl << ui::endl;
+					edit_screen.setexit_button("Submit");
+
+					edit_screen.loop();
+
+					edit_screen.hide();
+
 					temp_patient.set_emergency_contact(temp);
 					hospital::write_patient(temp_patient);
+
+					break;
 				}
 				
 				case 4:
@@ -1176,8 +1343,18 @@ void interface::patient_management(){
 					phone temp;
 					edit_screen.setdefault(temp_patient.get_emer_contact_no());
 					edit_screen >> temp;
+
+					edit_screen << ui::endl << ui::endl;
+					edit_screen.setexit_button("Submit");
+
+					edit_screen.loop();
+
+					edit_screen.hide();
+
 					temp_patient.set_emer_contact_no(temp);
 					hospital::write_patient(temp_patient);
+
+					break;
 				}
 				
 				case 5:
@@ -1196,12 +1373,24 @@ void interface::patient_management(){
 					edit_screen << ui::endl << "Expiry date (MM/DD/YYYY):";
 					char temp_date[11];
 					edit_screen >> hospital::date_validity >> temp_date;
+
+					edit_screen << ui::endl << ui::endl;
+					edit_screen.setexit_button("Submit");
+
+					edit_screen.loop();
+
+					edit_screen.hide();
+					
 					temp.expiry = hospital::str_to_date(temp_date);
 					temp_patient.set_insur_info(temp);
 					hospital::write_patient(temp_patient);
+
+					break;
 				}
 
 			}
+
+			break;
 		}
 	}
 
