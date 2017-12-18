@@ -112,18 +112,30 @@ class hospital
 
 class interface{
 	public:
-		static void interface_init();
+		static void init();
 		static int login_screen();
 		static int menu();
 		static void patient_management();
 		static void employee_management();
 		static void stock_management();
+		
+		static void doctor_screen();
+		static void nurse_screen();
+		static void receptionist_screen();
 
 		static void error(char*);
 		static void clear_error();
 
 	private:
 		interface();
+		class validate_menu			//for creating a validation function to use in menus
+		{							//to validate the choice input of the menu option to be accessed
+				static int lowest_choice, greatest_choice;
+				validate_menu();
+			public:
+				static int input(const char *);
+				static void set_menu_limits(int, int);
+		};
 		static box window;
 };
 
@@ -541,10 +553,29 @@ medicine get_med_by_code(int inp_code){
 }
 
 int hospital::get_employee_by_id(unsigned long ID, employee &target)
-{
+{	/*This function can also be used to fetch the data members common to
+	employee from doctor, nurse, or receptionist object files. This is done
+	by converting id into employee type, and then setting the path string accordingly*/
 	employee null;
 	str temp;
-	sprintf(temp, "employee/%lu/base.dat", ID);
+	switch(id_to_emp::convert(ID))
+	{
+		case INVALID:
+//			cerr<<"Invalid id";
+			return 0;
+		case OTHERS:
+			sprintf(temp, "employee/%lu/base.dat", ID);
+			break;
+		case DOCTOR:
+			sprintf(temp, "employee/doctor/%lu/base.dat", ID);
+			break;
+		case NURSE:
+			sprintf(temp, "employee/nurse/%lu/base.dat", ID);
+			break;
+		case RECEPTIONIST:
+			sprintf(temp, "employee/receptionist/%lu/base.dat", ID);
+			break;
+	}
 	int i = hospital::read_from( ID, (char*) &target, sizeof(employee), temp );
 	if(!i)
 	{
@@ -690,32 +721,12 @@ int hospital::write_employee(receptionist a)
 int hospital::pay_salary(unsigned long id, Date d1, Time t1)
 {
 	employee e;
-	doctor d;
-	nurse n;
-	receptionist r;
+	str temp;
+	
 	if(!hospital::get_employee_by_id(id, e))
 	{
 //		cerr<<"Employee not found or error while reading file";
 		return 0;
-	}
-	str temp;
-	switch(id_to_emp::convert(id))
-	{
-		case INVALID:
-//			cerr<<"Invalid id";
-			return 0;
-		case OTHERS:
-			sprintf(temp, "employee/%lu", id);
-			break;
-		case DOCTOR:
-			sprintf(temp, "employee/doctor/%lu", id);
-			break;
-		case NURSE:
-			sprintf(temp, "employee/nurse/%lu", id);
-			break;
-		case RECEPTIONIST:
-			sprintf(temp, "employee/receptionist/%lu", id);
-			break;
 	}
 	unsigned long inp1;
 	char inp2[100] = "Salary paid to ";
@@ -890,7 +901,7 @@ Date hospital::str_to_date(const char * inp_date){
 ////////////////////////////////////////////
 //////// Function definitions for interface
 
-void interface::interface_init(){
+void interface::init(){
 	window.hide();
 	window.display();
 	window.settcolor(WHITE);
@@ -908,102 +919,105 @@ void interface::interface_init(){
 	window << box::setheader << curr_date << box::setheader << ui::rightalign 
 			<< curr_time << box::setfooter << ui::centeralign
 		    << "Everything looks OK";
+	int id;
+	do
+	{
+		id = interface::login_screen();
+		if(id && id_to_emp::convert(id) != OTHERS || id == 1)	//so that general employees (except administrator) do
+		{														// not accidentally login(as they have been assigned
+			interface::clear_error();							// username and password as "", "")
+			break;
+		}
+	}while(1);
+	if(id == 1)	//if user logging in is administrator
+	{
+		int choice = 0;
 
-	int id = interface::login_screen();
-
-	int choice = 0;
-
-	while(choice < 1 || choice > 3){
 		choice = interface::menu();
-		if(choice < 1 || choice > 3){
-			interface::error("Invalid choice!!");
-		}
-		else{
-			interface::clear_error();
+
+		switch(choice){
+			case 1:
+				interface::patient_management();
+				break;
+			case 2:
+				interface::employee_management();
+				break;
+			case 3:
+				interface::stock_management();
+				break;
 		}
 	}
-
-	switch(choice){
-		case 1:
-			interface::patient_management();
-			break;
-		case 2:
-			interface::employee_management();
-			break;
-		case 3:
-			interface::stock_management();
-			break;
+	else
+	{
+		switch(id_to_emp::convert(id))
+		{
+			case INVALID:
+				interface::error("You have an invalid id generated. Create a new account");
+				break;
+			case DOCTOR:
+				interface::doctor_screen();
+				break;
+			case NURSE:
+				interface::nurse_screen();
+				break;
+			case RECEPTIONIST:
+				interface::receptionist_screen();
+				break;	
+		}
 	}
-
 }
 
-int interface::login_screen(){
+int interface::login_screen()
+{
+	const int login_screen_height = 9;
 	coord c(ui::scr_width / 3, ui::scr_height / 3);
-	box login_box (c, ui::scr_width / 3, ui::scr_height / 3);
+	box login_box (c, ui::scr_width / 3, login_screen_height);
 
 	str uid, pwd;
-	while(1)
+
+	login_box.settcolor_input(YELLOW);
+	login_box << "User ID : ";
+	login_box >> uid;
+	login_box << ui::endl << "Password : ";
+	login_box >> box::setpassword >> pwd;
+	login_box << ui::endl;
+	login_box.setexit_button("Login");
+	login_box.loop();
+	login_box.hide();
+	unsigned long max_id;
+	ifstream fin;
+	fin.open("employee/max_id.dat", ios::binary);
+	if(!fin)
+		max_id = 1;
+	else
 	{
-		login_box.settcolor_input(YELLOW);
-		login_box << "User ID : ";
-		login_box >> uid;
-		login_box << ui::endl << "Password : ";
-		login_box >> box::setpassword >> pwd;
-		login_box << ui::endl;
-
-		login_box.setexit_button("Login");
-		login_box.loop();
-		login_box.hide();
-
-		unsigned long max_id;
-		ifstream fin;
-		fin.open("employee/max_id.dat", ios::binary);
-		if(!fin)
-			max_id = 1;
-		else
+		fin.read((char *) &max_id, sizeof(unsigned long));
+		if(fin.fail())
 		{
-			fin.read((char *) &max_id, sizeof(unsigned long));
-			if(fin.fail())
-			{
-				interface::error("ERROR WHILE READING FROM FILE!!! ");
-				continue;
-			}
+			interface::error("ERROR WHILE READING FROM FILE!!! ");
+			return 0;
 		}
-		fin.close();
-
-		str temp;
-		for(unsigned long id = 1; id <= max_id; ++id)
-		{
-			switch(id_to_emp::convert(id))
-			{
-				case INVALID:
-					break;
-				case OTHERS:
-					sprintf(temp, "employee/%lu/base.dat", id);
-					break;
-				case DOCTOR:
-					sprintf(temp, "employee/doctor/%lu/base.dat", id);
-					break;
-				case NURSE:
-					sprintf(temp, "employee/nurse/%lu/base.dat", id);
-					break;
-				case RECEPTIONIST:
-					sprintf(temp, "employee/receptionist/%lu/base.dat", id);
-					break;
-			}
-			employee x;
-			ifstream fin;
-			fin.open(temp, ios::binary);
-			fin.read((char *) &x, sizeof(employee));
-			if(!strcmp(x.account.get_username(), uid) && x.account.login(pwd))
-			{
-				interface::clear_error();
-				return id;
-			}
-		}
-
-		interface::error("Invalid login details!!");
 	}
+	fin.close();
+	str temp;
+	for(unsigned long id = 1; id <= max_id; ++id)
+	{
+		employee x;
+		if(!hospital::get_employee_by_id(id, x))
+		{
+			str errmsg;
+			sprintf(errmsg, "Error in reading file of id %lu", id);
+			interface::error(errmsg);
+			return 0;
+		}
+		if(!strcmp(x.account.get_username(), uid) && x.account.login(pwd))
+		{
+			interface::clear_error();
+			return id;
+		}
+	}
+	interface::error("Invalid login details!!");
+	return 0;
 }
 
 int interface::menu(){
@@ -1011,14 +1025,14 @@ int interface::menu(){
 	box menu (c, ui::scr_width / 3, ui::scr_height / 2.2);
 
 	int ch;
-
 	menu << "1. Patient management"
 			<< ui::endl << "2. Employee management"
 			<< ui::endl << "3. Stock management"
 			<< ui::endl << ui::endl << "Choice : ";
 	menu.setdefault(1);
 	menu.settcolor_input(YELLOW);
-	menu >> ch;
+	validate_menu::set_menu_limits(1, 3);
+	menu >> validate_menu::input >> ch;
 
 	menu << ui::endl;
 	menu.setexit_button("Submit");
@@ -1195,6 +1209,36 @@ void interface::patient_management(){
 
 void interface::employee_management()
 {
+	/*
+	1. View employee data
+	2. Add new employee
+	3. Remove existing employee
+	4. Edit employee data
+	5. Pay salary to individual employee
+	6. Pay salary to all employees
+	7. Back
+	*/
+	coord c(window.getwidth() * 0.2, 5);
+	int ch;
+	box menu(c, window.getwidth() * 0.6, window.getheight() - 6 );
+	menu.settcolor(GREEN);
+	menu << ui::centeralign << "Employee Management" << ui::endl << ui::endl;
+	menu.settcolor(ui::tcolor);
+	menu << "1. View employee data" << ui::endl
+		 << "2. Add new employee" << ui::endl
+		 << "3. Remove existing employee" <<ui::endl
+		 << "4. Edit employee data" <<ui::endl
+		 << "5. Pay salary to individual employee" <<ui::endl
+		 << "6. Pay salary to all employees" <<ui::endl
+		 << "7. Back" <<ui::endl
+		 << ui::endl <<"Enter your choice: ";
+	menu.settcolor_input(YELLOW);
+	validate_menu::set_menu_limits(1, 7);
+	menu >> validate_menu::input >> ch;
+	menu << ui::endl;
+	menu.setexit_button("Submit");
+	menu.loop();
+	menu.hide();
 	
 }
 
@@ -1380,6 +1424,60 @@ void interface::stock_management(){
 
 }
 
+void interface::doctor_screen()
+{
+	coord c(2, 4);
+	box profile(c, (window.getwidth() * 3 / 5), window.getheight() - 4);
+	box menu(( c + coord((window.getwidth() * 3 / 5), 0)), (window.getwidth() * 2 / 5) - 2, window.getheight() - 4);
+	profile.settcolor(GREEN);
+	profile << ui::centeralign << "Personal Details" << ui::endl;
+	profile.settcolor(ui::tcolor);
+	profile << "Name: ";
+}
+void interface::nurse_screen()
+{
+	coord c(2, 4);
+	box profile(c, (window.getwidth() * 3 / 5), window.getheight() - 4);
+	box menu(( c + coord((window.getwidth() * 3 / 5), 0)), (window.getwidth() * 2 / 5) - 2, window.getheight() - 4);
+	profile.settcolor(GREEN);
+	profile << ui::centeralign << "Personal Details" << ui::endl;
+	profile.settcolor(ui::tcolor);
+	profile << "Name: ";
+}
+void interface::receptionist_screen()
+{
+	coord c(2, 4);
+	box profile(c, (window.getwidth() * 3 / 5), window.getheight() - 4);
+	box menu(( c + coord((window.getwidth() * 3 / 5), 0)), (window.getwidth() * 2 / 5) - 2, window.getheight() - 4);
+	profile.settcolor(GREEN);
+	profile << ui::centeralign << "Personal Details" << ui::endl;
+	profile.settcolor(ui::tcolor);
+	profile << "Name: ";
+}
+
+int interface::validate_menu::input(const char * ch)
+{
+	char *endptr;
+	int a = (int) strtol(ch, &endptr, 10);
+	if(!validation::vint(ch) || a < lowest_choice || a > greatest_choice)
+	{
+		return 0;
+	}
+	else
+	{
+		return 1;
+	}
+}
+
+void interface::validate_menu::set_menu_limits(int a, int b)
+{
+	lowest_choice = a;
+	greatest_choice = b;
+}
+
+int interface::validate_menu::lowest_choice = 0;
+int interface::validate_menu::greatest_choice = 0;
+
 void interface::error(char* err){
 	window.clear_footer();
 	window.setfooter_tcolor(RED);
@@ -1410,6 +1508,6 @@ void main()
 	employee x("Administrator", 3, Date(), yay, "", 0, Time(), Time(), "admin", "password");
 	hospital::write_employee(x);
 /////////////////////////////////////////////*/
-	interface::interface_init();
+	interface::init();
 	getch();
 }
