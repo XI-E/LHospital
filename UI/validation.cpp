@@ -107,6 +107,8 @@ validator_f validation::getvalidator
             return validation::vint;
         case info_tbox::LONG:
             return validation::vlong;
+        case info_tbox::UNSIGNED_LONG:
+            return validation::vunsigned_long;
         case info_tbox::STRING:
         case info_tbox::PASSWORD:
             return validation::vstring;
@@ -118,5 +120,6 @@ validator_f validation::getvalidator
             return validation::vfloat;
     }
     
+    //TODO: log undefined behaviour
     return NULL;
 }

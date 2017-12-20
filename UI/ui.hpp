@@ -1,3 +1,8 @@
+/*!
+ \file ui.hpp
+ \brief Contains prototypes of UI functions
+*/
+
 #ifndef UI_HPP
 #define UI_HPP
 
@@ -11,61 +16,78 @@
 #include <limits.h>
 #include <errno.h>
 
+//! Validator function that's used for validating user input
 typedef int (*validator_f)(const char *);
 
+//! For running ui::init() before main
 class init_lib_ui
 {
-	static int counter;
+	static int counter; //!< Ensures ui::init() is called only once
 	public:
-		init_lib_ui();
+		init_lib_ui(); //!< Ctor
 };
 
+//! Static object of type init_lib_ui that is initialised
+//! before main is run and thus, ui::init is called
 static init_lib_ui init_obj_ui;
 
+//! Manipulator class to manipulate UI functions
+/*!
+ Objects of this type would be used instead of an enum
+ to avoid conflicts with int
+ Every manipulator object is identified by its index while
+ static index indicates the index to be assigned to the next
+ manipulator
+*/
 class manipulator
 {
-	static int index;
-	int own_index;
+	static int index; //!< index of a new manipulator object
+	int own_index;	  //!< index of current manipulator
 
 	public:
-		manipulator();
-		int operator==(manipulator);
+		manipulator(); //!< Ctor; assigns index
+		int operator==(manipulator); //!< Returns 1 if indexes are same
 };
 
+//! Class containing basic UI functions and attributes
 class ui
 {
-	ui();	//object of this class shouldn't be created
+	ui();	//!< Private ctor; object of this class shouldn't be created
 	public:
+	
+		//! Specifies the directions for modifying frame, etc.
 		enum dir
 		{
 			left = 1,
 			top = 2,
 			right = 4,
 			bottom = 8,
-			all = 16 //When all sides need to be modified
+			all = 16 //!< When all sides need to be modified
 		};
-		static int scr_height;
-		static int scr_width;
-		static void init();
-		static void clrscr();
-		static int tcolor;
-		static int bcolor;
-		static manipulator endl;
-		static manipulator centeralign;
-		static manipulator rightalign;
+		static int scr_height; //!< Height of screen
+		static int scr_width; //!< Width of screen
+		static void init(); //!< Sets all static variables
+		static void clrscr(); //!< Clears the contents off the screen
+		static int tcolor; //!< text color
+		static int bcolor; //!< background color
+		static manipulator endl; //!< End line and move cursor to next line
+		static manipulator centeralign; //!< Center align
+		static manipulator rightalign; //!< Right align
 };
 
+//! Represents a coordinate
 struct coord
 {
-	int x;
-	int y;
+	int x;	//!< x coordinate
+	int y;	//!< y coordinate
 
-	coord(int = 1,int = 1);
+	coord(int = 1,int = 1); //!< Sets the coordinate
 	coord & operator+=(coord);
 	coord & operator-=(coord);
-	coord operator+(coord);
+	coord operator+(coord); 
 	coord operator-(coord);
 };
+
 
 class list_layout_node
 {
