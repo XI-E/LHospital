@@ -44,7 +44,7 @@ int validation::vunsigned_long(const char *str)
     {
         return 0;
     }
-    if (end == str || end != '\0')
+    if (end == str || *end != '\0')
     {
         return 0;
     }
