@@ -35,36 +35,14 @@ int person::get_sex()
 	return sex;
 }
 
-int person::get_dob(int inp)
+Date person::get_dob()
 {
-	switch(inp){
-		case DAY:
-			return dob.day;
-		case MONTH:
-			return dob.month;
-		case YEAR:
-			return dob.year;
-		default:
-			return 0;
-	}
+	return dob;
 }
 
-char* person::get_address(int inp)
+address person::get_address()
 {
-	switch(inp){
-		case HOUSE_NO:
-			return adr.house_no;
-		case STREET:
-			return adr.street;
-		case CITY:
-			return adr.city;
-		case DISTRICT:
-			return adr.district;
-		case STATE:
-			return adr.state;
-		default:
-			return 0;
-	}
+	return adr;
 }
 
 char* person::get_phone()
@@ -133,6 +111,12 @@ Time::Time(unsigned h, unsigned m, unsigned s)
 	}
 }
 
+box & operator<<(box &output, Time & t)
+{
+	output << (unsigned long)t.hour << ':' << (unsigned long)t.minute << ':' << (unsigned long)t.second;//box::operator <<(unsigned int) not working...
+	return output;
+}
+
 Date::Date()
 {
 	day = 0;
@@ -156,6 +140,12 @@ Date::Date(unsigned d, unsigned m, unsigned y)
 	}
 }
 
+box & operator<<(box &output, Date & d)
+{
+	output << (unsigned long)d.day << '/' << (unsigned long)d.month << '/' << (unsigned long)d.year;//box::operator <<(unsigned int) not working...
+	return output;
+}
+
 Date system::get_date()
 {
 	time_t t = time(0);
@@ -170,6 +160,13 @@ Time system::get_time()
 	struct tm *now = localtime(&t);
 	Time tnow(now->tm_hour, now->tm_min ,now->tm_sec);
 	return tnow;
+}
+
+box & operator<<(box &output, address & a)
+{
+	output << a.house_no << ", " << a.street << ", " 
+		   << a.city << ", " << a.district << ", " << a.state;
+	return output;
 }
 
 userid::userid(str name ,str plaintext)	//plaintext is the unencrypted password

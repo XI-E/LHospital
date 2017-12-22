@@ -1,6 +1,7 @@
 #ifndef BASE
 #define BASE
 
+#include "ui/ui.hpp"
 #include <string.h>
 #include <time.h>
 #include <stdlib.h>			//for random() and randomize()
@@ -26,6 +27,7 @@ struct Time{
 
 	Time();
 	Time(unsigned h, unsigned m, unsigned s);
+	friend box & operator<<(box &output, Time & t);
 };
 
 struct Date{
@@ -35,6 +37,7 @@ struct Date{
 
 	Date();
 	Date(unsigned d, unsigned m, unsigned y);
+	friend box & operator<<(box &output, Date & d);
 };
 
 class system
@@ -52,6 +55,8 @@ struct address{
 	str city;
 	str district;
 	str state;
+	
+	friend box & operator<<(box &output, address & a);
 };
 
 struct disease{
@@ -96,8 +101,8 @@ class person{
 		char* get_name();
 		int get_age();
 		int get_sex();
-		int get_dob(int);
-		char* get_address(int);
+		Date get_dob();
+		address get_address();
 		char* get_phone();
 
 		//Updating functions

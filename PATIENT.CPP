@@ -25,12 +25,12 @@ patient::patient(str inp1, int inp2 , Date inp3, address inp4, phone inp5, disea
 	admission_date = inp11;
 	Date dnow = system::get_date();
 
-	if(	admission_date.day != dnow.day &&
-		admission_date.month != dnow.month &&
+	if(	admission_date.day != dnow.day ||
+		admission_date.month != dnow.month ||
 		admission_date.year != dnow.year		)
-
+	{
 		set_dob(inp3, inp11);
-
+	}
 	for(int i = 0; i < 50; i++){
 		med[i][0] = med[i][1] = 0;
 	}

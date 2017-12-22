@@ -126,6 +126,8 @@ class interface{
 		static void error(char*);
 		static void clear_error();
 
+		static int log_this(char *);
+
 	private:
 		interface();
 		class validate_menu			//for creating a validation function to use in menus
@@ -1681,6 +1683,24 @@ void interface::clear_error(){
 		<< "Everything looks OK";
 }
 
+int interface::log_this(char * message)
+{
+	Date dnow = system::get_date();
+	Time tnow = system::get_time();
+	str text;
+	sprintf(text, "$ [%u-%u-%u %u:%u:%u +0530]: ", dnow.day, dnow.month, dnow.year, tnow.hour, tnow.minute, tnow.second);
+	strcat(text, message);
+	ofstream fout;
+	fout.open("log.txt", ios::out | ios::app);
+	if(!fout)
+		return 0;
+	fout << text << endl;
+	if(fout.fail())
+		return 0;
+	fout.close();
+	return 1;
+}
+
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
@@ -1697,6 +1717,8 @@ void main()
 	employee x("Administrator", 3, Date(), yay, "", 0, Time(), Time(), "admin", "password");
 	hospital::write_employee(x);
 /////////////////////////////////////////////*/
+	interface::log_this("Program initiated\n");
 	interface::init();
+	interface::log_this("Program terminated\n");
 	getch();
 }
