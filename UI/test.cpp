@@ -3,15 +3,70 @@
 #include "ui/ui.hpp"
 #include "ui/test.hpp"
 
-/*void main()
+void main()
 {
-	test_all();
+	int shit = 14;
+	box menu2(coord(2, 4), 40, 10 );
+	menu2 << "Enter your shit: ";
+	menu2 >> shit;
+	menu2.setexit_button("Submit my shit");
+	menu2.loop();
+
+	menu2.clear();
+	menu2 << "Your shit's coming up!" << ui::endl; getch();
+	menu2 << "Here's your shit: ";
+	menu2 << shit;
+	menu2 << ". Deal with it!" << ui::endl;
+	getch();
 
 	getch();
-} */
+} 
 
 void test_all()
 {
+	/*
+	ui::clrscr();
+	box menu2(coord(2, 4), 40, 10 );
+
+	menu2.settcolor(GREEN);
+	menu2 << ui::centeralign << "Employee Management" << ui::endl << ui::endl;
+	menu2.settcolor(WHITE);
+	int menu2_height;
+	menu2_height = 10;
+//	menu2.setheight(menu2_height);
+	menu2 << "View employee data" << ui::endl;
+	menu2.settcolor(ui::tcolor);
+//	menu2 << "Enter employee's id: ";
+	unsigned long id;
+	menu2 >> id;
+	menu2 << ui::endl;
+	menu2.setexit_button("Submit");
+	menu2.loop();
+	
+	menu2.clear();
+	menu2.setheight(15);
+	menu2.settcolor(GREEN);
+	menu2 << ui::centeralign << "Employee Management" << ui::endl << ui::endl;
+	menu2.settcolor(WHITE);
+	menu2 << "Employee Details: " << ui::endl;
+	menu2.settcolor(ui::tcolor);
+		getch();
+		menu2.hide();
+		getch();
+		menu2.display();
+		getch();
+	menu2 << "ID: " << 1 << ui::endl;
+		getch();
+		menu2.hide();
+		getch();
+		menu2.display();
+		getch();
+	*/
+
+	
+
+
+	/*
 	char name[40], pwd[40];
 	int age;
 	long phn;
@@ -61,6 +116,8 @@ void test_all()
 	  << "Date: " << date << ui::endl
 	  << "Amount: " << amt << ui::endl
 	  << "Password: " << pwd << ui::endl;
+
+	*/
 }
 
 
@@ -166,7 +223,7 @@ void test_frame()
 	  << ui::bottom << 'b'
 	  << ui::right << 'r';
 
-	f.setcolor(LIGHTBLUE);
+	f.settcolor(LIGHTBLUE);
 
 	f.display();
 
@@ -181,7 +238,7 @@ void test_frame()
 	  << ui::left << (char) 186
 	  << ui::right << (char) 186;
 
-	f.setcolor(ui::tcolor);
+	f.settcolor(ui::tcolor);
 
 	f.display();
 

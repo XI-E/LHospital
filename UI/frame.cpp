@@ -79,7 +79,8 @@ frame::frame(coord topleft, int w, int h)
 		border_chars[i] = '*';
 		sides_visibility[i] = 1;
 	}
-	color = LIGHTGRAY;
+	tcolor = ui::tcolor;
+	bcolor = ui::bcolor;
 	frame_visibility = 0;
 	height = h;
 	width = w;
@@ -99,7 +100,8 @@ void frame::hide()
 
 void frame::print(int param)
 {
-	textcolor(frame::color);
+	textcolor(frame::tcolor);
+	textbackground(frame::bcolor);
 
 	char visible_chars[8];
 	frame_visibility = param;
@@ -217,9 +219,14 @@ int frame::getframe_visibility()
 	return frame_visibility;
 }
 
-int frame::getcolor()
+int frame::gettcolor()
 {
-	return color;
+	return tcolor;
+}
+
+int frame::getbcolor()
+{
+	return bcolor;
 }
 
 char frame::getborder_char(int side)
@@ -249,9 +256,15 @@ void frame::setwidth(int w)
 	display();
 }
 
-void frame::setcolor(int c)
+void frame::settcolor(int c)
 {
-	color = c;
+	tcolor = c;
+	display();
+}
+
+void frame::setbcolor(int b)
+{
+	bcolor = b;
 	display();
 }
 

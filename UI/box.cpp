@@ -8,6 +8,7 @@ line::line()
     strcpy(right, "");
     width = ui::scr_width - 2;
     tcolor = ui::tcolor;
+    bcolor = ui::bcolor;
     corner_top_left = coord(0,0);
 }
 
@@ -36,6 +37,8 @@ void line::print(int mode)
     &ctl = corner_top_left;
     gotoxy(ctl.x, ctl.y);
     textcolor(tcolor);
+    textbackground(bcolor);
+
     if(mode == 1)
     {
         cprintf("%s", left);
@@ -121,11 +124,17 @@ int box::wrap(char str[], int length, int return_one_line)
                     sprintf(out_str + strlen(out_str), "\n%s ", word);
                     written = word_len + 1;
                 }
-                else
+				else if(written + word_len < length)
                 {
                     sprintf(out_str + strlen(out_str), "%s ", word);
                     written += word_len + 1;
                 }
+                else //Not to add the space at the end if the line just completes
+                {
+                    sprintf(out_str + strlen(out_str), "%s", word);
+                    written += word_len;
+                }
+                
                 chars_read += read;
             }
 
@@ -746,8 +755,8 @@ void box::hide()
 {
     layout.hide();
     f.hide();
-    header.display();
-    footer.display();
+    header.hide();
+    footer.hide();
 }
 
 void box::clear()
@@ -773,9 +782,11 @@ void box::setfooter_tcolor(int c)
 void box::clear_header()
 {
     header.clear();
+    f.display();
 }
 
 void box::clear_footer()
 {
     footer.clear();
+    f.display();
 }

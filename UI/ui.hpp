@@ -275,7 +275,8 @@ class list_layout
 class frame
 {
 	char border_chars[8];
-	int color;
+	int tcolor;
+	int bcolor;
 	int sides_visibility[8];
 	int frame_visibility;
 	coord corner_top_left; //top left
@@ -309,13 +310,15 @@ class frame
 		int getwidth();
 		coord getcorner_top_left();
 		int getframe_visibility(); //Returns 1 if visible; 0 = not visible
-		int getcolor();
+		int gettcolor();
+		int getbcolor();
 		char getborder_char(int);
 		int getside_visibility(int);
 
 		void setheight(int);
 		void setwidth(int);
-		void setcolor(int);
+		void settcolor(int);
+		void setbcolor(int);
 		void setcorner_top_left(coord);
 };
 
@@ -382,6 +385,7 @@ struct line
 
 	int width;
 	int tcolor;
+	int bcolor;
 	coord corner_top_left;
 
 	line();
