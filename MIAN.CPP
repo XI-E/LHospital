@@ -1,3 +1,6 @@
+#include "iface.hpp"
+#include <conio.h>
+
 void main()
 {
 	clrscr();

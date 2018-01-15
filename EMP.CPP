@@ -1,5 +1,7 @@
-#include "emp.cpp"
-
+#include "hosp.hpp"
+#include "iface.hpp"
+#include "emp.hpp"
+#include <fstream.h>
 
 //////////////////////////////////
 /// Function definitions for class employee
