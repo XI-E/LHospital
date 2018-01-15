@@ -16,7 +16,7 @@ enum time_type {HOUR, MINUTE, SECOND};
 enum body_parts {BRAIN, HEART, SKIN,
 	LUNG, BONE, EYE,
 	THROAT, TEETH, STOMACH,
-	BLOOD, ASSMAN, GEN};	// GEN for general problems
+	BLOOD, GUT, GEN};	// GEN for general problems
 enum address_parts {HOUSE_NO, STREET, CITY, DISTRICT, STATE};
 enum times_of {START, END};
 
@@ -27,7 +27,6 @@ struct Time{
 
 	Time();
 	Time(unsigned h, unsigned m, unsigned s);
-	friend box & operator<<(box &output, Time & t);
 };
 
 struct Date{
@@ -37,7 +36,6 @@ struct Date{
 
 	Date();
 	Date(unsigned d, unsigned m, unsigned y);
-	friend box & operator<<(box &output, Date & d);
 };
 
 class system
@@ -55,8 +53,6 @@ struct address{
 	str city;
 	str district;
 	str state;
-	
-	friend box & operator<<(box &output, address & a);
 };
 
 struct disease{
@@ -139,6 +135,17 @@ class userid
 		char * get_username();
 		void set_username(char *);
 		int login(char *);
+};
+
+class enum_to_str			//defines << operator overloads to facilitate printing of some stuff
+{
+		enum_to_str();
+	public:
+		friend box & operator<<(box &output, sex s);		//converts sex enumeration constant into a string and prints it to a box
+		friend box & operator<<(box &output, body_parts b);	//converts body_parts enumeration constant into a string and prints it to a box
+		friend box & operator<<(box &output, Time & t);		//converts Time variable into a string and prints it to a box
+		friend box & operator<<(box &output, Date & d);		//converts Date variable into a string and prints it to a box
+		friend box & operator<<(box &output, address & a);	////converts address variable into a string and prints it to a box
 };
 
 #endif

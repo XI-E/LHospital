@@ -4,6 +4,7 @@
 #include <dir.h>
 #include <stdio.h>
 #include "patient.hpp"
+#include "if.hpp"
 #include <math.h>
 
 enum emp_type {INVALID, OTHERS, DOCTOR, NURSE, RECEPTIONIST};
@@ -25,6 +26,7 @@ class employee : public person{
 	public:
 		employee(str, int, Date, address, phone, unsigned long, Time, Time, str = "", str = "");	//for all those with user accounts(doctors, nurses, receptionists), last 2 arguments are to be provided as well
 		employee();	//default constructor
+		int get_age();		//overridden function
 		unsigned long get_salary();
 		void set_salary(unsigned long);
 		Time get_shift(int);
@@ -44,17 +46,20 @@ class doctor : public employee{
 	public:
 		doctor(str, int, Date, address, phone, unsigned long, Time, Time, int, int, str, str);
 		doctor();	//default constructor
+		int * get_speciality();
+		long * get_patients();
 	private:
 		int speciality[2];				// Doctor's specialization
-		int patients[10];				// Patients currently under care, can take only 10 at once
+		long patients[10];				// Patients currently under care, can take only 10 at once
 };
 
 class nurse : public employee{
 	public:
 		nurse(str, int, Date, address, phone, unsigned long, Time, Time, str, str);
 		nurse();		//default constructor
+		long * get_patients();
 	private:
-		int patients[5];
+		long patients[5];
 };
 
 class receptionist : public employee
@@ -87,14 +92,14 @@ class hospital
 
 		static medicine get_med_by_code(int);
 
-		static int get_employee_by_id(unsigned long, employee &);
-		static int get_employee_by_id(unsigned long, doctor &);
-		static int get_employee_by_id(unsigned long, nurse &);
-		static int get_employee_by_id(unsigned long, receptionist &);
-		static int write_employee(employee);
-		static int write_employee(doctor);
-		static int write_employee(nurse);
-		static int write_employee(receptionist);
+		static int get_employee_by_id(unsigned long, void *);
+//		static int get_employee_by_id(unsigned long, doctor &);	//The new get_employee_by_id hasn't been tested properly, so until that is done, these functions are gonna remain commented
+//		static int get_employee_by_id(unsigned long, nurse &);
+//		static int get_employee_by_id(unsigned long, receptionist &);
+		static int write_employee(void *);
+//		static int write_employee(doctor);						//same as above for write function
+//		static int write_employee(nurse);
+//		static int write_employee(receptionist);
 		static int pay_salary(unsigned long, Date, Time);
 		static int pay_all_salaries();
 
@@ -108,37 +113,6 @@ class hospital
 		hospital();
 		static int read_from(unsigned long, char *, int, char *);
 		static double balance;
-};
-
-class interface{
-	public:
-		static void init();
-		static int login_screen();
-		static int menu();
-		static void patient_management();
-		static void employee_management();
-		static void stock_management();
-		
-		static void doctor_screen();
-		static void nurse_screen();
-		static void receptionist_screen();
-
-		static void error(char*);
-		static void clear_error();
-
-		static int log_this(char *);
-
-	private:
-		interface();
-		class validate_menu			//for creating a validation function to use in menus
-		{							//to validate the choice input of the menu option to be accessed
-				static int lowest_choice, greatest_choice;
-				validate_menu();
-			public:
-				static int input(const char *);
-				static void set_menu_limits(int, int);
-		};
-		static box window;
 };
 
 //////////////////////////////////
@@ -185,20 +159,20 @@ int id_to_emp::convert(unsigned long ID)
 	fin.open("employee/id_list.dat", ios::binary);
 	if(!fin)
 	{
-//		cerr<<"File id_list.dat not found!!";
+		interface::log_this("id_to_emp::convert() : File id_list.dat not found!!");
 		return INVALID;
 	}
 	fin.seekg( (ID * sizeof(id_to_emp)) );
 	fin.read((char *) &a, sizeof(id_to_emp));
 	if(fin.fail())
 	{
-//		cerr<<"Error while reading from file id_list.dat";
+		interface::log_this("id_to_emp::convert() : Error while reading from file id_list.dat");
 		return INVALID;
 	}
 	fin.close();
 	if(a.id != ID)
 	{
-//		cerr<<"(For dev only)Error in the code... Recheck it!!";
+		interface::log_this("id_to_emp::convert() : (For dev only)Error in the code... Recheck it!!");
 		return INVALID;
 	}
 	return a.employee_type;
@@ -261,6 +235,16 @@ employee::employee(str inp1, int inp2, Date inp3, address inp4, phone inp5, unsi
 employee::employee() : person()
 {
 	id = 0;
+}
+
+int employee::get_age()
+{
+	////////////////Updating age to present age///////////
+	set_dob(dob);		//This function is used here to invoke calc_age() in it only(because calc_age is directly not accessible)
+	employee temp;
+	if(hospital::get_employee_by_id(id, &temp))		//if employee's file exists on disk
+		hospital::write_employee(this);				//overwrite that file
+	return age;
 }
 
 unsigned long employee::get_salary(){
@@ -337,7 +321,23 @@ doctor::doctor(str inp1, int inp2, Date inp3, address inp4, phone inp5, unsigned
 }
 
 doctor::doctor() : employee()
-{}
+{
+	speciality[0] = speciality[1] = GEN + 1;	//storing an invalid value in speciality
+	for(int i = 0; i < 10; ++i)
+	{
+		patients[i] = 0;
+	}
+}
+
+int * doctor::get_speciality()
+{
+	return speciality;
+}
+
+long * doctor::get_patients()
+{
+	return patients;
+}
 
 nurse::nurse(str inp1, int inp2, Date inp3, address inp4, phone inp5, unsigned long inp6, Time inp7, Time inp8, str inp10, str inp11) : employee(inp1, inp2, inp3, inp4, inp5, inp6, inp7, inp8, inp10, inp11)
 {
@@ -348,7 +348,17 @@ nurse::nurse(str inp1, int inp2, Date inp3, address inp4, phone inp5, unsigned l
 }
 
 nurse::nurse() : employee()
-{}
+{
+	for(int i = 0; i < 5; ++i)
+	{
+		patients[i] = 0;
+	}
+}
+
+long * nurse::get_patients()
+{
+	return patients;
+}
 
 receptionist::receptionist(str inp1, int inp2, Date inp3, address inp4, phone inp5, unsigned long inp6, Time inp7, Time inp8, str inp10, str inp11) : employee(inp1, inp2, inp3, inp4, inp5, inp6, inp7, inp8, inp10, inp11)
 {
@@ -420,6 +430,11 @@ transaction hospital::add_money(float amt, char* reason, Date d, Time t){
 }
 
 patient hospital::get_patient_by_id(int id){
+	if(!id)
+	{
+		patient null;
+		return null;
+	}
 	str temp;
 	sprintf(temp, "patient/%d/base.dat", id);
 	ifstream patient_file ( temp , ios::in | ios::binary );
@@ -527,7 +542,7 @@ void hospital::discharge_patient(int pat_id){
 	hospital::write_patient(temp);
 }
 
-medicine get_med_by_code(int inp_code){
+medicine hospital::get_med_by_code(int inp_code){
 	fstream meds ("hospital/medicine.dat", ios::in | ios::binary);
 
 	medicine temp;
@@ -554,12 +569,10 @@ medicine get_med_by_code(int inp_code){
 	return temp;
 }
 
-int hospital::get_employee_by_id(unsigned long ID, employee &target)
-{	/*This function can also be used to fetch the data members common to
-	employee from doctor, nurse, or receptionist object files. This is done
-	by converting id into employee type, and then setting the path string accordingly*/
-	employee null;
+int hospital::get_employee_by_id(unsigned long ID, void * target)
+{
 	str temp;
+	int size_of_target;
 	switch(id_to_emp::convert(ID))
 	{
 		case INVALID:
@@ -567,26 +580,30 @@ int hospital::get_employee_by_id(unsigned long ID, employee &target)
 			return 0;
 		case OTHERS:
 			sprintf(temp, "employee/%lu/base.dat", ID);
+			size_of_target = sizeof(employee);
 			break;
 		case DOCTOR:
 			sprintf(temp, "employee/doctor/%lu/base.dat", ID);
+			size_of_target = sizeof(doctor);
 			break;
 		case NURSE:
 			sprintf(temp, "employee/nurse/%lu/base.dat", ID);
+			size_of_target = sizeof(nurse);
 			break;
 		case RECEPTIONIST:
 			sprintf(temp, "employee/receptionist/%lu/base.dat", ID);
+			size_of_target = sizeof(receptionist);
 			break;
 	}
-	int i = hospital::read_from( ID, (char*) &target, sizeof(employee), temp );
+	int i = hospital::read_from( ID, (char*) target, size_of_target, temp );
 	if(!i)
 	{
-		target = null;
+		target = NULL;
 		return 0;
 	}
 	return 1;
 }
-
+/*
 int hospital::get_employee_by_id(unsigned long ID, doctor &target)
 {
 	doctor null;
@@ -628,12 +645,36 @@ int hospital::get_employee_by_id(unsigned long ID, receptionist &target)
 	}
 	return 1;
 }
-
-int hospital::write_employee(employee a)
+*/
+int hospital::write_employee(void * a)
 {
 	mkdir("employee");
 	str temp;
-	sprintf(temp, "employee/%lu", a.get_id());
+	int size_of_target;
+	employee *x = (employee *) a;
+	const unsigned long ID = x->get_id();
+	switch(id_to_emp::convert(ID))
+	{
+		case INVALID:
+//			cerr<<"Invalid id";
+			return 0;
+		case OTHERS:
+			sprintf(temp, "employee/%lu", ID);
+			size_of_target = sizeof(employee);
+			break;
+		case DOCTOR:
+			sprintf(temp, "employee/doctor/%lu", ID);
+			size_of_target = sizeof(doctor);
+			break;
+		case NURSE:
+			sprintf(temp, "employee/nurse/%lu", ID);
+			size_of_target = sizeof(nurse);
+			break;
+		case RECEPTIONIST:
+			sprintf(temp, "employee/receptionist/%lu", ID);
+			size_of_target = sizeof(receptionist);
+			break;
+	}
 	mkdir(temp);
 	strcat(temp, "/base.dat");
 	ofstream fout ( temp , ios::out | ios::binary);
@@ -642,7 +683,7 @@ int hospital::write_employee(employee a)
 //		cerr<<"Employee data file could not be created or accessed";
 		return 0;
 	}
-	fout.write( (char*) &a , sizeof(employee) );
+	fout.write( (char *) a , size_of_target );
 	if(fout.fail())
 	{
 //		cerr<<"Error while writing to file";
@@ -650,7 +691,7 @@ int hospital::write_employee(employee a)
 	}
 	return 1;
 }
-
+/*
 int hospital::write_employee(doctor a)
 {
 	mkdir("employee");
@@ -719,13 +760,13 @@ int hospital::write_employee(receptionist a)
 	}
 	return 1;
 }
-
+*/
 int hospital::pay_salary(unsigned long id, Date d1, Time t1)
 {
 	employee e;
 	str temp;
 	
-	if(!hospital::get_employee_by_id(id, e))
+	if(!hospital::get_employee_by_id(id, &e))
 	{
 //		cerr<<"Employee not found or error while reading file";
 		return 0;
@@ -964,7 +1005,7 @@ void interface::init(){
 				break;
 			case RECEPTIONIST:
 				interface::receptionist_screen();
-				break;	
+				break;
 		}
 	}
 }
@@ -1005,7 +1046,7 @@ int interface::login_screen()
 	for(unsigned long id = 1; id <= max_id; ++id)
 	{
 		employee x;
-		if(!hospital::get_employee_by_id(id, x))
+		if(!hospital::get_employee_by_id(id, &x))
 		{
 			str errmsg;
 			sprintf(errmsg, "Error in reading file of id %lu", id);
@@ -1045,7 +1086,7 @@ int interface::menu(){
 	return ch;
 }
 
-void interface::patient_management(){
+void interface::patient_management(){/*
 	int ch = 0;
 
 	while(ch < 1 || ch > 3){
@@ -1069,7 +1110,7 @@ void interface::patient_management(){
 
 	switch(ch){
 		case 1:
-		{
+		{*//*
 			coord c(ui::scr_width / 2, ui::scr_height / 3);
 			box form (c, ui::scr_width / 2, ui::scr_height / 1.5);
 			form.settcolor_input(YELLOW);
@@ -1077,7 +1118,7 @@ void interface::patient_management(){
 			str inp_name, inp_sex_str, inp_dob_str
 				, inp_phone, inp_guard_name, inp_emer_contact
 				, inp_emer_phone, inp_insur_expiry, inp_admdate_str;
-			
+
 			address inp_adr;
 			disease inp_dis;
 			insurance inp_insur;
@@ -1085,51 +1126,51 @@ void interface::patient_management(){
 			form << "Enter data for the patient :" << ui::endl
 					<< ui::endl << "Name : ";
 			form >> inp_name;
-			
+
 			form << ui::endl << "Sex : ";
 			form >> inp_sex_str;
 			form << ui::endl << "Key - M/F/T = Male/Female/Trans"
 					<< ui::endl << "Date of Birth : ";
-			
+
 			form.setdefault("25/12/1991");
 			form >> inp_dob_str;
-			
-			
+
+
 			form << ui::endl << "Address"
 					<< ui::endl << ui::endl
 					<< "\tHouse # : ";
 			form.setdefault("221B");
 			form >> inp_adr.house_no;
-			
+
 			form << ui::endl << "\tStreet : ";
 			form.setdefault("Baker Street");
 			form >> inp_adr.street;
-			
+
 			form << ui::endl << "\tDistrict : ";
 			form.setdefault("Idk");
 			form >> inp_adr.district;
-			
+
 			form << ui::endl << "/tState : ";
 			form.setdefault("London(?)");
 			form >> inp_adr.state;
-			
-			
+
+
 			form << ui::endl << ui::endl
 					<< "Phone : ";
 			form.setdefault("1234567890");
 			form >> inp_phone;
-			
-			
+
+
 			form << ui::endl << "Disease"
 					<< ui::endl << ui::endl
 					<< "\tName : ";
 			form.setdefault("Melanoma");
 			form >> inp_dis.name;
-			
+
 			form << ui::endl << "Type : ";
 			form.setdefault(0);
 			form >> inp_dis.type;
-			
+
 			form << ui::endl << "\tType key : " << ui::endl
 					<< "\t0 - Brain\t1 - Heart" << ui::endl
 					<< "\t2 - Skin\t3 - Lung" << ui::endl
@@ -1139,54 +1180,54 @@ void interface::patient_management(){
 					<< "\t10 - General/full body condition"
 					<< ui::endl << "\tSymptoms"
 					<< ui::endl << "\tSymptom 1 : ";
-			
+
 			form >> inp_dis.symptoms[0];
-			
+
 			form << ui::endl << "\tSymptom 2 : ";
 			form >> inp_dis.symptoms[1];
-			
+
 			form << ui::endl << "\tSymptom 3 : ";
 			form >> inp_dis.symptoms[2];
-			
+
 			form << ui::endl << "\tSymptom 4 : ";
 			form >> inp_dis.symptoms[3];
-			
-			
+
+
 			form << ui::endl << ui::endl
 					<< "Guardian name : ";
 			form.setdefault("Dr. John Watson");
 			form >> inp_guard_name;
-			
+
 			form << ui::endl << "Emergency Contact : ";
 			form.setdefault("Irene Adler");
 			form >> inp_emer_contact;
-			
+
 			form << ui::endl << "Emer. Cont. Phone : ";
 			form.setdefault("1234567890");
 			form >> inp_emer_phone;
-			
-			
+
+
 			form << ui::endl << "Insurance"
-					<< ui::endl << ei::endl
+					<< ui::endl << ui::endl
 					<< "\tProvder : ";
 			form.setdefault("LIC");
 			form >> inp_insur.provider;
-			
+
 			form << ui::endl << "\tAmount ($) : ";
 			form.setdefault(30000);
 			form >> inp_insur.amount;
-			
+
 			form << ui::endl << "\tExpiry";
 			form.setdefault("25/12/2022");
 			form >> inp_insur_expiry;
 			inp_insur.expiry = hospital::str_to_date(inp_insur_expiry);
-			
-			
+
+
 			form << ui::endl << ui::endl
 					<< "Admission Date : ";
 			char dnow[11];
 			Date current_date = system::get_date();
-			sprintf(dnow, "%d/%d/%d", current_date.day 
+			sprintf(dnow, "%d/%d/%d", current_date.day
 									, current_date.month
 									, current_date.year);
 			form.setdefault(dnow);
@@ -1206,7 +1247,7 @@ void interface::patient_management(){
 										, inp_insur, hospital::str_to_date(inp_admdate_str));
 
 			hospital::write_patient(temp_pat);
-
+		*//*break;
 		}
 
 		case 2:
@@ -1310,7 +1351,7 @@ void interface::patient_management(){
 
 					break;
 				}
-				
+
 				case 3:
 				{
 					coord c(ui::scr_width / 3, ui::scr_height / 3);
@@ -1334,7 +1375,7 @@ void interface::patient_management(){
 
 					break;
 				}
-				
+
 				case 4:
 				{
 					coord c(ui::scr_width / 3, ui::scr_height / 3);
@@ -1358,7 +1399,7 @@ void interface::patient_management(){
 
 					break;
 				}
-				
+
 				case 5:
 				{
 					coord c(ui::scr_width / 3, ui::scr_height / 3);
@@ -1370,8 +1411,8 @@ void interface::patient_management(){
 					edit_screen.setdefault(temp.provider);
 					edit_screen >> temp.provider;
 					edit_screen << ui::endl << "Amount (in $) :";
-					edit_screen.setdefault(temp.amount);	
-					edit_screen >> temp.amount;            
+					edit_screen.setdefault(temp.amount);
+					edit_screen >> temp.amount;
 					edit_screen << ui::endl << "Expiry date (MM/DD/YYYY):";
 					char temp_date[11];
 					edit_screen >> hospital::date_validity >> temp_date;
@@ -1382,7 +1423,7 @@ void interface::patient_management(){
 					edit_screen.loop();
 
 					edit_screen.hide();
-					
+
 					temp.expiry = hospital::str_to_date(temp_date);
 					temp_patient.set_insur_info(temp);
 					hospital::write_patient(temp_patient);
@@ -1396,7 +1437,7 @@ void interface::patient_management(){
 		}
 	}
 
-}
+*/}
 
 void interface::employee_management()
 {
@@ -1409,9 +1450,10 @@ void interface::employee_management()
 	6. Pay salary to all employees
 	7. Back
 	*/
-	coord c(window.getwidth() * 0.2, 5);
+	const int menu_corner_top_left_y = 5;
+	coord c(ui::scr_width * 0.2, menu_corner_top_left_y);
 	int ch;
-	box menu(c, window.getwidth() * 0.6, window.getheight() - 6 );
+	box menu(c, ui::scr_width * 0.6, ui::scr_height - 6 );
 	menu.settcolor(GREEN);
 	menu << ui::centeralign << "Employee Management" << ui::endl << ui::endl;
 	menu.settcolor(ui::tcolor);
@@ -1430,7 +1472,177 @@ void interface::employee_management()
 	menu.setexit_button("Submit");
 	menu.loop();
 	menu.hide();
-	
+	box menu2(c, ui::scr_width * 0.6, ui::scr_height - 6 );
+	menu2.clear();
+	menu2.settcolor(GREEN);
+	menu2 << ui::centeralign << "Employee Management" << ui::endl << ui::endl;
+	menu2.settcolor(WHITE);
+	int menu2_height;
+	switch (ch)
+	{
+		case 1:
+		{
+			menu2_height = 10;
+			menu2.setheight(menu2_height);
+			menu2 << "View employee data" << ui::endl;
+			menu2.settcolor(ui::tcolor);
+			menu2 << "Enter employee's id: ";
+			unsigned long id;
+			void * temp;
+			menu2.settcolor_input(YELLOW);
+			menu2 >> id;
+			menu2 << ui::endl;
+			menu2.setexit_button("Submit");
+			menu2.loop();
+			menu2.hide();
+			if(!hospital::get_employee_by_id(id, temp))
+			{
+				interface::error("Error while reading from file!");
+			}
+			else
+			{
+				employee *e = (employee *) temp;
+				box menu3( menu2.getcorner_top_left(), menu2.getwidth(), menu2.getheight() );
+				menu3.setheight( menu.getheight() );
+				menu3.settcolor(GREEN);
+				menu3 << ui::centeralign << "Employee Management" << ui::endl << ui::endl;
+				menu3.settcolor(WHITE);
+				menu3 << "Employee Details: " << ui::endl;
+				menu3.settcolor(ui::tcolor);
+				menu3 << "ID: " << e->get_id() << ui::endl;
+				menu3 << "Name: " << e->get_name() << ui::endl;
+				menu3 << "Age: " << e->get_age() << ui::endl;
+				menu3 << "Sex: " << (sex)e->get_sex() << ui::endl;
+				menu3 << "Date of Birth: " << e->get_dob() << ui::endl;
+				menu3 << "Address: " << e->get_address() << ui::endl;
+				menu3 << "Phone no.: " << e->get_phone() << ui::endl;
+				menu3 << "Salary: " << e->get_salary() << ui::endl;
+				menu3 << "Shift timings: Starts - " << e->get_shift(START) << ui::endl;
+				menu3 << "-------------: Ends - " << e->get_shift(END) <<ui::endl;
+				switch( id_to_emp::convert( e->get_id() ) )
+				{
+					case INVALID:	//Test this case, menu3.hide() not working properly
+					{
+						menu3.clear();
+						int menu3_height = 9;
+						menu3.setheight(menu3_height);
+						menu3.settcolor(GREEN);
+						menu3 << ui::centeralign << "Employee Management" << ui::endl << ui::endl;
+						menu3.settcolor(WHITE);
+						menu3 << "Employee Details: " << ui::endl;
+						menu3.settcolor(RED);
+						menu3 << "Invalid ID!!" << id_to_emp::convert( e->get_id() );
+						menu3.settcolor(ui::tcolor);
+						menu3.setexit_button("Back");
+						menu3.loop();
+						menu3.hide();
+						break;
+					}
+					case OTHERS:
+					case RECEPTIONIST:	//there are no extra data members in class receptionist
+					{
+						menu3.setexit_button("Back");
+						menu3.loop();  //	menu3.clear();	int w = window.getwidth(), m = menu3.getwidth(); menu3<<w<<' '<<m;	getch();
+						menu3.hide();
+						break;
+					}
+					case DOCTOR:
+					{
+						doctor *d = (doctor *)temp;
+						menu3.hide();
+						menu3.setcorner_top_left( coord( 1, menu3.getcorner_top_left().y ) );
+						menu3.display();
+						menu3.f << ( ui::top | ui::left ) << (char)204
+								<< ( ui::bottom | ui::left ) << (char)204;
+						menu3.f.display();
+						box sidemenu( menu3.getcorner_top_left() + coord( menu3.getwidth() - 1, 0 ), ( ui::scr_width - menu3.getwidth() + 1 ),  menu3.getheight() );
+						sidemenu.f << ( ui::top | ui::left ) << (char)203
+								   << ( ui::bottom | ui::left ) << (char)202
+								   << ( ui::top | ui::right ) << (char)185
+								   << ( ui::bottom | ui::right ) << (char)185;
+						sidemenu.f.display();
+						sidemenu << "Speciality(s)" << ui::endl;
+						for(int i = 0; i < 2 && d->get_speciality()[i] <= GEN; ++i)
+						{
+							sidemenu << i + 1 << ". " << (body_parts)d->get_speciality()[i] << ui::endl;
+						}
+						if(!i)
+						{
+							sidemenu << "None" << ui::endl;
+						}
+						sidemenu << "Patients currently under care:" << ui::endl;
+						for(i = 0; d->get_patients()[i] && i < 10; ++i)
+						{
+							sidemenu << i + 1 << ". " << hospital::get_patient_by_id( d->get_patients()[i] ).get_name() << ui::endl;
+						}
+						if(!i)
+						{
+							sidemenu << "None" << ui::endl;
+						}
+						menu3.loop();
+						menu3.hide();
+						sidemenu.hide();
+						window.f.display();
+						break;
+					}
+					case NURSE:
+					{
+						nurse *n = (nurse *)temp;
+						menu3.hide();
+						menu3.setcorner_top_left( coord( 1, menu3.getcorner_top_left().y ) );
+						menu3.display();
+						menu3.f << ( ui::top | ui::left ) << (char)204
+								<< ( ui::bottom | ui::left ) << (char)204;
+						menu3.f.display();
+						box sidemenu( menu3.getcorner_top_left() + coord( menu3.getwidth() - 1, 0 ), ( ui::scr_width - menu3.getwidth() + 1 ),  menu3.getheight() );
+						sidemenu.f << ( ui::top | ui::left ) << (char)203
+								   << ( ui::bottom | ui::left ) << (char)202
+								   << ( ui::top | ui::right ) << (char)185
+								   << ( ui::bottom | ui::right ) << (char)185;
+						sidemenu.f.display();
+						
+						break;
+					}
+				}
+			}
+			break;
+		}
+		case 2:
+		{
+			menu2 << "Add new employee" << ui::endl;
+			menu2.settcolor(ui::tcolor);
+			break;
+		}
+		case 3:
+		{
+			menu2 << "Remove existing employee" << ui::endl;
+			menu2.settcolor(ui::tcolor);
+			break;
+		}
+		case 4:
+		{
+			menu2 << "Edit employee data" << ui::endl;
+			menu2.settcolor(ui::tcolor);
+			break;
+		}
+		case 5:
+		{
+			menu2 << "Pay salary to individual employee" << ui::endl;
+			menu2.settcolor(ui::tcolor);
+			break;
+		}
+		case 6:
+		{
+			menu2 << "Pay salary to all employees" << ui::endl;
+			menu2.settcolor(ui::tcolor);
+			break;
+		}
+		case 7:
+		{
+			menu2 << "This program will exit now. You wanna go back, you're gonna have to start the program again." << ui::endl;
+			break;
+		}
+	}
 }
 
 void interface::stock_management(){
@@ -1479,7 +1691,7 @@ void interface::stock_management(){
 				sale_menu.loop();
 				sale_menu.hide();
 
-				temp = get_med_by_code(temp.code);
+				temp = hospital::get_med_by_code(temp.code);
 			}
 			
 			int quantity = -2;
@@ -1548,7 +1760,7 @@ void interface::stock_management(){
 				purchase_menu.loop();
 				purchase_menu.hide();
 
-				temp = get_med_by_code(temp.code);
+				temp = hospital::get_med_by_code(temp.code);
 			}
 
 			int quantity;
@@ -1595,7 +1807,7 @@ void interface::stock_management(){
 				stock_menu.loop();
 				stock_menu.hide();
 
-				temp = get_med_by_code(temp.code);
+				temp = hospital::get_med_by_code(temp.code);
 			}
 
 			coord c(ui::scr_width / 3, ui::scr_height / 3);
@@ -1617,33 +1829,75 @@ void interface::stock_management(){
 
 void interface::doctor_screen()
 {
-	coord c(2, 4);
-	box profile(c, (window.getwidth() * 3 / 5), window.getheight() - 4);
-	box menu(( c + coord((window.getwidth() * 3 / 5), 0)), (window.getwidth() * 2 / 5) - 2, window.getheight() - 4);
+	coord c(1, 4);
+	box profile(c, (ui::scr_width * 3 / 5), ui::scr_height - 5);
+	box menu(( c + coord((ui::scr_width * 3 / 5) - 1, 0)), (ui::scr_width * 2 / 5) + 1, ui::scr_height - 5);
+	profile.f << ( ui::top | ui::left ) << (char)204
+			  << ( ui::bottom | ui::left ) << (char)204
+			  << ( ui::top | ui::right ) << (char)203
+			  << ( ui::bottom | ui::right ) << (char)202;
+	profile.f.display();
+	menu.f << ( ui::top | ui::left ) << (char)203
+		   << ( ui::bottom | ui::left ) << (char)202
+		   << ( ui::top | ui::right ) << (char)185
+		   << ( ui::bottom | ui::right ) << (char)185;
+	menu.f.display();
 	profile.settcolor(GREEN);
 	profile << ui::centeralign << "Personal Details" << ui::endl;
 	profile.settcolor(ui::tcolor);
 	profile << "Name: ";
+	profile.setexit_button("yay");	profile.loop();menu << "yay";
+	menu.hide();
+	profile.hide();
+	window.f.display();
 }
 void interface::nurse_screen()
 {
-	coord c(2, 4);
-	box profile(c, (window.getwidth() * 3 / 5), window.getheight() - 4);
-	box menu(( c + coord((window.getwidth() * 3 / 5), 0)), (window.getwidth() * 2 / 5) - 2, window.getheight() - 4);
+	coord c(1, 4);
+	box profile(c, (ui::scr_width * 3 / 5), ui::scr_height - 5);
+	box menu(( c + coord((ui::scr_width * 3 / 5) - 1, 0)), (ui::scr_width * 2 / 5) + 1, ui::scr_height - 5);
+	profile.f << ( ui::top | ui::left ) << (char)204
+			  << ( ui::bottom | ui::left ) << (char)204
+			  << ( ui::top | ui::right ) << (char)203
+			  << ( ui::bottom | ui::right ) << (char)202;
+	profile.f.display();
+	menu.f << ( ui::top | ui::left ) << (char)203
+		   << ( ui::bottom | ui::left ) << (char)202
+		   << ( ui::top | ui::right ) << (char)185
+		   << ( ui::bottom | ui::right ) << (char)185;
+	menu.f.display();
 	profile.settcolor(GREEN);
 	profile << ui::centeralign << "Personal Details" << ui::endl;
 	profile.settcolor(ui::tcolor);
 	profile << "Name: ";
+	profile.setexit_button("yay");	profile.loop();menu << "yay";
+	menu.hide();
+	profile.hide();
+	window.f.display();
 }
 void interface::receptionist_screen()
 {
-	coord c(2, 4);
-	box profile(c, (window.getwidth() * 3 / 5), window.getheight() - 4);
-	box menu(( c + coord((window.getwidth() * 3 / 5), 0)), (window.getwidth() * 2 / 5) - 2, window.getheight() - 4);
+	coord c(1, 4);
+	box profile(c, (ui::scr_width * 3 / 5), ui::scr_height - 5);
+	box menu(( c + coord((ui::scr_width * 3 / 5) - 1, 0)), (ui::scr_width * 2 / 5) + 1, ui::scr_height - 5);
+	profile.f << ( ui::top | ui::left ) << (char)204
+			  << ( ui::bottom | ui::left ) << (char)204
+			  << ( ui::top | ui::right ) << (char)203
+			  << ( ui::bottom | ui::right ) << (char)202;
+	profile.f.display();
+	menu.f << ( ui::top | ui::left ) << (char)203
+		   << ( ui::bottom | ui::left ) << (char)202
+		   << ( ui::top | ui::right ) << (char)185
+		   << ( ui::bottom | ui::right ) << (char)185;
+	menu.f.display();
 	profile.settcolor(GREEN);
 	profile << ui::centeralign << "Personal Details" << ui::endl;
 	profile.settcolor(ui::tcolor);
 	profile << "Name: ";
+	profile.setexit_button("yay");	profile.loop();menu << "yay";
+	menu.hide();
+	profile.hide();
+	window.f.display();
 }
 
 int interface::validate_menu::input(const char * ch)
@@ -1701,13 +1955,13 @@ int interface::log_this(char * message)
 	return 1;
 }
 
+box interface::window;
+
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
 double hospital::balance = 1000.0;
-
-box interface::window;
 
 void main()
 {
@@ -1715,10 +1969,10 @@ void main()
 /*/////Administrator object creator////////////////
 	address yay = {0, 0, 0, 0, 0};
 	employee x("Administrator", 3, Date(), yay, "", 0, Time(), Time(), "admin", "password");
-	hospital::write_employee(x);
+	hospital::write_employee(&x);
 /////////////////////////////////////////////*/
-	interface::log_this("Program initiated\n");
+	interface::log_this("Program initiated\n-----------------------------------\n");
 	interface::init();
-	interface::log_this("Program terminated\n");
+	interface::log_this("Program terminated\n-----------------------------------\n");
 	getch();
 }

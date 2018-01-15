@@ -111,12 +111,6 @@ Time::Time(unsigned h, unsigned m, unsigned s)
 	}
 }
 
-box & operator<<(box &output, Time & t)
-{
-	output << (unsigned long)t.hour << ':' << (unsigned long)t.minute << ':' << (unsigned long)t.second;//box::operator <<(unsigned int) not working...
-	return output;
-}
-
 Date::Date()
 {
 	day = 0;
@@ -140,12 +134,6 @@ Date::Date(unsigned d, unsigned m, unsigned y)
 	}
 }
 
-box & operator<<(box &output, Date & d)
-{
-	output << (unsigned long)d.day << '/' << (unsigned long)d.month << '/' << (unsigned long)d.year;//box::operator <<(unsigned int) not working...
-	return output;
-}
-
 Date system::get_date()
 {
 	time_t t = time(0);
@@ -160,13 +148,6 @@ Time system::get_time()
 	struct tm *now = localtime(&t);
 	Time tnow(now->tm_hour, now->tm_min ,now->tm_sec);
 	return tnow;
-}
-
-box & operator<<(box &output, address & a)
-{
-	output << a.house_no << ", " << a.street << ", " 
-		   << a.city << ", " << a.district << ", " << a.state;
-	return output;
 }
 
 userid::userid(str name ,str plaintext)	//plaintext is the unencrypted password
@@ -259,4 +240,68 @@ transaction::transaction()
 	strcpy(reason, "NA");
 	_date = Date();
 	_time = Time();
+}
+
+box & operator<<(box &output, sex s)
+{
+	switch(s)
+	{
+		case MALE:
+			return output << "Male";
+		case FEMALE:
+			return output << "Female";
+		case TRANS:
+			return output << "Transsexual";
+		default:
+			return output << "Invalid";
+	}
+}
+
+box & operator<<(box &output, body_parts b)
+{
+	switch(b)
+	{
+		case BRAIN:
+			return output << "Brain";
+		case HEART:
+			return output << "Heart";
+		case SKIN:
+			return output << "Skin";
+		case LUNG:
+			return output << "Lung";
+		case BONE:
+			return output << "Bone";
+		case EYE:
+			return output << "Eye";
+		case THROAT:
+			return output << "Throat";
+		case TEETH:
+			return output << "Teeth";
+		case STOMACH:
+			return output << "Stomach";
+		case BLOOD:
+			return output << "Blood";
+		case GUT:
+			return output << "Gastrointestinal tract";
+		case GEN:
+			return output << "General ailments";
+		default:
+			return output << "Invalid";
+	}
+}
+
+box & operator<<(box &output, Time & t)
+{
+	return output << (unsigned long)t.hour << ':' << (unsigned long)t.minute << ':' << (unsigned long)t.second;
+}
+
+box & operator<<(box &output, Date & d)
+{
+	return output << (unsigned long)d.day << '/' << (unsigned long)d.month << '/' << (unsigned long)d.year;
+}
+
+box & operator<<(box &output, address & a)
+{
+	return output << a.house_no << ", " << a.street << ", " 
+		   << a.city << ", " << a.district << ", " << a.state;
 }
