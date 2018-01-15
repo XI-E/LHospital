@@ -2,6 +2,11 @@
 #define BASE
 
 #include "ui/ui.hpp"
+#include <fstream.h>
+#include <string.h>
+#include <dir.h>
+#include <stdio.h>
+#include <math.h>
 #include <string.h>
 #include <time.h>
 #include <stdlib.h>			//for random() and randomize()
