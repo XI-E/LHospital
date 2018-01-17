@@ -1,6 +1,7 @@
 #include "hosp.hpp"
 #include "iface.hpp"
 #include "emp.hpp"
+#include "base.hpp"
 #include <fstream.h>
 
 //////////////////////////////////

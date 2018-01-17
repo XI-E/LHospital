@@ -1,6 +1,7 @@
 #ifndef INTERFACE_HPP
 #define INTERFACE_HPP
 
+#include "ui/ui.hpp"
 
 class interface{
 	public:
