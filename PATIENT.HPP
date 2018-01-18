@@ -32,6 +32,8 @@ class patient : public person
 		unsigned long get_bill_amt();
 		int get_med(int, int);
 		int get_discharge_date(int);
+		transaction get_transaction(int);
+		transaction get_transaction();
 
 		//updating functions
 		void set_dis(disease);

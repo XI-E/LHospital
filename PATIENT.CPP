@@ -113,6 +113,24 @@ int patient::get_med(int a, int b){
 	return med[a][b];
 }
 
+transaction patient::get_transaction(int trans_num){
+	str temp;
+	transaction trans;
+	sprintf(temp, "patient/%d/trans.dat", this->id);
+	ifstream patient_file ( temp , ios::out | ios::binary | ios::app );
+
+	int i = 0;
+	while ( i<=trans_num && patient_file ){
+		patient_file.read( (char*) &trans , sizeof(transaction) );
+		i++;	
+	}
+	if( i!= trans_num ){
+		trans = transaction(0);
+	}
+	patient_file.close();
+	return trans;
+}
+
 void patient::set_dis(disease a)
 {
 	dis = a;
