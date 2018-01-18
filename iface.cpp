@@ -13,23 +13,21 @@ void interface::stock_management(){
 
 	int ch = 0;
 
-	while (ch < 1 || ch > 3){
-		menu << "1. Sale"
-				<< ui::endl << "2. Purchase"
-				<< ui::endl << "3. Stock check"
-				<< ui::endl << ui::endl << "Choice : ";
-		menu.setdefault(1);
-		menu.settcolor_input(YELLOW);
-		menu >> ch;
+	menu << "1. Sale"
+			<< ui::endl << "2. Purchase"
+			<< ui::endl << "3. Stock check"
+			<< ui::endl << "4. Go to main menu"
+			<< ui::endl << ui::endl << "Choice : ";
+	menu.setdefault(1);
+	menu.settcolor_input(YELLOW);
+	validate_menu::set_menu_limits(1, 4);
+	menu >> validate_menu::input >> ch;
 
-		menu << ui::endl;
-		menu.setexit_button("Submit");
+	menu << ui::endl;
+	menu.setexit_button("Submit");
 
-		menu.loop();
-		menu.hide();
-
-		interface::error("Invalid choice!!");
-	}
+	menu.loop();
+	menu.hide();
 
 	interface::clear_error();
 

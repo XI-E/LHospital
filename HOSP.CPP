@@ -63,8 +63,9 @@ patient hospital::get_patient_by_id(int id){
 
 void hospital::write_patient(patient a){
 	str temp, temp2;
-	sprintf(temp, "patient/%d/base.dat", a.get_id());
-	sprintf(temp2, "patient/%d", a.get_id());
+	sprintf(temp, "patient/%lu/base.dat", a.get_id());
+	sprintf(temp2, "patient/%lu", a.get_id());
+	mkdir("patient");
 	mkdir(temp2);
 	ofstream patient_file ( temp , ios::out | ios::binary );
 
@@ -72,8 +73,11 @@ void hospital::write_patient(patient a){
 		patient a;
 		patient_file.write( (char*) &a , sizeof(patient) );
 	}
+	else{
+		interface::error("Patient file access failure!!");
+	}
 	if(patient_file.fail()){
-		// pass an error ---------------------------------------------------
+		interface::error("Patient file write failure!!");
 	}
 	patient_file.close();
 }
@@ -478,24 +482,27 @@ Date hospital::str_to_date(const char * inp_date){
 	int input[3];
 	input[0] = input[1] = input[2] = 0;
 	while(counter < 3){
-		char ch[10];
-		for(int i = 0; i < 9; i++){
+		char ch[12];
+		ch[0] = '/';
+		for(int i = 1; i < 7; i++){
 			ch[i] = inp_date[count];
 			count++;
-			if(ch[i] == '/' || ch[i] == '\\' || ch[i] == 0){
-				if(ch[i] == 0 && count < 10){
-					interface::error("Invalid date entry!!");
+			if(ch[i] == '/' || ch[i] == '\\' || ch[i] == 0 || ch[i] == '-'){
+				if(ch[i] == 0 && count < 11){
 					return system::get_date();
 				}
-				int temp = i;
-				while(temp){
-					input[counter] += ( pow(10, temp) * ch[i-temp] );
+				ch[i] = '/';
+				int temp = i-1, temp2 = 0;
+				while(ch[temp] != '/'){
+					input[counter] += ( pow(10, temp2) * ((int)ch[temp] - (int)'0') );
 					temp--;
+					temp2++;
 				}
 				counter++;
 			}
 		}
 	}
+
 	return Date(input[0], input[1], input[2]);
 }
 

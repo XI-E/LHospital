@@ -36,18 +36,23 @@ void interface::init(){
 	{
 		int choice = 0;
 
-		choice = interface::menu();
+		while(1){
+			choice = interface::menu();
 
-		switch(choice){
-			case 1:
-				interface::patient_management();
-				break;
-			case 2:
-				interface::employee_management();
-				break;
-			case 3:
-				interface::stock_management();
-				break;
+			switch(choice){
+				case 1:
+					interface::patient_management();
+					break;
+				case 2:
+					interface::employee_management();
+					break;
+				case 3:
+					interface::stock_management();
+					break;
+				case 4:
+					exit(0);
+					break;
+			}
 		}
 	}
 	else
@@ -131,10 +136,11 @@ int interface::menu(){
 	menu << "1. Patient management"
 			<< ui::endl << "2. Employee management"
 			<< ui::endl << "3. Stock management"
+			<< ui::endl << "4. Exit"
 			<< ui::endl << ui::endl << "Choice : ";
 	menu.setdefault(1);
 	menu.settcolor_input(YELLOW);
-	validate_menu::set_menu_limits(1, 3);
+	validate_menu::set_menu_limits(1, 4);
 	menu >> validate_menu::input >> ch;
 
 	menu << ui::endl;
@@ -149,30 +155,30 @@ int interface::menu(){
 void interface::patient_management(){
 	int ch = 0;
 
-	while(ch < 1 || ch > 3){
-		coord c(ui::scr_width / 3, ui::scr_height / 3);
-		box menu (c, ui::scr_width / 3, ui::scr_height / 2.2);
+	coord c(ui::scr_width / 3, ui::scr_height / 3);
+	box menu (c, ui::scr_width / 3, ui::scr_height / 2.2);
 
-		menu << "1. Patient admission"
-				<< ui::endl << "2. Patient discharge"
-				<< ui::endl << "3. Edit patient details"
-				<< ui::endl << ui::endl << "Choice : ";
-		menu.setdefault(1);
-		menu.settcolor_input(YELLOW);
-		menu >> ch;
+	menu << "1. Patient admission"
+			<< ui::endl << "2. Patient discharge"
+			<< ui::endl << "3. Edit patient details"
+			<< ui::endl << "4. Go to main menu"
+			<< ui::endl << ui::endl << "Choice : ";
+	menu.setdefault(1);
+	menu.settcolor_input(YELLOW);
+	validate_menu::set_menu_limits(1,4);
+	menu >> validate_menu::input >> ch;
 
 		menu << ui::endl;
 		menu.setexit_button("Submit");
 
 		menu.loop();
 		menu.hide();
-	}
 
 	switch(ch){
 		case 1:
 		{
-			coord c(ui::scr_width / 2, ui::scr_height / 3);
-			box form (c, ui::scr_width / 2, ui::scr_height / 1.5);
+			coord c(ui::scr_width / 4, ui::scr_height / 4);
+			box form (c, ui::scr_width / 2, ui::scr_height / 1.25);
 			form.settcolor_input(YELLOW);
 
 			str inp_name, inp_sex_str, inp_dob_str
@@ -300,14 +306,21 @@ void interface::patient_management(){
 
 			form.hide();
 
+			cout << "helo";
+
 			patient temp_pat = patient(inp_name, hospital::str_to_sex(inp_sex_str)
 										, hospital::str_to_date(inp_dob_str), inp_adr
 										, inp_phone, inp_dis, inp_guard_name
 										, inp_emer_contact, inp_emer_phone
 										, inp_insur, hospital::str_to_date(inp_admdate_str));
 
-			hospital::write_patient(temp_pat);
+			cout << "helllloooo";
 
+			hospital::write_patient(temp_pat);
+			
+			cout << "helllloooo2";
+
+			break;
 		}
 
 		case 2:
@@ -364,7 +377,7 @@ void interface::patient_management(){
 
 			float total_bill;
 			bill.settcolor(GREEN);
-			bill << "/t$" << ( total_bill += hospital::calc_bill(stay_len) );
+			bill << "$" << ( total_bill += hospital::calc_bill(stay_len) );
 
 			for(int i = 0; i < 50; i++){
 					transaction temp_trans = temp_patient.get_transaction(i);
@@ -390,6 +403,7 @@ void interface::patient_management(){
 
 			hospital::discharge_patient(temp_patient);
 
+			break;
 		}
 
 		case 3:
@@ -603,6 +617,10 @@ void interface::patient_management(){
 
 			}
 
+			break;
+		}
+		case 4:
+		{ 
 			break;
 		}
 	}
