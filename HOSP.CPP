@@ -100,7 +100,7 @@ float hospital::calc_bill(int stay){
 	return stay * ::stay_charge;
 }
 
-medicine get_med_by_code(int inp_code){
+medicine hospital::get_med_by_code(int inp_code){
 	fstream meds ("hospital/medicine.dat", ios::in | ios::binary);
 
 	medicine temp;
