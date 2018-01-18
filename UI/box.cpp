@@ -464,7 +464,8 @@ box & box::operator<< (char *inp_str)
     num_lines = wrap(str, layout.getwidth());
 
     int len_str = strlen(str),
-        pos_curr_newline = -1;
+        pos_curr_newline = -1,
+        chars_to_forward = 0;
 
     for(int i = 0; i < len_str; i++)
     {
@@ -473,17 +474,18 @@ box & box::operator<< (char *inp_str)
             pos_curr_newline = i;
 
             str[pos_curr_newline] = '\0';
-            layout << pos_pointer << str;
+            layout << pos_pointer << str + chars_to_forward;
             pos_pointer.y++;
 
-            str += strlen(str) + 1;
+            chars_to_forward += 
+                strlen(str + chars_to_forward) + 1;
         }
     }
 
     if(i == len_str - 1)    return *this;
 
-    layout << pos_pointer << str;
-    pos_pointer.x += strlen(str);
+    layout << pos_pointer << str + chars_to_forward;
+    pos_pointer.x += strlen(str + chars_to_forward);
 
     return *this;
 }
