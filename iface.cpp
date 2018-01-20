@@ -301,7 +301,7 @@ int interface::log_this(char * message)
 {
 	Date dnow = system::get_date();
 	Time tnow = system::get_time();
-	str text;
+	char text[300];
 	sprintf(text, "$ [%u-%u-%u %u:%u:%u +0530]: ", dnow.day, dnow.month, dnow.year, tnow.hour, tnow.minute, tnow.second);
 	strcat(text, message);
 	ofstream fout;

@@ -60,6 +60,7 @@ class id_to_emp
 		unsigned long id;
 		int employee_type;
 	public:
+		int status;	//true whenever the constructor runs successfully and succeeds in storing the object to id_list.dat
 		id_to_emp(unsigned long, int);
 		id_to_emp();
 		static int convert(unsigned long);

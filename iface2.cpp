@@ -50,8 +50,7 @@ void interface::init(){
 					interface::stock_management();
 					break;
 				case 4:
-					exit(0);
-					break;
+					return;
 			}
 		}
 	}
@@ -107,7 +106,6 @@ int interface::login_screen()
 		}
 	}
 	fin.close();
-	str temp;
 	for(unsigned long id = 1; id <= max_id; ++id)
 	{
 		employee x;
@@ -130,7 +128,7 @@ int interface::login_screen()
 
 int interface::menu(){
 	coord c(ui::scr_width / 3, ui::scr_height / 3);
-	box menu (c, ui::scr_width / 3, ui::scr_height / 2.2);
+	box menu (c, ui::scr_width / 3, ui::scr_height / 2.2 + 1);
 
 	int ch;
 	menu << "1. Patient management"
@@ -138,7 +136,6 @@ int interface::menu(){
 			<< ui::endl << "3. Stock management"
 			<< ui::endl << "4. Exit"
 			<< ui::endl << ui::endl << "Choice : ";
-	menu.setdefault(1);
 	menu.settcolor_input(YELLOW);
 	validate_menu::set_menu_limits(1, 4);
 	menu >> validate_menu::input >> ch;
@@ -624,5 +621,4 @@ void interface::patient_management(){
 			break;
 		}
 	}
-
 }

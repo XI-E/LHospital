@@ -138,7 +138,7 @@ int hospital::get_employee_by_id(unsigned long ID, void * target)
 	switch(id_to_emp::convert(ID))
 	{
 		case INVALID:
-//			cerr<<"Invalid id";
+			interface::log_this("hospital::get_employee_by_id() : Invalid id supplied to function\nFunction aborted");
 			return 0;
 		case OTHERS:
 			sprintf(temp, "employee/%lu/base.dat", ID);
@@ -218,7 +218,7 @@ int hospital::write_employee(void * a)
 	switch(id_to_emp::convert(ID))
 	{
 		case INVALID:
-//			cerr<<"Invalid id";
+			interface::log_this("hospital::write_employee() : Object with ID zero cannot be written to file\nFunction aborted");
 			return 0;
 		case OTHERS:
 			sprintf(temp, "employee/%lu", ID);
@@ -242,13 +242,13 @@ int hospital::write_employee(void * a)
 	ofstream fout ( temp , ios::out | ios::binary);
 	if(!fout)
 	{
-//		cerr<<"Employee data file could not be created or accessed";
+		interface::log_this("hospital::write_employee() : Employee data file could not be created or accessed\nFunction aborted");
 		return 0;
 	}
 	fout.write( (char *) a , size_of_target );
 	if(fout.fail())
 	{
-//		cerr<<"Error while writing to file";
+		interface::log_this("hospital::write_employee() : Error while writing to file (fout.fail())\nFunction aborted");
 		return 0;
 	}
 	return 1;
@@ -330,7 +330,7 @@ int hospital::pay_salary(unsigned long id, Date d1, Time t1)
 	
 	if(!hospital::get_employee_by_id(id, &e))
 	{
-//		cerr<<"Employee not found or error while reading file";
+		interface::log_this("hospital::pay_salary() : Employee not found or error while reading file\nFunction aborted");
 		return 0;
 	}
 	unsigned long inp1;
@@ -343,13 +343,13 @@ int hospital::pay_salary(unsigned long id, Date d1, Time t1)
 	ofstream fout ( temp ,ios::binary | ios::app );
 	if(!fout)
 	{
-//		cerr<<"Employee data file could not be created or accessed";
+		interface::log_this("hospital::pay_salary() : Employee data file could not be created or accessed\nFunction aborted");
 		return 0;
 	}
 	fout.write((char *) &t, sizeof(transaction));
 	if(fout.fail())
 	{
-//		cerr<<"Error while writing to file";
+		interface::log_this("hospital::pay_salary() : Error while writing to file (fout.fail())\nFunction aborted");
 		return 0;
 	}
 	return 1;
@@ -366,7 +366,7 @@ int hospital::pay_all_salaries()
 	fin.open("employee/max_id.dat", ios::binary);
 	if(!fin)
 	{
-//		cerr<<"No employees found or cannot access file";
+		interface::log_this("hospital::pay_all_salaries() : No employees found or cannot access file\nFunction aborted");
 		return 0;
 	}
 	else
@@ -374,7 +374,7 @@ int hospital::pay_all_salaries()
 		fin.read((char *) &max_id, sizeof(unsigned long));
 		if(fin.fail())
 		{
-//			cerr<<"Error while reading file!!";
+			interface::log_this("hospital::pay_all_salaries() : Error while reading file (fin.fail())\nFunction aborted");
 			return 0;
 		}
 		if(!employee::get_generate_id_status())
@@ -386,7 +386,7 @@ int hospital::pay_all_salaries()
 			int a = hospital::pay_salary(i, d1, t1);
 			if(!a)
 			{
-//				cerr<<"Failed to pay all salaries...";
+				interface::log_this("hospital::pay_all_salaries() : Failed to pay all salaries...\nFunction aborted");
 				return 0;
 			}
 		}
@@ -414,17 +414,18 @@ int hospital::read_from(unsigned long ID, char * dest, int size, char * temp)
 	ifstream fin ( temp , ios::in | ios::binary );
 	if(!fin)
 	{
-//		cerr<<"Employee with id "<<ID<<" not found...";
+		char errmsg[200];
+		sprintf(errmsg, "hospital::read_from() : Employee with id %lu not found\nFunction aborted", ID);
+		interface::log_this(errmsg);
 		return 0;
 	}
-	fin.read( (char*) dest, size );
+	fin.read( dest, size );
 	if(fin.fail())
 	{
-//		cerr<<"Error while reading from file";
+		interface::log_this("hospital::read_from() : Error while reading from file (fin.fail())\nFunction aborted");
 		return 0;
 	}
 	fin.close();
-
 	return 1;
 }
 

@@ -14,13 +14,16 @@ int employee::generate_id()
 	ifstream fin;
 	fin.open("employee/max_id.dat", ios::binary);
 	if(!fin)
+	{
+		interface::log_this("employee::generate_id() : File max_id.dat not found or error while loading file\nmax_id will be set to zero");
 		max_id = 0;
+	}
 	else
 	{
 		fin.read((char *) &max_id, sizeof(unsigned long));
 		if(fin.fail())
 		{
-//			cerr<<"ERROR WHILE READING FROM FILE!!! ";
+			interface::log_this("employee::generate_id() : Error while reading from file max_id.dat (fin.fail())\nFunction aborted");
 			id = 0;
 			return 0;
 		}
@@ -33,7 +36,7 @@ int employee::generate_id()
 	fout.write((char *) &max_id, sizeof(unsigned long));
 	if(fout.fail())
 	{
-//		cerr<<"ERROR WHILE WRITING TO FILE!!! ";
+		interface::log_this("employee::generate_id() : Error while writing to file max_id.dat (fout.fail())\nFunction aborted");
 		return 0;
 	}
 	else
@@ -46,12 +49,18 @@ employee::employee(str inp1, int inp2, Date inp3, address inp4, phone inp5, unsi
 {
 	if(!generate_id_status)
 	{
-//		cerr<<"ID cannot be generated for this employee..";
+		interface::error("ID cannot be generated for this employee. Check log");
+		interface::log_this("employee::employee() : ID generation using generate_id() unsuccessful as generate_id_status is set to zero.\nThis is because some error was encountered during the last ID generation");
 	}
 	else
 	{
 		employee::generate_id_status = generate_id();
 		id_to_emp i1(id, OTHERS);
+		if(!i1.status)
+		{
+			interface::error("ID not generated properly for this employee. Check log");
+			interface::log_this("employee::employee() : i1.status was set to zero, i.e id_list.dat doesn't have a record of the employee's id");
+		}
 		salary = inp6;
 		shift_start = inp7;
 		shift_end = inp8;
@@ -138,6 +147,11 @@ int employee::get_generate_id_status()
 doctor::doctor(str inp1, int inp2, Date inp3, address inp4, phone inp5, unsigned long inp6, Time inp7, Time inp8, int inp10, int inp11, str inp12, str inp13) : employee(inp1, inp2, inp3, inp4, inp5, inp6, inp7, inp8, inp12, inp13)
 {
 	id_to_emp i1(get_id(), DOCTOR);
+	if(!i1.status)
+	{
+		interface::error("ID not generated properly for this employee. Check log");
+		interface::log_this("doctor::doctor() : i1.status was set to zero, i.e id_list.dat doesn't have a record of the employee's id");
+	}
 	speciality[0] = inp10;
 	speciality[1] = inp11;
 
@@ -168,6 +182,11 @@ long * doctor::get_patients()
 nurse::nurse(str inp1, int inp2, Date inp3, address inp4, phone inp5, unsigned long inp6, Time inp7, Time inp8, str inp10, str inp11) : employee(inp1, inp2, inp3, inp4, inp5, inp6, inp7, inp8, inp10, inp11)
 {
 	id_to_emp i1(get_id(), NURSE);
+	if(!i1.status)
+	{
+		interface::error("ID not generated properly for this employee. Check log");
+		interface::log_this("nurse::nurse() : i1.status was set to zero, i.e id_list.dat doesn't have a record of the employee's id");
+	}
 	for(int i = 0; i < 5; i++){
 		patients[i] = 0;
 	}
@@ -189,6 +208,11 @@ long * nurse::get_patients()
 receptionist::receptionist(str inp1, int inp2, Date inp3, address inp4, phone inp5, unsigned long inp6, Time inp7, Time inp8, str inp10, str inp11) : employee(inp1, inp2, inp3, inp4, inp5, inp6, inp7, inp8, inp10, inp11)
 {
 	id_to_emp i1(get_id(), RECEPTIONIST);
+	if(!i1.status)
+	{
+		interface::error("ID not generated properly for this employee. Check log");
+		interface::log_this("receptionist::receptionist() : i1.status was set to zero, i.e id_list.dat doesn't have a record of the employee's id");
+	}
 }
 
 receptionist::receptionist() : employee()
@@ -200,6 +224,7 @@ receptionist::receptionist() : employee()
 
 id_to_emp::id_to_emp(unsigned long inp1, int inp2)
 {
+	status = 0;
 	id = inp1;
 	if(!id)
 	{
@@ -214,7 +239,7 @@ id_to_emp::id_to_emp(unsigned long inp1, int inp2)
 	fout.open("employee/id_list.dat", ios::binary | ios::ate);
 	if(!fout)
 	{
-//		cerr<<"File id_list.dat couldn't be opened...";
+		interface::log_this("id_to_emp::id_to_emp() : File id_list.dat couldn't be opened...\nFunction aborted");
 	}
 	else
 	{
@@ -222,14 +247,18 @@ id_to_emp::id_to_emp(unsigned long inp1, int inp2)
 		fout.write((char *) this, sizeof(id_to_emp));
 		if(fout.fail())
 		{
-//			cerr<<"Error while writing to id_list.dat";
+			interface::log_this("id_to_emp::id_to_emp() : Error while writing to file id_list.dat (fout.fail())\nFunction aborted");
+		}
+		else
+		{
+			status = 1;
 		}
 	}
 }
 
 id_to_emp::id_to_emp()
 {
-	id = employee_type = 0;
+	id = employee_type = status = 0;
 }
 
 int id_to_emp::convert(unsigned long ID)
@@ -246,7 +275,7 @@ int id_to_emp::convert(unsigned long ID)
 	fin.read((char *) &a, sizeof(id_to_emp));
 	if(fin.fail())
 	{
-		interface::log_this("id_to_emp::convert() : Error while reading from file id_list.dat");
+		interface::log_this("id_to_emp::convert() : Error while reading from file id_list.dat (fin.fail())");
 		return INVALID;
 	}
 	fin.close();
