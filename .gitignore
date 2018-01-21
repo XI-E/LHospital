@@ -36,3 +36,6 @@
 *.bak
 
 *.DSK
+
+# Log Files
+LOG\.TXT
