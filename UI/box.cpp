@@ -785,10 +785,12 @@ void box::clear_header()
 {
     header.clear();
     f.display();
+    footer.display();
 }
 
 void box::clear_footer()
 {
     footer.clear();
     f.display();
+    header.display();
 }
