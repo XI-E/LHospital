@@ -19,7 +19,7 @@
 //! Validator function that's used for validating user input
 typedef int (*validator_f)(const char *);
 
-//! For running ui::init() before main
+//! For running ui::init() before main (initialising basic stuff)
 class init_lib_ui
 {
 	static int counter; //!< Ensures ui::init() is called only once
@@ -88,37 +88,47 @@ struct coord
 	coord operator-(coord);
 };
 
-
+//! Represents the node of a list representing the layout
+/*!
+ Represents all the information of an element that will be
+ printed on the screen. Also points to the next element of the
+ screen that will be printed next to it
+*/
 class list_layout_node
 {
-    list_layout_node *next;     //Pointer to next node
-    coord pos;                  //Position where to print
-    int tcolor;                 //Text colour
-    int bcolor;                 //Background colour
-	char str[100];              //String to print
-	int print_type;				//How to print the string
-								//Mainly for passwords
+    list_layout_node *next;     //!< Pointer to next node
+    coord pos;                  //!< Position where to print
+    int tcolor;                 //!< Text colour
+    int bcolor;                 //!< Background colour
+	char str[100];              //!< String to print
+
+	//! How to print the string; mainly for passwords
+	int print_type;				
 
     public:
-        list_layout_node();     //Ctor
-        ~list_layout_node();    //Dtor
+        list_layout_node();     //!< Ctor
+        ~list_layout_node();    //!< Dtor
 
-        //Setters
+        //@{ Setter functions
         void setnext(list_layout_node *);
         void setpos(coord);
         void settcolor(int);
         void setbcolor(int);
 		void setstr(const char *);
 		void setprint_type(int);
+		//@}
 
-        //Getters
+        //@{ Getter functions
         list_layout_node * getnext();
         coord getpos();
         int gettcolor();
         int getbcolor();
 		const char * getstr();
 		int getprint_type();
+		//@}
 		
+		//! Used to distinguish will be printed i.e.
+		//! as is or hidden (as passwords)
 		enum print_types
 		{
 			DEFAULT,
@@ -126,35 +136,55 @@ class list_layout_node
 		};
 };
 
+//! A node of the representation of string as a linked list
 struct string_node
 {
-    string_node *next;
-    string_node *prev;
-    char data;
+    string_node *next;	//!< Pointer to next node
+    string_node *prev;	//!< Pointer to previous node
+    char data;			//!< Character stored in string
 
-    string_node();
+    string_node();		//!< Ctor
 };
 
+//! Represents all interactive information
+/*!
+ Basically a parent class of all the classes that
+ represent the elements of the layout the user can
+ interact with.
+ Used so that all those elements can be clubbed together
+ and the input be taken.
+*/
 class interactive : public list_layout_node
 {
-	interactive *prev;    //ptr to previous node
-	interactive *next;    //ptr to next node
-	int offset;		   	  //offset to y position when printing
+	interactive *prev;    	//!< ptr to previous node
+	interactive *next;    	//!< ptr to next node
+	int offset;		   	  	//!< offset to y position when printing
 	public:
-		interactive();
-		~interactive();
-		virtual int input(int);
+		interactive();		//!< Ctor
+		~interactive();		//!< Dtor
 
+		//! Empty input function that will be overridden by children
+		/*!
+		 \param offset The offset to y position
+		 \return Action that was performed by the user
+		*/
+		virtual int input(int offset);
+
+		//! Setter function
 		void setoffset(int);
+
+		//! Getter function
 		int getoffset();
 
-		enum
+		//! Actions that are performed by user; returned from input func.
+		enum actions
         {
             GOTONEXT,
 			GOTOPREV,
 			CLICKED
 		};
 		
+		//! Keys that user can press to navigate the form
 		enum keys
 		{
 			TAB,
@@ -170,51 +200,108 @@ class interactive : public list_layout_node
 			RIGHT
 		};
 
+		//! Gets key from user and returns code
+		/*
+		 \return Keyname corresponding to enum keys
+		*/
 		static int getkey();
 };
 
+//! Represents a text box
+/*!
+ Inherits from interactive as a text box can be interacted
+ with. Gets data from user and stores it as a string that
+ can be further converted to the required data type
+*/
 class text_box : public interactive
 {
+	//! Represents if the data entered in the text box
+	//! should be displayed as is or replaced with asterisks
 	int is_password;
+
 	public:
-		text_box();
-        int input(int = 0);   //Takes input,stores it
-                       //& returns GOTONEXT or
-					   //GOTOPREV; parameter is offset
-					   //y coordinate
-		void print_str(string_node*); //Prints string
+		text_box(); //!< Ctor
+
+		//! Takes input and returns user action
+		/*!
+		 /param offset Offset of y coordinate to print
+		 /return Action performed by user
+		*/
+        int input(int offset = 0);
+
+		//! Prints string represented by a linked list
+		/*
+		 Takes in the head pointer of the linked list
+		 string and prints the string by iterating through
+		 the list. Has no other side effects.
+		 /param head ptr to head of the linked list
+		*/
+		void print_str(string_node *head);
+
+		//! Setter function
 		void setis_password(int);
 };
 
+//! Represents a button that can be clicked
+/*!
+ Inherits from interactive as a button can be interacted with.
+ A user can click the button while it's input function is
+ running which will return the user action
+*/
 class button : public interactive
 {
-	int tcolor_selected; //tcolor when selected
-	int bcolor_selected; //bcolor when seilected
+	int tcolor_selected; //!< tcolor when selected
+	int bcolor_selected; //!< bcolor when seilected
 
 	public:
-		button();
+		button(); //!< Ctor
+
+		//@{ Setter functions
 		void settcolor_selected(int);
 		void setbcolor_selected(int);
+		//@}
+
+		//@{ Getter functions
 		int gettcolor_selected();
 		int getbcolor_selected();
+		//@}
 
-		int input(int = 0); //Returns CLICKED,
-							//GOTONEXT or 
-							
-		void print(int = 0); //Prints the button
-						 //pmt indicates if btn is selected
-						 //or not
+		//! Input function
+		/*!
+		 Effectively allows the button to be clicked
+		 /param offset Offset of y coordinate to print
+		 /return Action performed by the user
+		*/
+		int input(int offset = 0);
+
+		//! Prints the button
+		/*!
+		 /param isselected Indicates if button is selected or not
+		*/						
+		void print(int isselected = 0);
 };
 
+//! Represents the layout of the page
+/*!
+ Incorporates elements like simple nodes as well as other
+ interactive elements. This layout can be contained within
+ a specific height and the overflowing content can reached
+ by scrolling which is also implemented here.
+*/
 class list_layout
 {
-    list_layout_node *head;
-	list_layout_node *current;
+	//@{ Pointers to implement a linked list to elements
+    list_layout_node *head;	//!< ptr to head node
+	list_layout_node *current; //!< ptr to current node
+	//@}
 
-	coord corner_top_left; //top left corner of container
+	coord corner_top_left; //!< top left corner of container
 	
-	//Following are used as temporary
-	//placeholders till data is written to the nodes
+	/*!
+     Following are used as temporary placeholders till data
+	 is written to the nodes
+	*/
+	///@{
 	coord pos;
 	int tcolor;
 	int bcolor;
@@ -222,33 +309,58 @@ class list_layout
 	int bcolor_selected;
 	int tcolor_input;
 	int bcolor_input;
+	///@}
 
-	//FOR SCROLLING IMPLEMENTATION
-	int height; //height of container; to implement scrolling
-	int width;
-	int lines_scrolled;
+	//@{ For scrolling implementation
+	int height; //!< Height of the layout
+	int width; //!< Width of the layout
+	int lines_scrolled; //!< Lines currently scrolled
+	//@}
 
+	//! For better verbosity at internal level
 	enum print_modes
 	{
 		DISPLAY, 
 		HIDE
 	};
-	void print(int = DISPLAY);
+
+	//! Prints the layout
+	/*!
+	 Prints the layout by iterating through the internal
+	 linked list maintained. Has no other side effects
+	 /param print_mode How to print the data
+	*/
+	void print(int print_mode = DISPLAY);
     public:
-		list_layout();
+		list_layout(); //!< Ctor
 		
-		//Set a label
-		list_layout& operator<<(coord);
+		//@{ Set an element (node)
+		list_layout& operator<<(coord); //!< Set coord of node
+
+		//! Set data held by the node
 		list_layout& operator<<(const char *);
+		//@}
 
-		//Sets a text box at the position indicated by
-		//coord and returns a pointer to it
-		interactive * settext_box(coord, int = 0);
-		//								 ^is_password
+		//! Set a text box
+		/*!
+		 Sets a text box at the position indicated by pos and
+		 returns a pointer to it
+		 /param pos Position at which to set text box
+		 /param is_pass If the text box has a password, set to 1
+		 /return pointer to the text box set (casted to interactive *)
+		*/
+		interactive * settext_box(coord pos, int is_pass = 0);
 
-		interactive * setbutton(coord, const char *);
-		//								^text the btn displays
+		//! Set a button
+		/*!
+		 Sets a button at the position indicated by pos and 
+		 returns a pointer to it
+		 /param pos Position at which to set the button
+		 /param txt The text the button displays
+		*/
+		interactive * setbutton(coord pos, const char *txt);
 
+		//@{ Setter functions
 		void settcolor(int);
 		void setbcolor(int);
 		void settcolor_selected(int);
@@ -260,17 +372,22 @@ class list_layout
 		void setwidth(int);
 		void setlines_scrolled(int);
 		void setpos(coord);
+		//@}
 
+		//@{ Getter functions
 		int getheight();
 		int getwidth();
 		int getlines_scrolled();
 		coord getpos();
 		coord getcorner_top_left();
+		//@}
 		
-		void display();
-		void hide();
-		void clear();
+		void display();	//!< Display the layout
+		void hide(); //!< Hide the layout
+		void clear(); //!< Deletes contents of the layout
 };
+
+//! Represents a border
 
 class frame
 {
