@@ -388,97 +388,185 @@ class list_layout
 };
 
 //! Represents a border
-
+/*!
+ Basically represents a border with characters that can be
+ customised to suit the requirements.
+*/
 class frame
 {
-	char border_chars[8];
-	int tcolor;
-	int bcolor;
+	char border_chars[8];	//!< chars used to draw border
+	int tcolor;				//!< text color
+	int bcolor;				//!< background color
+	
+	//! Represents what part of frame is visible.
 	int sides_visibility[8];
-	int frame_visibility;
-	coord corner_top_left; //top left
-	int height;  //height and width includes border
-	int width;
-	int state;	//Used by << Operator
-	void setside_visibility(int, int); //state, side
-	int convert(int); //Eg: ios::top | ios::left -> 0
-					   //    ios::bottom | ios::left -> 3	
+	int frame_visibility;	//!< Frame visible or not
+	coord corner_top_left;  //!< coord of top left corner
 
-	void print(int = 1); //0 = hide, 1 = display
+	//@{These include the border characters too
+	int height;  			//!< height
+	int width;				//!< width
+	//@}
+
+	//! Internal pmt used by operator<<
+	int state;
+
+	//! Sets the visibility of the side
+	/*!
+	 /param side Specifies the side using ui::dir
+	 /param visib Set the visibility of the side
+	*/
+	void setside_visibility(int side, int visib);
+
+	//! Converts the ui::dir code into internally usable code
+	int convert(int);
+
+	//! Prints the frame
+	/*!
+	 /param f_visib If 1, frame is printed; hidden if it's 0
+	*/
+	void print(int f_visib = 1);
 
 	public:
+
+		//! Used to set the visibility mode of the frame
+		/*
+		 all: -----
+		 	  |   |
+			  -----
+		 nosides: ------
+
+		 		  ------
+		*/
 		enum visibility_modes
 		{
 			all = 1,
 			nosides = 2
 		};
-
-		frame(coord = coord(1,1), int = ui::scr_width, int = ui::scr_height - 1);
-
-		void display();
-		void hide();
 		
-		void setvisibility_mode(int);
-		frame & operator<<(int); //Sets state
-		frame & operator<<(char); //Sets border_char according
-								//to state
+		//! Ctor
+		/*!
+		 /param corner_top_left Top left corner of frame
+		 /param width Width of the frame
+		 /param height Height of the frame
+		*/
+		frame(coord corner_top_left = coord(1,1), int width = 
+		ui::scr_width, int height = ui::scr_height - 1);
 
+		void display();	//!< Display the frame
+		void hide();    //!< Hides the frame
+		
+		//! Sets the visibility mode of the frame
+		void setvisibility_mode(int);
+
+		//@{ operator<<
+		frame & operator<<(int); //!<Sets state
+
+		//! Sets border_char according to state
+		frame & operator<<(char);
+		//@}
+
+		//@{ Getter functions
 		int getheight();
 		int getwidth();
 		coord getcorner_top_left();
-		int getframe_visibility(); //Returns 1 if visible; 0 = not visible
+
+		//! Returns 1 if visible; 0 = not visible
+		int getframe_visibility(); 
 		int gettcolor();
 		int getbcolor();
 		char getborder_char(int);
 		int getside_visibility(int);
+		//@}
 
+		//@{ Setter functions
 		void setheight(int);
 		void setwidth(int);
 		void settcolor(int);
 		void setbcolor(int);
 		void setcorner_top_left(coord);
+		//@}
 };
 
-/*
-* Stores information related to a text box
-* Such as what type to convert it's data to
-* and where to store it
+//! Info related to a text box
+/*!
+ Stores information related to a text box
+ Such as what type to convert it's data to
+ and where to store it
 */
 struct info_tbox
 {
-	text_box * tbox;
+	text_box * tbox;	//!< ptr to text_box whose info is stored
+	
+	//! Data type to convert the string stored in text box to
 	int type;
-	void * data_store;
-	int (*validator)(const char *);
+	void * data_store;	//!< Where to store converted data
 
+	/*!
+	 A validation function that's used to validate the
+	 string stored in the text box to see if it is of
+	 the required type before converting it.
+	 /param str The string to validate
+	 /param return 1, if string is validate; 0, otherwise
+	*/
+	int (*validator)(const char *str);
+
+	//! The data types the string stored in text box represents
+	/*!
+	 Whenever a text box is set, the pointer to the place where
+	 final data has to be stored is converted to a void* and
+	 the data type is stored.
+	 So, void* in different cases is:
+
+	 data type     | What void* was
+	 ------------- | --------------------
+	 INT		   | int *	 
+	 LONG		   | long *
+	 UNSIGNED_LONG | unsigned long *
+	 STRING		   | char *
+	 CHAR		   | char *
+	 DOUBLE		   | double *
+	 FLOAT		   | float *
+	 PASSWORD	   | char *
+	*/
 	enum data_types
-	{					//Stored as (void * is actually)
-		INT, 			//int *
-		LONG,			//long *
-		UNSIGNED_LONG,  //unsigned long *
-		STRING,			//char *
-		CHAR,			//char *
-		DOUBLE,			//double *
-		FLOAT,			//float *
-		PASSWORD,		//char *
-		OTHER //Not supported at the moment
+	{					
+		INT, 			
+		LONG,			
+		UNSIGNED_LONG,  
+		STRING,			
+		CHAR,			
+		DOUBLE,			
+		FLOAT,			
+		PASSWORD,		
+		OTHER //!< Not supported at the moment
 	};
 
-	info_tbox();
-	int setdata(); //Returns 1 on success; 0 on failure
+	info_tbox();	//!< Ctor
 
+	//! Sets data to the data_store
+	/*!
+	 Gets the string stored in the text box, validates
+	 it using the validation function and then converts
+	 the string to the required data type and stores it in
+	 the required space
+	 /return 1 on success, 0 on invalid data
+	*/
+	int setdata();
 };
 
-/*
-* Contains default validation functions of type
-* int f(char *)
-* that take in a string and return 1 if the string
-* is valid and 0, otherwise
+/*!
+ Contains default validation functions of type
+ int f(char *)
+ that take in a string and return 1 if the string
+ is valid and 0, otherwise
 */
 class validation
 {
-	validation(); //Object of this class is not allowed
+	validation(); //!< Object of this class is not allowed
 	public:	
+
+		//@{ Default validation functions
 		static int vint(const char *);
 		static int vlong(const char *);
 		static int vunsigned_long(const char *);
@@ -486,34 +574,55 @@ class validation
 		static int vchar(const char *);
 		static int vdouble(const char *);
 		static int vfloat(const char *);
+		//@}
 
-		static validator_f getvalidator(int, validator_f);
+		/*!
+		 Get the default validator function for the type
+		 specified. If func is not NULL, returns default
+		 function, else returns v
+		*/
+		static validator_f getvalidator(int type,
+								 validator_f func);
 };
 
-/*
-* Represents a line with the three strings depiciting
-* left, middle and right aligned stuff respectively
+/*!
+ Represents a line with the three strings depiciting
+ left, middle and right aligned stuff respectively
 */
 struct line
 {
-	char left[100];
-	char middle[100];
-	char right[100];
+	//@{ Parts of the line
+	char left[100];	  //!< left aligned
+	char middle[100]; //!< centre aligned
+	char right[100];  //!< right aligned
+	//@}
 
-	int width;
-	int tcolor;
-	int bcolor;
-	coord corner_top_left;
+	int width;	//!< width of line
+	int tcolor; //!< text color
+	int bcolor; //!< background color
+	coord corner_top_left; //!< coord of top left corner
 
-	line();
-	void display();
-	void hide();
-	void clear();
+	line(); //!< Ctor
+	void display(); //!< Display the line
+	void hide();	//!< Hide the line
+	void clear();	//!< Delete the data stored
 
 	private:
-		void print(int);
+		void print(int); //!< Print the line according to arg
 };
 
+//! A box that has a border and a layout
+/*!
+ Basically incorporates all the elements into a single
+ entity that the user will interact with.
+ Basically looks like
+ ------------------  <-- Frame
+ | -------------- |
+ | |		  <-------Layout (No border)	
+ | |			| |	
+ | -------------- <----Padding (between layout and frame)
+ ------------------
+*/
 class box
 {
 	int height;
