@@ -81,10 +81,11 @@ void line::print(int mode)
     gotoxy(curr_pos.x, curr_pos.y);
 }
 
-/*
-* Wraps a string with specified number of
-* characters (length) in each line. Returns number of lines
-*/
+int default_back_func()
+{
+    return 0;
+}
+
 int box::wrap(char str[], int length, int return_one_line)
 {
 	int num_lines = 1;
@@ -254,6 +255,8 @@ box::box(coord c, int w, int h) : f(c, w, h)
     header.corner_top_left = c + coord(1,0);
     footer.corner_top_left = c + coord(0, h-1);
 
+    back_func = default_back_func;
+
     f.display();
 }
 
@@ -330,6 +333,11 @@ void box::settcolor_input(int c)
 void box::setbcolor_input(int c)
 {
     layout.setbcolor_input(c);
+}
+
+void box::setback_func( int(*f)(void) )
+{
+    back_func = f;
 }
 
 box & box::operator<< (char *inp_str)
@@ -724,6 +732,10 @@ void box::loop()
         else if(response == interactive::CLICKED)
         {
             break;
+        }
+        else if(response == interactive::BACK && back_func())
+        {
+            return;
         }
     }
 

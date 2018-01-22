@@ -181,7 +181,8 @@ class interactive : public list_layout_node
         {
             GOTONEXT,
 			GOTOPREV,
-			CLICKED
+			CLICKED,
+			BACK //!< When shift-bckspc is pressed
 		};
 		
 		//! Keys that user can press to navigate the form
@@ -190,6 +191,7 @@ class interactive : public list_layout_node
 			TAB,
 			ENTER,
 			BACKSPACE,
+			SHIFT_BACKSPACE,
 			SHIFT_TAB,
 			HOME,
 			END,
@@ -611,6 +613,14 @@ struct line
 		void print(int); //!< Print the line according to arg
 };
 
+/*!
+ Default Back function for use in the class box.
+ Can't declare it as member function as member functions
+ are not inherently addresses and setting it as a member function
+ was causing unsolvable problems
+*/
+int default_back_func();
+
 //! A box that has a border and a layout
 /*!
  Basically incorporates all the elements into a single
@@ -670,7 +680,7 @@ class box
 	char default_text[100]; //!< Default text to set in textbox
 
 	/*!
-	 A temporary variable that stored validator func till it
+	 A temporary variable that stores validator func till it
 	 is stored in the required place.
 	*/
 	int (*temp_validator)(const char *);
@@ -679,6 +689,13 @@ class box
 	line header;
 	line footer;
 	//!@}
+
+	/*!
+	 The function is called when the user performs a back func
+	 while interacting with any interactive
+	 /return 1, if loop exits on back; 0, if it does nothing
+	*/
+	int (*back_func)();
 
 	protected:
 		coord pos_pointer;	//!< Pos of pointer in box
@@ -723,6 +740,7 @@ class box
 		void setbcolor_selected(int);
 		void settcolor_input(int);
 		void setbcolor_input(int);
+		void setback_func( int(*f)(void) );
 		//!@}
 
 		//!@{ operator<< is used for adding data to the box's

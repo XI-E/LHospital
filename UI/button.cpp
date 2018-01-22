@@ -54,6 +54,9 @@ int button::input(int offset)
                 case interactive::SHIFT_TAB :
                     state_to_return = interactive::GOTOPREV;
                     goto next;
+                case interactive::SHIFT_BACKSPACE :
+                    state_to_return = interactive::BACK;
+                    goto next;
             }
         }
     }

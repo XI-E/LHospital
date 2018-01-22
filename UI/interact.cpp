@@ -42,7 +42,15 @@ int interactive::getkey()
     {
         case 9:     return TAB;
         case 13:    return ENTER;
-        case 8:     return BACKSPACE;
+        case 8:     
+        {
+            unsigned char far *key_state_byte
+                = (unsigned char far*) 0x00400017;
+            int key_state = (int) *key_state_byte;
+
+            if(key_state & 2) return SHIFT_BACKSPACE;
+            else              return BACKSPACE;
+        }
         case 0:     break;
         default:    return ch;
     }

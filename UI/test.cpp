@@ -3,7 +3,7 @@
 #include "ui/ui.hpp"
 #include "ui/test.hpp"
 
-void main()
+void test_weird_error()
 {
 	int shit = 14;
 	box menu2(coord(2, 4), 40, 10 );
@@ -17,14 +17,49 @@ void main()
 	menu2 << "Here's your shit: ";
 	menu2 << shit;
 	menu2 << ". Deal with it!" << ui::endl;
-	getch();
 
 	getch();
-} 
+}
+
+int exit_func()
+{
+	char c = getch();
+	int x = wherex(), y = wherey();
+
+	gotoxy(1, ui::scr_height - 1);
+	if(c != '1')
+	{
+		cprintf("Returning 0"); getch();
+		gotoxy(x, y);
+		return 0;
+	}
+	else
+	{
+		cprintf("Returning 1"); getch();
+		gotoxy(x, y);
+		return 1;
+	}
+}
+
+void test_back()
+{
+	box window;
+
+	int a, b;
+	window << "Here's some sample text" << ui::endl;
+	window << "Enter some fake data I don't care about" << ui::endl;
+	
+	window << "Fake #1: "; window >> a;
+	window << "Fake #2: "; window >> b;
+	window.setexit_button("A fake button");
+
+	window.setback_func(exit_func);
+
+	window.loop();
+}
 
 void test_all()
 {
-	/*
 	ui::clrscr();
 	box menu2(coord(2, 4), 40, 10 );
 
@@ -61,12 +96,7 @@ void test_all()
 		getch();
 		menu2.display();
 		getch();
-	*/
 
-	
-
-
-	/*
 	char name[40], pwd[40];
 	int age;
 	long phn;
@@ -116,8 +146,6 @@ void test_all()
 	  << "Date: " << date << ui::endl
 	  << "Amount: " << amt << ui::endl
 	  << "Password: " << pwd << ui::endl;
-
-	*/
 }
 
 

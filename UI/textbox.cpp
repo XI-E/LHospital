@@ -105,6 +105,9 @@ int text_box::input(int a)
                         gotoxy(wherex()+1, wherey());
                     }
                     break;
+                case SHIFT_BACKSPACE:
+                    state_to_return = BACK;
+                    goto convert_to_str;
                 case SHIFT_TAB:
                     state_to_return = GOTOPREV;
                     goto convert_to_str;
