@@ -109,23 +109,23 @@ class list_layout_node
         list_layout_node();     //!< Ctor
         ~list_layout_node();    //!< Dtor
 
-        //@{ Setter functions
+        //!@{ Setter functions
         void setnext(list_layout_node *);
         void setpos(coord);
         void settcolor(int);
         void setbcolor(int);
 		void setstr(const char *);
 		void setprint_type(int);
-		//@}
+		//!@}
 
-        //@{ Getter functions
+        //!@{ Getter functions
         list_layout_node * getnext();
         coord getpos();
         int gettcolor();
         int getbcolor();
 		const char * getstr();
 		int getprint_type();
-		//@}
+		//!@}
 		
 		//! Used to distinguish will be printed i.e.
 		//! as is or hidden (as passwords)
@@ -256,15 +256,15 @@ class button : public interactive
 	public:
 		button(); //!< Ctor
 
-		//@{ Setter functions
+		//!@{ Setter functions
 		void settcolor_selected(int);
 		void setbcolor_selected(int);
-		//@}
+		//!@}
 
-		//@{ Getter functions
+		//!@{ Getter functions
 		int gettcolor_selected();
 		int getbcolor_selected();
-		//@}
+		//!@}
 
 		//! Input function
 		/*!
@@ -290,10 +290,10 @@ class button : public interactive
 */
 class list_layout
 {
-	//@{ Pointers to implement a linked list to elements
+	//!@{ Pointers to implement a linked list to elements
     list_layout_node *head;	//!< ptr to head node
 	list_layout_node *current; //!< ptr to current node
-	//@}
+	//!@}
 
 	coord corner_top_left; //!< top left corner of container
 	
@@ -301,7 +301,7 @@ class list_layout
      Following are used as temporary placeholders till data
 	 is written to the nodes
 	*/
-	///@{
+	///!@{
 	coord pos;
 	int tcolor;
 	int bcolor;
@@ -309,13 +309,13 @@ class list_layout
 	int bcolor_selected;
 	int tcolor_input;
 	int bcolor_input;
-	///@}
+	///!@}
 
-	//@{ For scrolling implementation
+	//!@{ For scrolling implementation
 	int height; //!< Height of the layout
 	int width; //!< Width of the layout
 	int lines_scrolled; //!< Lines currently scrolled
-	//@}
+	//!@}
 
 	//! For better verbosity at internal level
 	enum print_modes
@@ -334,12 +334,12 @@ class list_layout
     public:
 		list_layout(); //!< Ctor
 		
-		//@{ Set an element (node)
+		//!@{ Set an element (node)
 		list_layout& operator<<(coord); //!< Set coord of node
 
 		//! Set data held by the node
 		list_layout& operator<<(const char *);
-		//@}
+		//!@}
 
 		//! Set a text box
 		/*!
@@ -360,7 +360,7 @@ class list_layout
 		*/
 		interactive * setbutton(coord pos, const char *txt);
 
-		//@{ Setter functions
+		//!@{ Setter functions
 		void settcolor(int);
 		void setbcolor(int);
 		void settcolor_selected(int);
@@ -372,15 +372,15 @@ class list_layout
 		void setwidth(int);
 		void setlines_scrolled(int);
 		void setpos(coord);
-		//@}
+		//!@}
 
-		//@{ Getter functions
+		//!@{ Getter functions
 		int getheight();
 		int getwidth();
 		int getlines_scrolled();
 		coord getpos();
 		coord getcorner_top_left();
-		//@}
+		//!@}
 		
 		void display();	//!< Display the layout
 		void hide(); //!< Hide the layout
@@ -403,10 +403,10 @@ class frame
 	int frame_visibility;	//!< Frame visible or not
 	coord corner_top_left;  //!< coord of top left corner
 
-	//@{These include the border characters too
+	//!@{These include the border characters too
 	int height;  			//!< height
 	int width;				//!< width
-	//@}
+	//!@}
 
 	//! Internal pmt used by operator<<
 	int state;
@@ -459,14 +459,14 @@ class frame
 		//! Sets the visibility mode of the frame
 		void setvisibility_mode(int);
 
-		//@{ operator<<
+		//!@{ operator<<
 		frame & operator<<(int); //!<Sets state
 
 		//! Sets border_char according to state
 		frame & operator<<(char);
-		//@}
+		//!@}
 
-		//@{ Getter functions
+		//!@{ Getter functions
 		int getheight();
 		int getwidth();
 		coord getcorner_top_left();
@@ -477,15 +477,15 @@ class frame
 		int getbcolor();
 		char getborder_char(int);
 		int getside_visibility(int);
-		//@}
+		//!@}
 
-		//@{ Setter functions
+		//!@{ Setter functions
 		void setheight(int);
 		void setwidth(int);
 		void settcolor(int);
 		void setbcolor(int);
 		void setcorner_top_left(coord);
-		//@}
+		//!@}
 };
 
 //! Info related to a text box
@@ -566,7 +566,7 @@ class validation
 	validation(); //!< Object of this class is not allowed
 	public:	
 
-		//@{ Default validation functions
+		//!@{ Default validation functions
 		static int vint(const char *);
 		static int vlong(const char *);
 		static int vunsigned_long(const char *);
@@ -574,7 +574,7 @@ class validation
 		static int vchar(const char *);
 		static int vdouble(const char *);
 		static int vfloat(const char *);
-		//@}
+		//!@}
 
 		/*!
 		 Get the default validator function for the type
@@ -591,11 +591,11 @@ class validation
 */
 struct line
 {
-	//@{ Parts of the line
+	//!@{ Parts of the line
 	char left[100];	  //!< left aligned
 	char middle[100]; //!< centre aligned
 	char right[100];  //!< right aligned
-	//@}
+	//!@}
 
 	int width;	//!< width of line
 	int tcolor; //!< text color
@@ -625,58 +625,95 @@ struct line
 */
 class box
 {
-	int height;
-	int width;
-	int padding;
+	int height;		//!< Height of the box
+	int width;		//!< Width of the box
+	int padding;	//!< Padding between frame and layout
 
-	int wrap(char[], int, int = 0);
-	//                    ^It will set first parameter
-	//					  to have only one line
-	void set_tbox(int, void *);
+	/*!
+	 Wraps a string with specified number of characters 
+	 in each line
+	 /param str String to wrap. Will be modified
+	 /param length Number of chars in a line
+	 /param return_one_line Sets string to have only one line
+	 /return Number of lines after wrapping
+	*/
+	int wrap(char str[], int length, int return_one_line = 0);
 
-	//List of text boxes and buttons
+	//! Sets the tbox
+	/*!
+	 Sets the textbox in the layout and also stores the 
+	 correpsonding data in a tbox that is stored in the array
+	 /param data_type Type of data in text box
+	 /param ptr Pointer to the data store to set in tbox
+	*/
+	void set_tbox(int data_type, void *ptr);
+
+	//!@{ Lists of interactives and text boxes
 	interactive * list_interactive[30]; 
-	button * exit_btn; //Clicking this button exits
-					   //the loop
 	info_tbox list_tbox[30];
-	int index_interactive;
-	int index_tbox;	
+	int index_interactive; //!< Index of element to set next
+	int index_tbox; //!< Index of element to set next
+	//!@}
 
+	//! Clicking this button exits the loop
+	button * exit_btn;
+
+	//!@{ Toggles that help setting required info in layout
 	int center_toggle;
 	int default_toggle;
 	int right_toggle;
 	int header_toggle;
 	int footer_toggle;
 	int password_toggle;
-	char default_text[100];
-	int (*temp_validator)(const char *); //A function pointer
+	//!@}
 
+	char default_text[100]; //!< Default text to set in textbox
+
+	/*!
+	 A temporary variable that stored validator func till it
+	 is stored in the required place.
+	*/
+	int (*temp_validator)(const char *);
+
+	//!@{ Header and footer
 	line header;
 	line footer;
+	//!@}
 
 	protected:
-		//Pos of the pointer in the box
-		coord pos_pointer;
-		list_layout layout;
-		coord corner_top_left;
+		coord pos_pointer;	//!< Pos of pointer in box
+		list_layout layout; //!< Layout in which data is stored
+		coord corner_top_left; //!< Coord of top left corner
 
 	public:
+
+		//!@{ Manipulators can be used to alter function of <<
 		static manipulator setheader;
 		static manipulator setfooter;
 		static manipulator setpassword;
+		//!@}
 
-		frame f;
+		frame f;	//!< Border of the box
 
-		box(coord = coord(1,1), int = ui::scr_width,
-			 int = ui::scr_height - 1);
+		//! Ctor
+		/*!
+		 Initialises all the variables of the class
+		 /param corner_top_left The top left corner
+		 /param width Width of box (includes border)
+		 /param height Height of box (includes border)
+		*/
+		box(coord corner_top_left = coord(1,1), 
+			int width = ui::scr_width,
+		 	int height= ui::scr_height - 1);
 
-		//GETTERS
+		//!@{ Getter functions
 		coord getcorner_top_left();
 		int getheight();
 		int getwidth();
 		int getpadding();
+		//!@}
 
-		//SETTERS
+		//!@{ Setter functions
 		void setcorner_top_left(coord);
 		void setheight(int);
 		void setpadding(int);
@@ -686,7 +723,10 @@ class box
 		void setbcolor_selected(int);
 		void settcolor_input(int);
 		void setbcolor_input(int);
+		//!@}
 
+		//!@{ operator<< is used for adding data to the box's
+		//!	  layout that will be printed
 		box & operator<<(char *);
 		box & operator<<(char);
 		box & operator<<(int);
@@ -695,7 +735,11 @@ class box
 		box & operator<<(double);
 		box & operator<<(float);
 		box & operator<<(manipulator);
+		//!@}
 
+		//!@{ operator>> is used for basically setting a text
+		//!   box at the place where pos_pointer is currently
+		//!	  at
 		box & operator>>(char *&);
 		box & operator>>(char &);
 		box & operator>>(int &);
@@ -704,16 +748,17 @@ class box
 		box & operator>>(double &);
 		box & operator>>(float &);
 		box & operator>>(manipulator);
+		
+		//! Using this before another >> will set this func
+		//! as the validator of that text box
 		box & operator>>(int (*)(const char *));
-		//Function pointer that takes in a char* and outputs int
-		//Basically supposed to be a validation function for
-		//the input field
+		//!@}
 
 		void setexit_button(char *);
 
-		//Sets default for the next text box and
-		//clears it after the next text box has been
-		//set
+		//!@{ Sets default for the next text box and
+		//!   clears it after the next text box has been
+		//!   set
 		void setdefault(char *);
 		void setdefault(char);
 		void setdefault(int);
@@ -721,20 +766,25 @@ class box
 		void setdefault(unsigned long);
 		void setdefault(double);
 		void setdefault(float);
+		//!@}
 
-		//Sets the box to loop, effectively enabling
-		//all the text boxes and buttons. Also enables
-		//scrolling
+		/*!
+		 Sets the box to loop, effectively enabling
+		 all the text boxes and buttons. Also enables
+		 scrolling
+		*/
 		void loop();
 
-		void display();
-		void hide();
-		void clear();
+		void display();	//!< Display the box
+		void hide();	//!< Hide the box
+		void clear();	//!< Delete the contents of the box
 
-		void setheader_tcolor(int);
-		void setfooter_tcolor(int);
-		void clear_header();
-		void clear_footer();
+		//!@{ Functions to set header and footer
+		void setheader_tcolor(int); //!< set header color
+		void setfooter_tcolor(int); //!< set footer color
+		void clear_header(); //!< Delete contents of header
+		void clear_footer(); //!< Delete contents of footer
+		//!@}
 };
 
 #endif /* UI_HPP */
