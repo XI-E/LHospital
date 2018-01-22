@@ -216,7 +216,7 @@ void interface::patient_management(){
 			form.setdefault("Idk");
 			form >> inp_adr.district;
 			
-			form << ui::endl << "/tState : ";
+			form << ui::endl << "\tState : ";
 			form.setdefault("London(?)");
 			form >> inp_adr.state;
 			
@@ -306,19 +306,13 @@ void interface::patient_management(){
 
 			form.hide();
 
-			cout << "helo";
-
 			patient temp_pat = patient(inp_name, hospital::str_to_sex(inp_sex_str)
 										, hospital::str_to_date(inp_dob_str), inp_adr
 										, inp_phone, inp_dis, inp_guard_name
 										, inp_emer_contact, inp_emer_phone
 										, inp_insur, hospital::str_to_date(inp_admdate_str));
 
-			cout << "helllloooo";
-
 			hospital::write_patient(temp_pat);
-			
-			cout << "helllloooo2";
 
 			break;
 		}
@@ -348,7 +342,7 @@ void interface::patient_management(){
 				login_box.hide();
 
 				temp_patient = hospital::get_patient_by_id(inp_pat_id);
-				
+
 				if(temp_patient.get_id() == inp_pat_id){
 					login_success++;
 					interface::clear_error();
@@ -408,11 +402,11 @@ void interface::patient_management(){
 
 		case 3:
 		{
-			int choice = 0, login_success = 0;
+			int choice = 0;
 
 			patient temp_patient;
 
-			while(!login_success){
+			while(1){
 				coord c(ui::scr_width / 3, ui::scr_height / 3);
 				box login_box (c, ui::scr_width / 3, ui::scr_height / 2.5);
 
@@ -433,7 +427,7 @@ void interface::patient_management(){
 				temp_patient = hospital::get_patient_by_id(inp_pat_id);
 				
 				if(temp_patient.get_id() == inp_pat_id){
-					login_success++;
+					break;
 					interface::clear_error();
 				}
 				else{
@@ -597,7 +591,7 @@ void interface::patient_management(){
 					edit_screen << ui::endl << "Amount (in $) :";
 					edit_screen.setdefault(temp.amount);
 					edit_screen >> temp.amount;
-					edit_screen << ui::endl << "Expiry date (MM/DD/YYYY):";
+					edit_screen << ui::endl << "Expiry date (DD/MM/YYYY):";
 					char temp_date[11];
 					edit_screen >> hospital::date_validity >> temp_date;
 
