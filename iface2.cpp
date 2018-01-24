@@ -5,6 +5,7 @@
 #include "emp.hpp"
 
 void interface::init(){
+	emp_mgmt::menu2.hide();
 	window.hide();
 	window.display();
 	window.settcolor(WHITE);
@@ -62,13 +63,9 @@ void interface::init(){
 				interface::error("You have an invalid id generated. Create a new account");
 				break;
 			case DOCTOR:
-				interface::doctor_screen();
-				break;
 			case NURSE:
-				interface::nurse_screen();
-				break;
 			case RECEPTIONIST:
-				interface::receptionist_screen();
+				interface::employee_screen(id);
 				break;
 		}
 	}
@@ -102,21 +99,29 @@ int interface::login_screen()
 		if(fin.fail())
 		{
 			interface::error("ERROR WHILE READING FROM FILE!!! ");
+			getch();
 			return 0;
 		}
 	}
 	fin.close();
 	for(unsigned long id = 1; id <= max_id; ++id)
 	{
-		employee x;
-		if(!hospital::get_employee_by_id(id, &x))
+		void * x = malloc( sizeof(doctor) );
+		if(x == NULL)
 		{
-			str errmsg;
-			sprintf(errmsg, "Error in reading file of id %lu", id);
-			interface::error(errmsg);
+			interface::log_this("interface::login_screen() : Not enough memory to allocate buffer void * temp = malloc( sizeof(doctor) )");
+			interface::error("Out of memory!! Check log");
+			getch();
 			return 0;
 		}
-		if(!strcmp(x.account.get_username(), uid) && x.account.login(pwd))
+		if(!hospital::get_employee_by_id(id, x))
+		{
+			char log_msg[300];
+			sprintf(log_msg, "interface::login_screen() : Error in reading file of id %lu (hospital::get_employee_by_id(id, x) returned 0), could be due to invalid login details entered", id);
+			interface::log_this(log_msg);
+		}
+		employee * e = (employee *)x;
+		if(!strcmp(e->account.get_username(), uid) && e->account.login(pwd))
 		{
 			interface::clear_error();
 			return id;

@@ -25,13 +25,7 @@ class hospital
 		static medicine get_med_by_code(int);
 
 		static int get_employee_by_id(unsigned long, void *);
-//		static int get_employee_by_id(unsigned long, doctor &);	//The new get_employee_by_id hasn't been tested properly, so until that is done, these functions are gonna remain commented
-//		static int get_employee_by_id(unsigned long, nurse &);
-//		static int get_employee_by_id(unsigned long, receptionist &);
 		static int write_employee(void *);
-//		static int write_employee(doctor);						//same as above for write function
-//		static int write_employee(nurse);
-//		static int write_employee(receptionist);
 		static int pay_salary(unsigned long, Date, Time);
 		static int pay_all_salaries();
 
@@ -39,7 +33,10 @@ class hospital
 		static int count_leap_years(Date);
 		static int date_validity(const char *);
 		static int date_validity(Date);
+		static int time_validity(const char *);
+		static int time_validity(Time);
 		static Date str_to_date(const char *);
+		static Time str_to_time(const char *);
 		static int str_to_sex(char *);
 
 	private:

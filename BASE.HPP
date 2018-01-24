@@ -58,6 +58,8 @@ struct address{
 	str city;
 	str district;
 	str state;
+	
+	address(const char * = "", const char * = "", const char * = "", const char * = "", const char * = "");
 };
 
 struct disease{
@@ -150,7 +152,7 @@ class enum_to_str			//defines << operator overloads to facilitate printing of so
 		friend box & operator<<(box &output, body_parts b);	//converts body_parts enumeration constant into a string and prints it to a box
 		friend box & operator<<(box &output, Time & t);		//converts Time variable into a string and prints it to a box
 		friend box & operator<<(box &output, Date & d);		//converts Date variable into a string and prints it to a box
-		friend box & operator<<(box &output, address & a);	////converts address variable into a string and prints it to a box
+		friend box & operator<<(box &output, address & a);	//converts address variable into a string and prints it to a box
 };
 
 #endif

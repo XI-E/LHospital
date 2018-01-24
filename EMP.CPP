@@ -76,9 +76,11 @@ int employee::get_age()
 {
 	////////////////Updating age to present age///////////
 	set_dob(dob);		//This function is used here to invoke calc_age() in it only(because calc_age is directly not accessible)
-	employee temp;
-	if(hospital::get_employee_by_id(id, &temp))		//if employee's file exists on disk
-		hospital::write_employee(this);				//overwrite that file
+	void * temp = malloc( sizeof(doctor) );
+	if(hospital::get_employee_by_id(id, temp))			//if employee's file exists on disk
+	{
+		hospital::write_employee( this );				//overwrite that file
+	}
 	return age;
 }
 
@@ -124,15 +126,34 @@ unsigned long employee::get_id()
 
 transaction * employee::get_last_10_transactions()
 {
-	transaction t[10];
-	str temp;
-	sprintf(temp, "employee/%d/trans.dat", id);
-	ifstream fin ( temp ,ios::binary | ios::ate );
-	fin.seekg(( (-10) * sizeof(transaction) ), ios::end);
+	transaction t[10], null;
 	for(int i = 0; i < 10; ++i)
 	{
-		fin.read((char *) &t[i], sizeof(transaction));
+		t[i] = null;
 	}
+	str temp;
+	sprintf(temp, "employee/%d/trans.dat", id);
+	ifstream fin ( temp ,ios::binary | ios::ate | ios::nocreate );
+	if(!fin)
+	{
+		char log_msg[300];
+		sprintf(log_msg, "employee::get_last_10_transactions() : Failed to open file trans.dat for id %lu\nFunction aborted", id);
+		interface::log_this(log_msg);
+		return NULL;
+	}
+	fin.seekg(( (-10) * sizeof(transaction) ), ios::end);
+	for(i = 0; i < 10 && !fin.eof(); ++i)
+	{
+		fin.read((char *) &t[i], sizeof(transaction));
+		if(fin.fail())
+		{
+			char log_msg[300];
+			sprintf(log_msg, "employee::get_last_10_transactions() : Failed to read file trans.dat for id %lu(loop failed at i = %i)\nFunction aborted", id, i);
+			interface::log_this(log_msg);
+			return NULL;
+		}
+	}
+	fin.close();
 	return t;
 }
 
@@ -179,6 +200,20 @@ long * doctor::get_patients()
 	return patients;
 }
 
+void doctor::set_speciality(int inp[2])
+{
+	speciality[0] = inp[0];
+	speciality[1] = inp[1];
+}
+
+void doctor::set_patients(long inp[10])
+{
+	for(int i = 0; i < 10; ++i)
+	{
+		patients[i] = inp[i];
+	}
+}
+
 nurse::nurse(str inp1, int inp2, Date inp3, address inp4, phone inp5, unsigned long inp6, Time inp7, Time inp8, str inp10, str inp11) : employee(inp1, inp2, inp3, inp4, inp5, inp6, inp7, inp8, inp10, inp11)
 {
 	id_to_emp i1(get_id(), NURSE);
@@ -203,6 +238,14 @@ nurse::nurse() : employee()
 long * nurse::get_patients()
 {
 	return patients;
+}
+
+void nurse::set_patients(long inp[5])
+{
+	for(int i = 0; i < 5; ++i)
+	{
+		patients[i] = inp[i];
+	}
 }
 
 receptionist::receptionist(str inp1, int inp2, Date inp3, address inp4, phone inp5, unsigned long inp6, Time inp7, Time inp8, str inp10, str inp11) : employee(inp1, inp2, inp3, inp4, inp5, inp6, inp7, inp8, inp10, inp11)
