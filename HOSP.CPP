@@ -38,21 +38,21 @@ transaction hospital::add_money(float amt, char* reason, Date d, Time t){
 	return temp;
 }
 
-patient hospital::get_patient_by_id(int id){
-	patient *a;
+patient hospital::get_patient_by_id(long id){
+	patient a;
 
 	str temp;
 
 	sprintf(temp, "patient/%lu/base.dat", id);
 
-	int i = hospital::read_from(id, (char *) a, sizeof(patient), temp);
+	int i = hospital::read_from(id, (char *) &a, sizeof(patient), temp);
 
 	if(!i){
 		interface::error("File read error!!");
 		getch();
 	}
 
-	return *a;
+	return a;
 
 }
 
@@ -65,7 +65,6 @@ void hospital::write_patient(patient a){
 	ofstream patient_file ( temp , ios::out | ios::binary );
 
 	if(patient_file){
-		patient a;
 		patient_file.write( (char*) &a , sizeof(patient) );
 	}
 	else{
@@ -486,6 +485,7 @@ Date hospital::str_to_date(const char * inp_date){
 			if(ch[i] == '/' || ch[i] == '\\' || ch[i] == 0 || ch[i] == '-'){
 				if(ch[i] == 0 && count < 11){
 					interface::error("Invalid date!");
+					return Date (99, 99, 9999);
 				}
 				ch[i] = '/';
 				int temp = i-1, temp2 = 0;

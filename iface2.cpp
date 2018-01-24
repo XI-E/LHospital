@@ -316,11 +316,9 @@ void interface::patient_management(){
 
 		case 2:
 		{
-			int login_success = 0;
-
 			patient temp_patient;
 
-			while(!login_success){
+			while(1){
 				coord c(ui::scr_width / 3, ui::scr_height / 3);
 				box login_box (c, ui::scr_width / 3, ui::scr_height / 2.5);
 
@@ -341,7 +339,7 @@ void interface::patient_management(){
 				temp_patient = hospital::get_patient_by_id(inp_pat_id);
 
 				if(temp_patient.get_id() == inp_pat_id){
-					login_success++;
+					break;
 					interface::clear_error();
 				}
 				else{
@@ -353,14 +351,21 @@ void interface::patient_management(){
 			coord c(ui::scr_width / 3, ui::scr_height / 3);
 			box bill (c, ui::scr_width / 3, ui::scr_height / 2);
 
-			int stay_len = hospital::get_date_difference(
+			str tt;
+			sprintf(tt, "%d/%d/%d", temp_patient.get_admission_date(DAY),
+															temp_patient.get_admission_date(MONTH),
+															temp_patient.get_admission_date(YEAR));
+
+															interface::log_this(tt);
+
+			int stay_len = abs( hospital::get_date_difference(
 														system::get_date(),
 														Date(
 															temp_patient.get_admission_date(DAY),
 															temp_patient.get_admission_date(MONTH),
 															temp_patient.get_admission_date(YEAR)
 														)
-							);
+							) );
 
 			bill << ui::endl << "Bill for " << temp_patient.get_name()
 					<< ui::endl << "1. Stay for "
@@ -379,7 +384,7 @@ void interface::patient_management(){
 
 					bill << i+2 << ". " << temp_trans.reason << ui::endl;
 					bill.settcolor(GREEN);
-					bill << "/t$" << temp_trans.amount << ui::endl;
+					bill << "\t$" << temp_trans.amount << ui::endl;
 					bill.settcolor(ui::tcolor);
 
 					total_bill += temp_trans.amount;

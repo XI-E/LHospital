@@ -16,7 +16,7 @@ class hospital
 		static transaction* get_transaction();
 		static void read_balance();
 
-		static patient get_patient_by_id(int);
+		static patient get_patient_by_id(long);
 		static void write_patient(patient);
 		static void charge_patient(int, transaction);
 		static void discharge_patient(patient);

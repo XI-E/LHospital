@@ -94,3 +94,63 @@ $ [22-1-2018 0:50:15 +0530]: Program initiated
 $ [22-1-2018 19:5:36 +0530]: Program initiated
 -----------------------------------
 
+$ [22-1-2018 19:43:31 +0530]: Program initiated
+-----------------------------------
+
+$ [22-1-2018 19:43:42 +0530]: hospital::read_from() : Employee with id 1 not found
+Function aborted
+$ [22-1-2018 19:43:45 +0530]: hospital::read_from() : Employee with id 2 not found
+Function aborted
+$ [22-1-2018 19:43:49 +0530]: hospital::read_from() : Employee with id 0 not found
+Function aborted
+$ [22-1-2018 19:43:52 +0530]: hospital::read_from() : Employee with id 0 not found
+Function aborted
+$ [22-1-2018 19:43:54 +0530]: hospital::read_from() : Employee with id 3 not found
+Function aborted
+$ [22-1-2018 19:45:45 +0530]: Program initiated
+-----------------------------------
+
+$ [22-1-2018 19:46:3 +0530]: hospital::read_from() : Employee with id 5 not found
+Function aborted
+$ [22-1-2018 19:49:6 +0530]: Program terminated
+-----------------------------------
+
+$ [22-1-2018 19:49:10 +0530]: Program initiated
+-----------------------------------
+
+$ [22-1-2018 19:49:28 +0530]: Program terminated
+-----------------------------------
+
+$ [22-1-2018 19:51:34 +0530]: Program initiated
+-----------------------------------
+
+$ [22-1-2018 19:51:47 +0530]: hospital::read_from() : Employee with id 4 not found
+Function aborted
+$ [22-1-2018 19:51:54 +0530]: Program terminated
+-----------------------------------
+
+$ [22-1-2018 21:23:48 +0530]: Program initiated
+-----------------------------------
+
+$ [22-1-2018 21:24:29 +0530]: Program terminated
+-----------------------------------
+
+$ [22-1-2018 21:28:6 +0530]: Program initiated
+-----------------------------------
+
+$ [22-1-2018 21:31:32 +0530]: Program terminated
+-----------------------------------
+
+$ [22-1-2018 21:34:54 +0530]: Program initiated
+-----------------------------------
+
+$ [22-1-2018 21:35:36 +0530]: Program terminated
+-----------------------------------
+
+$ [22-1-2018 21:37:18 +0530]: Program initiated
+-----------------------------------
+
+$ [22-1-2018 21:38:10 +0530]: 22/1/2017
+$ [22-1-2018 21:38:14 +0530]: Program terminated
+-----------------------------------
+
