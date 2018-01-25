@@ -138,7 +138,7 @@ class userid
 
 	public:
 		userid(char *, char *);
-		userid();	//default constructor;
+		userid();					//default constructor
 		char * get_username();
 		void set_username(char *);
 		int login(char *);

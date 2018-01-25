@@ -124,31 +124,71 @@ unsigned long employee::get_id()
 	return id;
 }
 
-transaction * employee::get_last_10_transactions()
+transaction * employee::get_last_5_transactions()
 {
-	transaction t[10], null;
-	for(int i = 0; i < 10; ++i)
+	transaction * t = (transaction *)malloc(5 * sizeof(transaction));
+	for(int i = 0; i < 5; ++i)
 	{
-		t[i] = null;
+		t[i] = transaction();
 	}
 	str temp;
-	sprintf(temp, "employee/%d/trans.dat", id);
-	ifstream fin ( temp ,ios::binary | ios::ate | ios::nocreate );
+	switch( id_to_emp::convert(id) )
+	{
+		case INVALID:
+		{
+			char log_msg[300];
+			sprintf(log_msg, "employee::get_last_5_transactions() : The object has invalid id (%lu)\nFunction aborted", id);
+			interface::log_this(log_msg);
+			return NULL;
+		}
+		case DOCTOR:
+		{
+			sprintf(temp, "employee/doctor/%lu/trans.dat", id);
+			break;
+		}
+		case NURSE:
+		{
+			sprintf(temp, "employee/nurse/%lu/trans.dat", id);
+			break;
+		}
+		case RECEPTIONIST:
+		{
+			sprintf(temp, "employee/receptionist/%lu/trans.dat", id);
+			break;
+		}
+		case OTHERS:
+		{
+			sprintf(temp, "employee/%lu/trans.dat", id);
+			break;
+		}
+	}
+	ifstream fin ( temp ,ios::binary | ios::in | ios::nocreate | ios::ate);
 	if(!fin)
 	{
 		char log_msg[300];
-		sprintf(log_msg, "employee::get_last_10_transactions() : Failed to open file trans.dat for id %lu\nFunction aborted", id);
+		sprintf(log_msg, "employee::get_last_5_transactions() : Failed to open file trans.dat for id %lu\nFunction aborted", id);
 		interface::log_this(log_msg);
 		return NULL;
 	}
-	fin.seekg(( (-10) * sizeof(transaction) ), ios::end);
-	for(i = 0; i < 10 && !fin.eof(); ++i)
+	int max_i, size_of_file = fin.tellg();
+	if( size_of_file >= ( 5 * sizeof(transaction) ) )
 	{
-		fin.read((char *) &t[i], sizeof(transaction));
+		const int a = (-5) * sizeof(transaction);
+		fin.seekg(a, ios::end);
+		max_i = 5;
+	}
+	else
+	{
+		fin.seekg(0, ios::beg);
+		max_i = (int)( size_of_file / sizeof(transaction) );
+	}
+	for(i = 0; i < max_i && !fin.eof(); ++i)
+	{
+		fin.read((char *) (t+i), sizeof(transaction));
 		if(fin.fail())
 		{
 			char log_msg[300];
-			sprintf(log_msg, "employee::get_last_10_transactions() : Failed to read file trans.dat for id %lu(loop failed at i = %i)\nFunction aborted", id, i);
+			sprintf(log_msg, "employee::get_last_5_transactions() : Failed to read file trans.dat for id %lu(loop failed at i = %i)\nFunction aborted", id, i);
 			interface::log_this(log_msg);
 			return NULL;
 		}

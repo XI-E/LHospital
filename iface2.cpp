@@ -5,7 +5,6 @@
 #include "emp.hpp"
 
 void interface::init(){
-	emp_mgmt::menu2.hide();
 	window.hide();
 	window.display();
 	window.settcolor(WHITE);

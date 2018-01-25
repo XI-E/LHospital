@@ -90,7 +90,7 @@ void person::set_phone(char* a)
 
 Time::Time()
 {
-	hour = 0;
+	hour = 25;
 	minute = 0;
 	second = 0;
 }

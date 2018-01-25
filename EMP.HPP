@@ -17,7 +17,7 @@ class employee : public person{
 		Time get_shift(int);
 		void set_shift(int, Time);
 		unsigned long get_id();
-		transaction * get_last_10_transactions();
+		transaction * get_last_5_transactions();
 		static int get_generate_id_status();
 		userid account;
 	protected:

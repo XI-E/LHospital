@@ -210,6 +210,14 @@ void interface::validate_menu::set_menu_limits(int a, int b)
 int interface::validate_menu::lowest_choice = 0;
 int interface::validate_menu::greatest_choice = 0;
 
+int interface::back_func::set_backbit()
+{
+	backbit = 1;
+	return 1;
+}
+
+int interface::back_func::backbit = 0;
+
 void interface::error(char* err){
 	window.clear_footer();
 	window.setfooter_tcolor(RED);

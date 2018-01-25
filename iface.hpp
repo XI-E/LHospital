@@ -29,13 +29,19 @@ class interface{
 				static int input(const char *);
 				static void set_menu_limits(int, int);
 		};
+		class back_func
+		{
+				back_func();
+			public:
+				static int backbit;
+				static int set_backbit();
+		};
 		static box window;
 };
 
 class emp_mgmt : public interface
 {
 	public:	
-		static box menu2;
 		static void view_emp();
 		static int view_emp(unsigned long);
 		static void add_emp();
@@ -45,7 +51,6 @@ class emp_mgmt : public interface
 		static void pay_all();
 	private:
 		emp_mgmt();
-		static int menu2_height;
 };
 
 #endif /* INTERFACE_HPP */
