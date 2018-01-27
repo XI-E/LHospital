@@ -85,6 +85,7 @@ void interface::employee_screen(unsigned long id)
 	{
 		interface::error("ID not found or error while reading from file!");
 		getch();
+		free(temp);
 		return;
 	}
 	employee *e = (employee *) temp;
@@ -103,11 +104,27 @@ void interface::employee_screen(unsigned long id)
 		menu.settcolor(ui::tcolor);
 		menu << "1. View profile" << ui::endl
 			 << "2. Change login details" << ui::endl
-			 << "3. View last 5 transactions" << ui::endl
-			 << "4. Exit" << ui::endl
-			 << ui::endl << "Enter your choice: ";
+			 << "3. View last 5 transactions" << ui::endl;
+		emp_type type_of_emp = id_to_emp::convert(id);
+		if(type_of_emp == RECEPTIONIST)
+		{
+			menu << "4. Manage patients" << ui::endl
+				 << "5. Exit" << ui::endl;
+		}
+		else
+		{
+			menu << "4. Exit" << ui::endl;
+		}
+		menu << ui::endl << "Enter your choice: ";
 		menu.settcolor_input(YELLOW);
-		validate_menu::set_menu_limits(1, 4);
+		if(type_of_emp == RECEPTIONIST)
+		{
+			validate_menu::set_menu_limits(1, 5);
+		}
+		else
+		{
+			validate_menu::set_menu_limits(1, 4);
+		}
 		menu >> validate_menu::input >> ch;
 		menu << ui::endl;
 		menu.setexit_button("Submit");
@@ -235,6 +252,7 @@ void interface::employee_screen(unsigned long id)
 								notice.setexit_button("Exit");
 								notice.loop();
 								notice.hide();
+								free(temp);
 								return;
 							}
 							box menu5( menu3.getcorner_top_left(), menu3.getwidth(), menu3.getheight() );
@@ -253,7 +271,7 @@ void interface::employee_screen(unsigned long id)
 							if(back_func::backbit)
 							{
 								back_func::backbit = 0;
-								break;		//At the "Enter new password" page, when sift+bkspc is pressed, control will go back to "Change login details" menu.
+								break;		//At the "Enter new password" page, when shift+bkspc is pressed, control will go back to "Change login details" menu.
 							}
 							e->account = userid( e->account.get_username(), new_pwd );
 							const int notice2_height = 13;
@@ -276,6 +294,7 @@ void interface::employee_screen(unsigned long id)
 							notice2.setexit_button("Exit");
 							notice2.loop();
 							notice2.hide();
+							free(temp);
 							return;
 						}
 						case 3:
@@ -333,6 +352,7 @@ void interface::employee_screen(unsigned long id)
 								 << "Reason: " << t[i].reason << ui::endl;
 					}
 				}
+				free(t);
 				if(i <= 3)
 				{
 					menu2.setexit_button("Back");
@@ -350,6 +370,20 @@ void interface::employee_screen(unsigned long id)
 			}
 			case 4:
 			{
+				if(type_of_emp == RECEPTIONIST)
+				{
+					interface::patient_management();
+					break;
+				}
+				else
+				{
+					free(temp);
+					return;
+				}
+			}
+			case 5:
+			{
+				free(temp);
 				return;
 			}
 		}
@@ -399,6 +433,7 @@ int emp_mgmt::view_emp(unsigned long id)
 	{
 		interface::error("ID not found or error while reading from file!");
 		getch();
+		free(temp);
 		return 0;
 	}
 	employee *e = (employee *) temp;
@@ -517,6 +552,7 @@ int emp_mgmt::view_emp(unsigned long id)
 			break;
 		}
 	}
+	free(temp);
 	return 1;
 }
 
@@ -927,12 +963,14 @@ void emp_mgmt::edit_emp()
 	if(back_func::backbit)
 	{
 		back_func::backbit = 0;
+		free(temp);
 		return;
 	}
 	if(!hospital::get_employee_by_id(id, temp))
 	{
 		interface::error("ID not found or error while reading from file!");
 		getch();
+		free(temp);
 		return;
 	}
 	notice:
@@ -1100,6 +1138,7 @@ void emp_mgmt::edit_emp()
 		notice2.setexit_button("Exit");
 		notice2.loop();
 		notice2.hide();
+		free(temp);
 		return;
 	}
 	notice2 << "Employee edited successfully!!" << ui::endl;
@@ -1111,6 +1150,7 @@ void emp_mgmt::edit_emp()
 	notice2.loop();
 	notice2.hide();
 	view_emp(id);
+	free(temp);
 }
 
 void emp_mgmt::pay_emp()

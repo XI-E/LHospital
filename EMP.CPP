@@ -77,10 +77,11 @@ int employee::get_age()
 	////////////////Updating age to present age///////////
 	set_dob(dob);		//This function is used here to invoke calc_age() in it only(because calc_age is directly not accessible)
 	void * temp = malloc( sizeof(doctor) );
-	if(hospital::get_employee_by_id(id, temp))			//if employee's file exists on disk
+	if(temp != NULL && hospital::get_employee_by_id(id, temp))			//if employee's file exists on disk
 	{
 		hospital::write_employee( this );				//overwrite that file
 	}
+	free(temp);
 	return age;
 }
 
@@ -127,6 +128,11 @@ unsigned long employee::get_id()
 transaction * employee::get_last_5_transactions()
 {
 	transaction * t = (transaction *)malloc(5 * sizeof(transaction));
+	if(t == NULL)
+	{
+		interface::log_this("employee::get_last_5_transactions() :Not enough memory to allocate buffer void * temp = malloc( sizeof(doctor) )\nFunction aborted");
+		return NULL;
+	}
 	for(int i = 0; i < 5; ++i)
 	{
 		t[i] = transaction();
@@ -139,6 +145,7 @@ transaction * employee::get_last_5_transactions()
 			char log_msg[300];
 			sprintf(log_msg, "employee::get_last_5_transactions() : The object has invalid id (%lu)\nFunction aborted", id);
 			interface::log_this(log_msg);
+			free(t);
 			return NULL;
 		}
 		case DOCTOR:
@@ -168,6 +175,7 @@ transaction * employee::get_last_5_transactions()
 		char log_msg[300];
 		sprintf(log_msg, "employee::get_last_5_transactions() : Failed to open file trans.dat for id %lu\nFunction aborted", id);
 		interface::log_this(log_msg);
+		free(t);
 		return NULL;
 	}
 	int max_i, size_of_file = fin.tellg();
@@ -190,6 +198,7 @@ transaction * employee::get_last_5_transactions()
 			char log_msg[300];
 			sprintf(log_msg, "employee::get_last_5_transactions() : Failed to read file trans.dat for id %lu(loop failed at i = %i)\nFunction aborted", id, i);
 			interface::log_this(log_msg);
+			free(t);
 			return NULL;
 		}
 	}
