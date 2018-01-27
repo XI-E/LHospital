@@ -42,7 +42,7 @@ void interface::stock_management(){
 				coord c(ui::scr_width / 3, ui::scr_height / 3);
 				box sale_menu (c, ui::scr_width / 3, ui::scr_height / 3);
 				sale_menu.settcolor_input(YELLOW);
-				sale_menu << ui::centeralign << "Medicine Sale";
+				sale_menu << ui::centeralign << "Medicine Sale" << ui::endl;
 				sale_menu << "Code : ";
 				sale_menu.setdefault(42);
 				sale_menu >> temp.code;
@@ -62,7 +62,7 @@ void interface::stock_management(){
 				coord c(ui::scr_width / 3, ui::scr_height / 3);
 				box sale_menu (c, ui::scr_width / 3, ui::scr_height / 2);
 				sale_menu.settcolor_input(YELLOW);
-				sale_menu << ui::centeralign << "Medicine Sale";
+				sale_menu << ui::centeralign << "Medicine Sale" << ui::endl;
 				sale_menu << "Name : " << temp.name
 							<< ui::endl << "Price : $" << temp.price
 							<< ui::endl << ui::endl
@@ -97,7 +97,7 @@ void interface::stock_management(){
 			}
 
 			hospital::write_patient(temp_patient);		
-			//hospital::write_med(temp);
+			hospital::write_med(temp);
 
 			break;
 		}
@@ -111,7 +111,7 @@ void interface::stock_management(){
 				coord c(ui::scr_width / 3, ui::scr_height / 3);
 				box purchase_menu (c, ui::scr_width / 3, ui::scr_height / 3);
 				purchase_menu.settcolor_input(YELLOW);
-				purchase_menu << ui::centeralign << "Medicine Purchase";
+				purchase_menu << ui::centeralign << "Medicine Purchase" << ui::endl;
 				purchase_menu << "Code : ";
 				purchase_menu.setdefault(42);
 				purchase_menu >> temp.code;
@@ -123,13 +123,13 @@ void interface::stock_management(){
 				temp = hospital::get_med_by_code(temp.code);
 			}
 
-			int quantity;
+			int quantity = -2;
 
 			while(quantity < 0 || quantity > 5000){
 				coord c(ui::scr_width / 3, ui::scr_height / 3);
 				box purchase_menu (c, ui::scr_width / 3, ui::scr_height / 2);
 				purchase_menu.settcolor_input(YELLOW);
-				purchase_menu << ui::centeralign << "Medicine Sale";
+				purchase_menu << ui::centeralign << "Medicine Purchase" << ui::endl;
 				purchase_menu << "Name : " << temp.name
 							<< ui::endl << "Price : $" << temp.price
 							<< ui::endl << ui::endl << "Quantity : ";
@@ -146,7 +146,9 @@ void interface::stock_management(){
 
 			temp.stock += quantity;
 			hospital::deduct_money(temp.price * quantity, "Medicine purchase", system::get_date(), system::get_time());
-			//hospital::write_med(temp);
+			hospital::write_med(temp);
+
+			break;
 		}
 		
 		case 3:
@@ -158,7 +160,7 @@ void interface::stock_management(){
 				coord c(ui::scr_width / 3, ui::scr_height / 3);
 				box stock_menu (c, ui::scr_width / 3, ui::scr_height / 3);
 				stock_menu.settcolor_input(YELLOW);
-				stock_menu << ui::centeralign << "Medicine Sale";
+				stock_menu << ui::centeralign << "Medicine Sale" << ui::endl;
 				stock_menu << "Code : ";
 				stock_menu.setdefault(42);
 				stock_menu >> temp.code;
@@ -173,7 +175,7 @@ void interface::stock_management(){
 			coord c(ui::scr_width / 3, ui::scr_height / 3);
 			box stock_menu (c, ui::scr_width / 3, ui::scr_height / 2);
 			stock_menu.settcolor_input(YELLOW);
-			stock_menu << ui::centeralign << "Medicine Details";
+			stock_menu << ui::centeralign << "Medicine Details" << ui::endl;
 			stock_menu << "Name : " << temp.name
 						<< ui::endl << "Price : $" << temp.price
 						<< ui::endl << "Dosage : " << temp.dosage << " ml"
@@ -182,6 +184,8 @@ void interface::stock_management(){
 			stock_menu.setexit_button("Okay");
 			stock_menu.loop();
 			stock_menu.hide();
+
+			break;
 		}
 	}
 

@@ -175,7 +175,7 @@ void interface::patient_management(){
 		case 1:
 		{
 			coord c(ui::scr_width / 4, ui::scr_height / 4);
-			box form (c, ui::scr_width / 2, ui::scr_height / 1.25);
+			box form (c, ui::scr_width / 2, ui::scr_height / 1.5);
 			form.settcolor_input(YELLOW);
 
 			str inp_name, inp_sex_str, inp_dob_str
@@ -283,17 +283,12 @@ void interface::patient_management(){
 			form << ui::endl << "\tExpiry";
 			form.setdefault("25/12/2022");
 			form >> inp_insur_expiry;
-			inp_insur.expiry = hospital::str_to_date(inp_insur_expiry);
 			
 			
 			form << ui::endl << ui::endl
 					<< "Admission Date : ";
 			char dnow[11];
-			Date current_date = system::get_date();
-			sprintf(dnow, "%d/%d/%d", current_date.day 
-									, current_date.month
-									, current_date.year);
-			form.setdefault(dnow);
+			form.setdefault("01/01/2018");
 			form >> inp_admdate_str;
 
 			form << ui::endl << ui::endl;
@@ -302,6 +297,8 @@ void interface::patient_management(){
 			form.loop();
 
 			form.hide();
+			
+			inp_insur.expiry = hospital::str_to_date(inp_insur_expiry);
 
 			patient temp_pat = patient(inp_name, hospital::str_to_sex(inp_sex_str)
 										, hospital::str_to_date(inp_dob_str), inp_adr
@@ -310,6 +307,16 @@ void interface::patient_management(){
 										, inp_insur, hospital::str_to_date(inp_admdate_str));
 
 			hospital::write_patient(temp_pat);
+
+			coord d(ui::scr_width / 3, ui::scr_height / 3);
+			box message (d, ui::scr_width / 3, ui::scr_height / 3);
+
+			message << ui::centeralign << "Patient has been admitted with ID #"
+					<< temp_pat.get_id() << ui::endl << ui::endl;
+
+			message.setexit_button("Okay");
+			message.loop();
+			message.hide();
 
 			break;
 		}
@@ -411,6 +418,7 @@ void interface::patient_management(){
 			while(1){
 				coord c(ui::scr_width / 3, ui::scr_height / 3);
 				box login_box (c, ui::scr_width / 3, ui::scr_height / 2.5);
+				login_box.settcolor_input(YELLOW);
 
 				long inp_pat_id;
 
@@ -463,7 +471,8 @@ void interface::patient_management(){
 				case 1:
 				{
 					coord c(ui::scr_width / 3, ui::scr_height / 3);
-					box edit_screen (c, ui::scr_width / 3, ui::scr_height / 1.5);
+					box edit_screen (c, ui::scr_width / 3, ui::scr_height / 2);
+					edit_screen.settcolor_input(YELLOW);
 
 					edit_screen <<  "Enter disease/condition for " << temp_patient.get_name()
 								<< ui::endl << "Disease : ";
@@ -511,7 +520,8 @@ void interface::patient_management(){
 				case 2:
 				{
 					coord c(ui::scr_width / 3, ui::scr_height / 3);
-					box edit_screen (c, ui::scr_width / 3, ui::scr_height / 3);
+					box edit_screen (c, ui::scr_width / 3, ui::scr_height / 2);
+					edit_screen.settcolor_input(YELLOW);
 
 					edit_screen <<  "Enter name of guardian for " << temp_patient.get_name()
 								<< ui::endl << "Guardian Name : ";
@@ -535,7 +545,8 @@ void interface::patient_management(){
 				case 3:
 				{
 					coord c(ui::scr_width / 3, ui::scr_height / 3);
-					box edit_screen (c, ui::scr_width / 3, ui::scr_height / 3);
+					box edit_screen (c, ui::scr_width / 3, ui::scr_height / 2);
+					edit_screen.settcolor_input(YELLOW);
 
 					edit_screen <<  "Enter emergency contact no. for " << temp_patient.get_name()
 								<< ui::endl << "Contact no. : ";
@@ -559,7 +570,8 @@ void interface::patient_management(){
 				case 4:
 				{
 					coord c(ui::scr_width / 3, ui::scr_height / 3);
-					box edit_screen (c, ui::scr_width / 3, ui::scr_height / 3);
+					box edit_screen (c, ui::scr_width / 3, ui::scr_height / 2);
+					edit_screen.settcolor_input(YELLOW);
 
 					edit_screen <<  "Enter emergency contact no. for " << temp_patient.get_name()
 								<< ui::endl << "Contact no. : ";
@@ -583,7 +595,8 @@ void interface::patient_management(){
 				case 5:
 				{
 					coord c(ui::scr_width / 3, ui::scr_height / 3);
-					box edit_screen (c, ui::scr_width / 3, ui::scr_height / 3);
+					box edit_screen (c, ui::scr_width / 3, ui::scr_height / 2);
+					edit_screen.settcolor_input(YELLOW);
 
 					edit_screen <<  "Enter insurance information for " << temp_patient.get_name()
 								<< ui::endl << "Provider : ";

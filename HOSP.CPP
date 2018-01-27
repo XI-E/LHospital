@@ -38,6 +38,21 @@ transaction hospital::add_money(float amt, char* reason, Date d, Time t){
 	return temp;
 }
 
+transaction* hospital::get_transaction(){
+	transaction a[10];
+
+	ifstream hosp_finances ("transactions.dat", ios::in | ios::binary);
+
+	hosp_finances.seekg( (-1) * sizeof(transaction) , hosp_finances.end );
+
+	for(int i = 0; i < 10; i++){
+		hosp_finances.read( (char *) &a[i] , sizeof(transaction) );
+		hosp_finances.seekg( hosp_finances.tellg() - ( 2 * sizeof(transaction) ) );
+	}
+
+	return a;
+}
+
 patient hospital::get_patient_by_id(long id){
 	patient a;
 
@@ -99,7 +114,7 @@ float hospital::calc_bill(int stay){
 }
 
 medicine hospital::get_med_by_code(int inp_code){
-	fstream meds ("hospital/medicine.dat", ios::in | ios::binary);
+	fstream meds ("stock/med.dat", ios::in | ios::binary);
 
 	medicine temp;
 	
@@ -123,6 +138,24 @@ medicine hospital::get_med_by_code(int inp_code){
 	}
 
 	return temp;
+}
+
+void hospital::write_med(medicine inp_med){
+	fstream med_file ("stock/medicine.dat", ios::in | ios::out | ios::binary);
+	med_file.seekg(0);
+
+	int success = 0;
+	
+	while (!success){
+		medicine a;
+		med_file.read( (char*) &a, sizeof(medicine) );
+		if(a.code==inp_med.code){
+			med_file.seekg( med_file.tellg() - sizeof(medicine) );
+			med_file.write( (char*) &a, sizeof(medicine) );
+			success++;
+		}
+	}
+
 }
 
 int hospital::get_employee_by_id(unsigned long ID, void * target)
@@ -388,52 +421,6 @@ int hospital::pay_all_salaries()
 	return 1;
 }
 
-transaction* hospital::get_transaction(){
-	transaction a[10];
-
-	ifstream hosp_finances ("transactions.dat", ios::in | ios::binary);
-
-	hosp_finances.seekg( (-1) * sizeof(transaction) , hosp_finances.end );
-
-	for(int i = 0; i < 10; i++){
-		hosp_finances.read( (char *) &a[i] , sizeof(transaction) );
-		hosp_finances.seekg( hosp_finances.tellg() - ( 2 * sizeof(transaction) ) );
-	}
-
-	return a;
-}
-
-int hospital::read_from(unsigned long ID, char * dest, int size, char * temp)
-{
-	ifstream fin ( temp , ios::in | ios::binary );
-	if(!fin)
-	{
-		char errmsg[200];
-		sprintf(errmsg, "hospital::read_from() : Employee with id %lu not found\nFunction aborted", ID);
-		interface::log_this(errmsg);
-		return 0;
-	}
-	fin.read( dest, size );
-	if(fin.fail())
-	{
-		interface::log_this("hospital::read_from() : Error while reading from file (fin.fail())\nFunction aborted");
-		return 0;
-	}
-	fin.close();
-	return 1;
-}
-
-int hospital::count_leap_years(Date d)
-{
-	int years = d.year;
-
-	if (d.month <= 2){
-		years--;		// checking whether to count the current year
-	}
-
-	return (years / 4) - (years / 100) + (years / 400);
-}
-
 int hospital::get_date_difference(Date dt1, Date dt2)
 {
 
@@ -454,15 +441,29 @@ int hospital::get_date_difference(Date dt1, Date dt2)
 	return (n2 - n1);
 }
 
+int hospital::count_leap_years(Date d)
+{
+	int years = d.year;
+
+	if (d.month <= 2){
+		years--;		// checking whether to count the current year
+	}
+
+	return (years / 4) - (years / 100) + (years / 400);
+}
+
 int hospital::date_validity(const char * inp_date){
 	return hospital::date_validity(hospital::str_to_date(inp_date));
 }
 
 int hospital::date_validity(Date inp_date){
+	 if(inp_date.year % 4 == 0 && inp_date.month = 2 &&
+		inp_date.day == 29){
+			return 1;
+	}
 	if (
 		inp_date.month > 12 || 
-		inp_date.day > monthDays[inp_date.month - 1]
-	)
+		inp_date.day > monthDays[inp_date.month - 1])
 	{
 		return 0;
 	}
@@ -506,6 +507,26 @@ int hospital::str_to_sex(char* s){
 	if(	strcmp(s, "M") 	)	{ return 0; }
 	else if(	strcmp(s, "F") 	)	{ return 1; }
 	else { return 2; }
+}
+
+int hospital::read_from(unsigned long ID, char * dest, int size, char * temp)
+{
+	ifstream fin ( temp , ios::in | ios::binary );
+	if(!fin)
+	{
+		char errmsg[200];
+		sprintf(errmsg, "hospital::read_from() : Employee with id %lu not found\nFunction aborted", ID);
+		interface::log_this(errmsg);
+		return 0;
+	}
+	fin.read( dest, size );
+	if(fin.fail())
+	{
+		interface::log_this("hospital::read_from() : Error while reading from file (fin.fail())\nFunction aborted");
+		return 0;
+	}
+	fin.close();
+	return 1;
 }
 
 ////////////////////////////////////////////////////////////

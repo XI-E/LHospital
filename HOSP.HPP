@@ -14,7 +14,6 @@ class hospital
 		static transaction deduct_money(float, char*, Date, Time);
 		static transaction add_money(float, char*, Date, Time);
 		static transaction* get_transaction();
-		static void read_balance();
 
 		static patient get_patient_by_id(long);
 		static void write_patient(patient);
@@ -23,6 +22,7 @@ class hospital
 		static float calc_bill(int);
 
 		static medicine get_med_by_code(int);
+		static void write_med(medicine);
 
 		static int get_employee_by_id(unsigned long, void *);
 //		static int get_employee_by_id(unsigned long, doctor &);	//The new get_employee_by_id hasn't been tested properly, so until that is done, these functions are gonna remain commented
