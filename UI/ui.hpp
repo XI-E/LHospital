@@ -15,6 +15,8 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <errno.h>
+#include <new.h>
+#include <process.h>
 
 //! Validator function that's used for validating user input
 typedef int (*validator_f)(const char *);
@@ -73,6 +75,9 @@ class ui
 		static manipulator endl; //!< End line and move cursor to next line
 		static manipulator centeralign; //!< Center align
 		static manipulator rightalign; //!< Right align
+
+		//! This func is called when new is unable to allocate memory
+		static void my_new_handler();
 };
 
 //! Represents a coordinate
