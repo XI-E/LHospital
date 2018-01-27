@@ -1,3 +1,9 @@
+/*!
+ \file BASE.HPP
+ \brief Contains the declarations of the basic structs, classes, typedefs
+		and enums to be used in the whole program
+*/
+
 #ifndef BASE
 #define BASE
 
@@ -141,7 +147,7 @@ class userid
 		userid();					//default constructor
 		char * get_username();
 		void set_username(char *);
-		int login(char *);
+		int login(char *);			//checks whether the string input in the function is the password or not
 };
 
 class enum_to_str			//defines << operator overloads to facilitate printing of some stuff

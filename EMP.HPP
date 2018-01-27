@@ -1,3 +1,8 @@
+/*!
+ \file EMP.HPP
+ \brief Contains the definitions of the employee class and its derivatives
+*/
+
 #ifndef EMP
 #define EMP
 

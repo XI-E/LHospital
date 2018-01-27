@@ -1,3 +1,8 @@
+/*!
+ \file PATIENT.HPP
+ \brief Contains the patient class definition
+*/
+
 #ifndef PATIENT
 #define PATIENT
 

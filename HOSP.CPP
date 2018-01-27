@@ -385,7 +385,7 @@ int hospital::date_validity(const char * inp_date){
 }
 
 int hospital::date_validity(Date inp_date){
-	 if(inp_date.year % 4 == 0 && inp_date.month = 2 &&
+	 if(inp_date.year % 4 == 0 && inp_date.month == 2 &&
 		inp_date.day == 29){
 			return 1;
 	}

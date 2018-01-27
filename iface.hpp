@@ -1,3 +1,8 @@
+/*!
+ \file iface.hpp
+ \brief Contains prototypes of the functions managing the interface of the program
+*/
+
 #ifndef INTERFACE_HPP
 #define INTERFACE_HPP
 
