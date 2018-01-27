@@ -251,6 +251,7 @@ int hospital::pay_salary(unsigned long id, Date d1, Time t1)
 	if(!hospital::get_employee_by_id(id, e))
 	{
 		interface::log_this("hospital::pay_salary() : Employee not found or error while reading file\nFunction aborted");
+		free(e);
 		return 0;
 	}
 	unsigned long inp1;
@@ -259,6 +260,7 @@ int hospital::pay_salary(unsigned long id, Date d1, Time t1)
 	inp1 = emp->get_salary();
 	strcat(inp2, emp->get_name());
 	transaction t = hospital::deduct_money(inp1, inp2, d1, t1);
+	free(e);
 
 	ofstream fout ( temp ,ios::binary | ios::app );
 	if(!fout)

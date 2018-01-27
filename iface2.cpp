@@ -41,15 +41,12 @@ void interface::init(){
 
 			switch(choice){
 				case 1:
-					interface::patient_management();
-					break;
-				case 2:
 					interface::employee_management();
 					break;
-				case 3:
+				case 2:
 					interface::stock_management();
 					break;
-				case 4:
+				case 3:
 					return;
 			}
 		}
@@ -103,9 +100,9 @@ int interface::login_screen()
 		}
 	}
 	fin.close();
+	void * x = malloc( sizeof(doctor) );
 	for(unsigned long id = 1; id <= max_id; ++id)
 	{
-		void * x = malloc( sizeof(doctor) );
 		if(x == NULL)
 		{
 			interface::log_this("interface::login_screen() : Not enough memory to allocate buffer void * temp = malloc( sizeof(doctor) )");
@@ -123,10 +120,12 @@ int interface::login_screen()
 		if(!strcmp(e->account.get_username(), uid) && e->account.login(pwd))
 		{
 			interface::clear_error();
+			free(x);
 			return id;
 		}
 	}
 	interface::error("Invalid login details!!");
+	free(x);
 	return 0;
 }
 
@@ -135,13 +134,12 @@ int interface::menu(){
 	box menu (c, ui::scr_width / 3, ui::scr_height / 2.2 + 1);
 
 	int ch;
-	menu << "1. Patient management"
-			<< ui::endl << "2. Employee management"
-			<< ui::endl << "3. Stock management"
-			<< ui::endl << "4. Exit"
-			<< ui::endl << ui::endl << "Choice : ";
+	menu << ui::endl << "1. Employee management"
+		 << ui::endl << "2. Stock management"
+		 << ui::endl << "3. Exit"
+		 << ui::endl << ui::endl << "Choice : ";
 	menu.settcolor_input(YELLOW);
-	validate_menu::set_menu_limits(1, 4);
+	validate_menu::set_menu_limits(1, 3);
 	menu >> validate_menu::input >> ch;
 
 	menu << ui::endl;
