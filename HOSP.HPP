@@ -10,7 +10,7 @@ const int stay_charge = 50;  // $50 per day
 class hospital
 {
 	public:
-		static float get_bal();
+		static float get_balance();
 		static transaction deduct_money(float, char*, Date, Time);
 		static transaction add_money(float, char*, Date, Time);
 		static transaction* get_transaction();

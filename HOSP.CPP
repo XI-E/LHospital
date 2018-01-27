@@ -6,7 +6,7 @@
 //////////////////////////////////////////////
 ///////////////////////////////////////////////// Function definitions for class hospital
 
-float hospital::get_bal(){
+float hospital::get_balance(){
 	return balance;
 }
 
