@@ -56,7 +56,7 @@ void ui::clrscr()
 
 void ui::my_new_handler()
 {
-	interface::log_this("Error in allocating memory");
+	interface::log_this("Error in allocating memory. Exiting...");
 	exit(1);
 }
 
