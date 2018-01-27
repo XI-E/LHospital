@@ -12,16 +12,14 @@ class interface{
 		static void employee_management();
 		static void stock_management();
 		
-		static void doctor_screen();
-		static void nurse_screen();
-		static void receptionist_screen();
+		static void employee_screen(unsigned long);
 
 		static void error(char*);
 		static void clear_error();
 		
 		static int log_this(char *);
 
-	private:
+	protected:
 		interface();
 		class validate_menu			//for creating a validation function to use in menus
 		{							//to validate the choice input of the menu option to be accessed
@@ -31,7 +29,28 @@ class interface{
 				static int input(const char *);
 				static void set_menu_limits(int, int);
 		};
+		class back_func
+		{
+				back_func();
+			public:
+				static int backbit;
+				static int set_backbit();
+		};
 		static box window;
+};
+
+class emp_mgmt : public interface
+{
+	public:	
+		static void view_emp();
+		static int view_emp(unsigned long);
+		static void add_emp();
+		static void remove_emp();
+		static void edit_emp();
+		static void pay_emp();
+		static void pay_all();
+	private:
+		emp_mgmt();
 };
 
 #endif /* INTERFACE_HPP */

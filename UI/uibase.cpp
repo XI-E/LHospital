@@ -1,4 +1,5 @@
 #include "ui/ui.hpp"
+#include "iface.hpp"
 
 int init_lib_ui::counter = 0;
 
@@ -33,6 +34,8 @@ manipulator ui::endl,
 
 void ui::init()
 {
+	set_new_handler(ui::my_new_handler);
+
 	ui::clrscr();
 
 	textcolor(ui::tcolor);
@@ -49,6 +52,12 @@ void ui::init()
 void ui::clrscr()
 {
 	::clrscr();
+}
+
+void ui::my_new_handler()
+{
+	interface::log_this("Error in allocating memory. Exiting...");
+	exit(1);
 }
 
 coord::coord(int X, int Y)

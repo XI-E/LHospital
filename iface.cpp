@@ -191,79 +191,6 @@ void interface::stock_management(){
 
 }
 
-void interface::doctor_screen()
-{
-	coord c(1, 4);
-	box profile(c, (ui::scr_width * 3 / 5), ui::scr_height - 5);
-	box menu(( c + coord((ui::scr_width * 3 / 5) - 1, 0)), (ui::scr_width * 2 / 5) + 1, ui::scr_height - 5);
-	profile.f << ( ui::top | ui::left ) << (char)204
-			  << ( ui::bottom | ui::left ) << (char)204
-			  << ( ui::top | ui::right ) << (char)203
-			  << ( ui::bottom | ui::right ) << (char)202;
-	profile.f.display();
-	menu.f << ( ui::top | ui::left ) << (char)203
-		   << ( ui::bottom | ui::left ) << (char)202
-		   << ( ui::top | ui::right ) << (char)185
-		   << ( ui::bottom | ui::right ) << (char)185;
-	menu.f.display();
-	profile.settcolor(GREEN);
-	profile << ui::centeralign << "Personal Details" << ui::endl;
-	profile.settcolor(ui::tcolor);
-	profile << "Name: ";
-	profile.setexit_button("yay");	profile.loop();menu << "yay";
-	menu.hide();
-	profile.hide();
-	window.f.display();
-}
-void interface::nurse_screen()
-{
-	coord c(1, 4);
-	box profile(c, (ui::scr_width * 3 / 5), ui::scr_height - 5);
-	box menu(( c + coord((ui::scr_width * 3 / 5) - 1, 0)), (ui::scr_width * 2 / 5) + 1, ui::scr_height - 5);
-	profile.f << ( ui::top | ui::left ) << (char)204
-			  << ( ui::bottom | ui::left ) << (char)204
-			  << ( ui::top | ui::right ) << (char)203
-			  << ( ui::bottom | ui::right ) << (char)202;
-	profile.f.display();
-	menu.f << ( ui::top | ui::left ) << (char)203
-		   << ( ui::bottom | ui::left ) << (char)202
-		   << ( ui::top | ui::right ) << (char)185
-		   << ( ui::bottom | ui::right ) << (char)185;
-	menu.f.display();
-	profile.settcolor(GREEN);
-	profile << ui::centeralign << "Personal Details" << ui::endl;
-	profile.settcolor(ui::tcolor);
-	profile << "Name: ";
-	profile.setexit_button("yay");	profile.loop();menu << "yay";
-	menu.hide();
-	profile.hide();
-	window.f.display();
-}
-void interface::receptionist_screen()
-{
-	coord c(1, 4);
-	box profile(c, (ui::scr_width * 3 / 5), ui::scr_height - 5);
-	box menu(( c + coord((ui::scr_width * 3 / 5) - 1, 0)), (ui::scr_width * 2 / 5) + 1, ui::scr_height - 5);
-	profile.f << ( ui::top | ui::left ) << (char)204
-			  << ( ui::bottom | ui::left ) << (char)204
-			  << ( ui::top | ui::right ) << (char)203
-			  << ( ui::bottom | ui::right ) << (char)202;
-	profile.f.display();
-	menu.f << ( ui::top | ui::left ) << (char)203
-		   << ( ui::bottom | ui::left ) << (char)202
-		   << ( ui::top | ui::right ) << (char)185
-		   << ( ui::bottom | ui::right ) << (char)185;
-	menu.f.display();
-	profile.settcolor(GREEN);
-	profile << ui::centeralign << "Personal Details" << ui::endl;
-	profile.settcolor(ui::tcolor);
-	profile << "Name: ";
-	profile.setexit_button("yay");	profile.loop();menu << "yay";
-	menu.hide();
-	profile.hide();
-	window.f.display();
-}
-
 int interface::validate_menu::input(const char * ch)
 {
 	char *endptr;
@@ -286,6 +213,14 @@ void interface::validate_menu::set_menu_limits(int a, int b)
 
 int interface::validate_menu::lowest_choice = 0;
 int interface::validate_menu::greatest_choice = 0;
+
+int interface::back_func::set_backbit()
+{
+	backbit = 1;
+	return 1;
+}
+
+int interface::back_func::backbit = 0;
 
 void interface::error(char* err){
 	window.clear_footer();
@@ -318,5 +253,7 @@ int interface::log_this(char * message)
 	fout.close();
 	return 1;
 }
+
+interface::interface(){}
 
 box interface::window;

@@ -160,6 +160,11 @@ void hospital::write_med(medicine inp_med){
 
 int hospital::get_employee_by_id(unsigned long ID, void * target)
 {
+	if(target == NULL)
+	{
+		interface::log_this("hospital::get_employee_by_id() : NULL pointer supplied to function\nFunction aborted");
+		return 0;
+	}
 	str temp;
 	int size_of_target;
 	switch(id_to_emp::convert(ID))
@@ -192,51 +197,14 @@ int hospital::get_employee_by_id(unsigned long ID, void * target)
 	}
 	return 1;
 }
-/*
-int hospital::get_employee_by_id(unsigned long ID, doctor &target)
-{
-	doctor null;
-	str temp;
-	sprintf(temp, "employee/doctor/%lu/base.dat", ID);
-	int i = hospital::read_from( ID, (char*) &target, sizeof(doctor), temp );
-	if(!i)
-	{
-		target = null;
-		return 0;
-	}
-	return 1;
-}
 
-int hospital::get_employee_by_id(unsigned long ID, nurse &target)
-{
-	nurse null;
-	str temp;
-	sprintf(temp, "employee/nurse/%lu/base.dat", ID);
-	int i = hospital::read_from( ID, (char*) &target, sizeof(nurse), temp );
-	if(!i)
-	{
-		target = null;
-		return 0;
-	}
-	return 1;
-}
-
-int hospital::get_employee_by_id(unsigned long ID, receptionist &target)
-{
-	receptionist null;
-	str temp;
-	sprintf(temp, "employee/receptionist/%lu/base.dat", ID);
-	int i = hospital::read_from( ID, (char*) &target, sizeof(receptionist), temp );
-	if(!i)
-	{
-		target = null;
-		return 0;
-	}
-	return 1;
-}
-*/
 int hospital::write_employee(void * a)
 {
+	if(a == NULL)
+	{
+		interface::log_this("hospital::write_employee() : NULL pointer supplied to function\nFunction aborted");
+		return 0;
+	}
 	mkdir("employee");
 	str temp;
 	int size_of_target;
@@ -252,14 +220,17 @@ int hospital::write_employee(void * a)
 			size_of_target = sizeof(employee);
 			break;
 		case DOCTOR:
+			mkdir("employee/doctor");
 			sprintf(temp, "employee/doctor/%lu", ID);
 			size_of_target = sizeof(doctor);
 			break;
 		case NURSE:
+			mkdir("employee/nurse");
 			sprintf(temp, "employee/nurse/%lu", ID);
 			size_of_target = sizeof(nurse);
 			break;
 		case RECEPTIONIST:
+			mkdir("employee/receptionist");
 			sprintf(temp, "employee/receptionist/%lu", ID);
 			size_of_target = sizeof(receptionist);
 			break;
@@ -280,93 +251,50 @@ int hospital::write_employee(void * a)
 	}
 	return 1;
 }
-/*
-int hospital::write_employee(doctor a)
-{
-	mkdir("employee");
-	mkdir("employee/doctor");
-	str temp;
-	sprintf(temp, "employee/doctor/%lu", a.get_id());
-	mkdir(temp);
-	strcat(temp, "/base.dat");
-	ofstream fout ( temp , ios::out | ios::binary);
-	if(!fout)
-	{
-//		cerr<<"Employee data file could not be created or accessed";
-		return 0;
-	}
-	fout.write( (char*) &a , sizeof(doctor) );
-	if(fout.fail())
-	{
-//		cerr<<"Error while writing to file";
-		return 0;
-	}
-	return 1;
-}
 
-int hospital::write_employee(nurse a)
-{
-	mkdir("employee");
-	mkdir("employee/nurse");
-	str temp;
-	sprintf(temp, "employee/nurse/%lu", a.get_id());
-	mkdir(temp);
-	strcat(temp, "/base.dat");
-	ofstream fout ( temp , ios::out | ios::binary);
-	if(!fout)
-	{
-//		cerr<<"Employee data file could not be created or accessed";
-		return 0;
-	}
-	fout.write( (char*) &a , sizeof(nurse) );
-	if(fout.fail())
-	{
-//		cerr<<"Error while writing to file";
-		return 0;
-	}
-	return 1;
-}
-
-int hospital::write_employee(receptionist a)
-{
-	mkdir("employee");
-	mkdir("employee/receptionist");
-	str temp;
-	sprintf(temp, "employee/receptionist/%lu", a.get_id());
-	mkdir(temp);
-	strcat(temp, "/base.dat");
-	ofstream fout ( temp , ios::out | ios::binary);
-	if(!fout)
-	{
-//		cerr<<"Employee data file could not be created or accessed";
-		return 0;
-	}
-	fout.write( (char*) &a , sizeof(receptionist) );
-	if(fout.fail())
-	{
-//		cerr<<"Error while writing to file";
-		return 0;
-	}
-	return 1;
-}
-*/
 int hospital::pay_salary(unsigned long id, Date d1, Time t1)
 {
-	employee e;
+	void * e = malloc( sizeof(doctor) );
+	if(e == NULL)
+	{
+		interface::log_this("hospital::pay_salary() : Not enough memory to allocate buffer void * temp = malloc( sizeof(doctor) )");
+		interface::error("Out of memory!! Check log");
+		getch();
+		return 0;
+	}
 	str temp;
-	
-	if(!hospital::get_employee_by_id(id, &e))
+	switch(id_to_emp::convert(id))
+	{
+		case INVALID:
+			interface::log_this("hospital::pay_salary() : Invalid id supplied to function\nFunction aborted");
+			return 0;
+		case OTHERS:
+			sprintf(temp, "employee/%lu/trans.dat", id);
+			break;
+		case DOCTOR:
+			sprintf(temp, "employee/doctor/%lu/trans.dat", id);
+			break;
+		case NURSE:
+			sprintf(temp, "employee/nurse/%lu/trans.dat", id);
+			break;
+		case RECEPTIONIST:
+			sprintf(temp, "employee/receptionist/%lu/trans.dat", id);
+			break;
+	}
+	if(!hospital::get_employee_by_id(id, e))
 	{
 		interface::log_this("hospital::pay_salary() : Employee not found or error while reading file\nFunction aborted");
+		free(e);
 		return 0;
 	}
 	unsigned long inp1;
 	char inp2[100] = "Salary paid to ";
-	inp1 = e.get_salary();
-	strcat(inp2, e.get_name());
+	employee * emp = (employee *)e;
+	inp1 = emp->get_salary();
+	strcat(inp2, emp->get_name());
 	transaction t = hospital::deduct_money(inp1, inp2, d1, t1);
+	free(e);
 
-	strcat(temp, "/trans.dat");
 	ofstream fout ( temp ,ios::binary | ios::app );
 	if(!fout)
 	{
@@ -384,16 +312,14 @@ int hospital::pay_salary(unsigned long id, Date d1, Time t1)
 
 int hospital::pay_all_salaries()
 {
-	Date d1;
-	d1 = system::get_date();
-	Time t1;
-	t1 = system::get_time();
+	Date d1 = system::get_date();
+	Time t1 = system::get_time();
 	unsigned long max_id;
 	ifstream fin;
 	fin.open("employee/max_id.dat", ios::binary);
 	if(!fin)
 	{
-		interface::log_this("hospital::pay_all_salaries() : No employees found or cannot access file\nFunction aborted");
+		interface::log_this("hospital::pay_all_salaries() : No employees found or cannot access file max_id.dat\nFunction aborted");
 		return 0;
 	}
 	else
@@ -401,11 +327,12 @@ int hospital::pay_all_salaries()
 		fin.read((char *) &max_id, sizeof(unsigned long));
 		if(fin.fail())
 		{
-			interface::log_this("hospital::pay_all_salaries() : Error while reading file (fin.fail())\nFunction aborted");
+			interface::log_this("hospital::pay_all_salaries() : Error while reading file max_id.dat(fin.fail())\nFunction aborted");
 			return 0;
 		}
 		if(!employee::get_generate_id_status())
-		{
+		{	//if generate_id_status is zero, then no id is generated after max_id + 1
+			//Thus, the following loop should run max_id + 1 times
 			++max_id;
 		}
 		for(unsigned long i = 1; i <= max_id; ++i)
@@ -413,8 +340,9 @@ int hospital::pay_all_salaries()
 			int a = hospital::pay_salary(i, d1, t1);
 			if(!a)
 			{
-				interface::log_this("hospital::pay_all_salaries() : Failed to pay all salaries...\nFunction aborted");
-				return 0;
+				str log_msg;
+				sprintf(log_msg, "hospital::pay_all_salaries() : Failed to pay salary of id %lu...\nSkipped", i);
+				interface::log_this(log_msg);
 			}
 		}
 	}
@@ -472,6 +400,20 @@ int hospital::date_validity(Date inp_date){
 	}
 }
 
+int hospital::time_validity(const char * inp_time)
+{
+	return time_validity( str_to_time(inp_time) );
+}
+
+int hospital::time_validity(Time t)
+{
+	if( t.hour > 24 || t.minute > 59 || t.second > 59)
+	{
+		return 0;
+	}
+	return 1;
+}
+
 Date hospital::str_to_date(const char * inp_date){
 	int counter = 0;
 	int count = 0;
@@ -501,6 +443,40 @@ Date hospital::str_to_date(const char * inp_date){
 	}
 
 	return Date(input[0], input[1], input[2]);
+}
+
+Time hospital::str_to_time(const char * inp_time)
+{
+///////In this function invalid time(25:00:00) is returned if time is in incorrect format//////////
+	char inp[3][3] = {"25", "0", "0"};
+	int inp_x = 0, inp_y = 0;
+	Time null(25, 0, 0);
+	if( strlen(inp_time) > 8 || strlen(inp_time) < 5 || inp_time[strlen(inp_time) - 1] == ':')
+	{
+		return null;
+	}
+	for(int i = 0; i < strlen(inp_time); ++i)
+	{
+		if(inp_time[i] == ':' && inp_y != 0)
+		{
+			inp[inp_x][inp_y] = '\0';
+			++inp_x;
+			inp_y = 0;
+			continue;
+		}
+		else if( (inp_y == 0 && inp_time[i] == ':') || inp_y > 1 
+				|| (inp_time[i] < '0' || inp_time[i] > '9') )
+		{
+			return null;
+		}
+		inp[inp_x][inp_y] = inp_time[i];
+		++inp_y;
+	}
+	char *endptr;
+	null.hour = (unsigned int) strtol(inp[0], &endptr, 10);
+	null.minute = (unsigned int) strtol(inp[1], &endptr, 10);
+	null.second = (unsigned int) strtol(inp[2], &endptr, 10);
+	return null;
 }
 
 int hospital::str_to_sex(char* s){
@@ -533,4 +509,4 @@ int hospital::read_from(unsigned long ID, char * dest, int size, char * temp)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-double hospital::balance = 1000.0;
+double hospital::balance = 10000000.0;

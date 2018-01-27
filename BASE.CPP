@@ -90,25 +90,16 @@ void person::set_phone(char* a)
 
 Time::Time()
 {
-	hour = 0;
+	hour = 25;
 	minute = 0;
 	second = 0;
 }
 
 Time::Time(unsigned h, unsigned m, unsigned s)
 {
-	if(h < 24 && m < 60 && s < 60)
-	{
-		hour = h;
-		minute = m;
-		second = s;
-	}
-	else
-	{
-		hour = 0;
-		minute = 0;
-		second = 0;
-	}
+	hour = h;
+	minute = m;
+	second = s;
 }
 
 Date::Date()
@@ -148,6 +139,15 @@ Time system::get_time()
 	struct tm *now = localtime(&t);
 	Time tnow(now->tm_hour, now->tm_min ,now->tm_sec);
 	return tnow;
+}
+
+address::address(const char *hno, const char *strt, const char *cty, const char *dist, const char *stat)
+{
+	strcpy(house_no, hno);
+	strcpy(street, strt);
+	strcpy(city, cty);
+	strcpy(district, dist);
+	strcpy(state, stat);
 }
 
 userid::userid(str name ,str plaintext)	//plaintext is the unencrypted password

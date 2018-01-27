@@ -41,15 +41,12 @@ void interface::init(){
 
 			switch(choice){
 				case 1:
-					interface::patient_management();
-					break;
-				case 2:
 					interface::employee_management();
 					break;
-				case 3:
+				case 2:
 					interface::stock_management();
 					break;
-				case 4:
+				case 3:
 					return;
 			}
 		}
@@ -62,13 +59,9 @@ void interface::init(){
 				interface::error("You have an invalid id generated. Create a new account");
 				break;
 			case DOCTOR:
-				interface::doctor_screen();
-				break;
 			case NURSE:
-				interface::nurse_screen();
-				break;
 			case RECEPTIONIST:
-				interface::receptionist_screen();
+				interface::employee_screen(id);
 				break;
 		}
 	}
@@ -102,27 +95,37 @@ int interface::login_screen()
 		if(fin.fail())
 		{
 			interface::error("ERROR WHILE READING FROM FILE!!! ");
+			getch();
 			return 0;
 		}
 	}
 	fin.close();
+	void * x = malloc( sizeof(doctor) );
 	for(unsigned long id = 1; id <= max_id; ++id)
 	{
-		employee x;
-		if(!hospital::get_employee_by_id(id, &x))
+		if(x == NULL)
 		{
-			str errmsg;
-			sprintf(errmsg, "Error in reading file of id %lu", id);
-			interface::error(errmsg);
+			interface::log_this("interface::login_screen() : Not enough memory to allocate buffer void * temp = malloc( sizeof(doctor) )");
+			interface::error("Out of memory!! Check log");
+			getch();
 			return 0;
 		}
-		if(!strcmp(x.account.get_username(), uid) && x.account.login(pwd))
+		if(!hospital::get_employee_by_id(id, x))
+		{
+			char log_msg[300];
+			sprintf(log_msg, "interface::login_screen() : Error in reading file of id %lu (hospital::get_employee_by_id(id, x) returned 0), could be due to invalid login details entered", id);
+			interface::log_this(log_msg);
+		}
+		employee * e = (employee *)x;
+		if(!strcmp(e->account.get_username(), uid) && e->account.login(pwd))
 		{
 			interface::clear_error();
+			free(x);
 			return id;
 		}
 	}
 	interface::error("Invalid login details!!");
+	free(x);
 	return 0;
 }
 
@@ -131,13 +134,12 @@ int interface::menu(){
 	box menu (c, ui::scr_width / 3, ui::scr_height / 2.2 + 1);
 
 	int ch;
-	menu << "1. Patient management"
-			<< ui::endl << "2. Employee management"
-			<< ui::endl << "3. Stock management"
-			<< ui::endl << "4. Exit"
-			<< ui::endl << ui::endl << "Choice : ";
+	menu << ui::endl << "1. Employee management"
+		 << ui::endl << "2. Stock management"
+		 << ui::endl << "3. Exit"
+		 << ui::endl << ui::endl << "Choice : ";
 	menu.settcolor_input(YELLOW);
-	validate_menu::set_menu_limits(1, 4);
+	validate_menu::set_menu_limits(1, 3);
 	menu >> validate_menu::input >> ch;
 
 	menu << ui::endl;

@@ -17,7 +17,7 @@ class employee : public person{
 		Time get_shift(int);
 		void set_shift(int, Time);
 		unsigned long get_id();
-		transaction * get_last_10_transactions();
+		transaction * get_last_5_transactions();
 		static int get_generate_id_status();
 		userid account;
 	protected:
@@ -33,6 +33,9 @@ class doctor : public employee{
 		doctor();	//default constructor
 		int * get_speciality();
 		long * get_patients();
+		
+		void set_speciality(int *);
+		void set_patients(long *);
 	private:
 		int speciality[2];				// Doctor's specialization
 		long patients[10];				// Patients currently under care, can take only 10 at once
@@ -43,6 +46,8 @@ class nurse : public employee{
 		nurse(str, int, Date, address, phone, unsigned long, Time, Time, str, str);
 		nurse();		//default constructor
 		long * get_patients();
+		
+		void set_patients(long *);
 	private:
 		long patients[5];
 };
