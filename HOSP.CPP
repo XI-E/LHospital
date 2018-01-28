@@ -141,7 +141,7 @@ medicine hospital::get_med_by_code(int inp_code){
 }
 
 void hospital::write_med(medicine inp_med){
-	fstream med_file ("stock/medicine.dat", ios::in | ios::out | ios::binary);
+	fstream med_file ("stock/med.dat", ios::in | ios::out | ios::binary);
 	med_file.seekg(0);
 
 	int success = 0;
