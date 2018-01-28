@@ -390,8 +390,8 @@ int hospital::date_validity(Date inp_date){
 			return 1;
 	}
 	if (
-		inp_date.month > 12 || 
-		inp_date.day > monthDays[inp_date.month - 1])
+		inp_date.month > 12 || inp_date.month < 1 ||
+		inp_date.day > monthDays[inp_date.month - 1] || inp_date.day < 1)
 	{
 		return 0;
 	}
@@ -428,7 +428,7 @@ Date hospital::str_to_date(const char * inp_date){
 			if(ch[i] == '/' || ch[i] == '\\' || ch[i] == 0 || ch[i] == '-'){
 				if(ch[i] == 0 && count < 11){
 					interface::error("Invalid date!");
-					return Date (99, 99, 9999);
+					return Date (32, 14, 0);
 				}
 				ch[i] = '/';
 				int temp = i-1, temp2 = 0;

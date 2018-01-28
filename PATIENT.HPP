@@ -13,24 +13,24 @@ class patient : public person
 {
 	protected:
 
-		long id; //!>Unique identification number of patient
-		disease dis; //!>patient's afflictions
-		str allergies[2]; //!>patient's known allergies
-		int med[50][2]; //!>patient's purchased medicines & quantities
-		str guardian_name; //!>Patient's guardian/caretaker
-		str emergency_contact; //!>Patient's emergency contact's name
-		phone emer_contact_no; //!>Emergency contact phone number
-		insurance insur_info; //!>Insurance struct storing patient's insurance info
-		Date admission_date; //!>Date patient was admitted
-		unsigned long bill_amt; //!>Net amount to be billed to patient
-		int discharged; //!>Binary; = 0 Admitted | = 1 Discharged
-		Date discharge_date; //!>Date patient was discharged. NULL if still admitted
+		long id; //!<Unique identification number of patient
+		disease dis; //!<patient's afflictions
+		str allergies[2]; //!<patient's known allergies
+		int med[50][2]; //!<patient's purchased medicines & quantities
+		str guardian_name; //!<Patient's guardian/caretaker
+		str emergency_contact; //!<Patient's emergency contact's name
+		phone emer_contact_no; //!<Emergency contact phone number
+		insurance insur_info; //!<Insurance struct storing patient's insurance info
+		Date admission_date; //!<Date patient was admitted
+		unsigned long bill_amt; //!<Net amount to be billed to patient
+		int discharged; //!<Binary; = 0 Admitted | = 1 Discharged
+		Date discharge_date; //!<Date patient was discharged. NULL if still admitted
 
 	public:
 
-		patient(str, int, Date, address, phone, disease, str, str, phone, insurance, Date = system::get_date()); //!>Explicit constructor
-		//!>If no date is provided, it is assumed that patient was admitted on the current system date
-		patient(); //!>Default constructor
+		patient(str, int, Date, address, phone, disease, str, str, phone, insurance, Date = system::get_date()); /*!>Explicit constructor
+		If no date is provided, it is assumed that patient was admitted on the current system date*/
+		patient(); //!<Default constructor
 		
 		//!@{Getters
 
