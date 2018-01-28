@@ -1,7 +1,7 @@
 #include "base.hpp"
 
 /////////////////////////////////////////////
-/// Function definitions for class person
+//// Function definitions for class person
 
 person::person(str inp1, int inp2, Date inp3, address inp4, phone inp5)
 {
@@ -155,9 +155,6 @@ userid::userid(str name ,str plaintext)	//plaintext is the unencrypted password
 	strcpy(username, name);
 	set_key(plaintext);
 	makecipher(plaintext);
-//	cout<<plaintext<<' '<<default_key<<endl;
-//	cout<<strlen(plaintext)<<' '<<strlen(default_key)<<' '<<strlen(passcipher)<<endl;
-//	decipher();
 }
 
 userid::userid()
@@ -177,7 +174,6 @@ void userid::makecipher(str plaintext)
 		passcipher[i] = (char) ( ( (plntext_i + key_i) % 256 ) - 127);
 	}
 	passcipher[i] = '\0';
-//	cout<<passcipher<<endl<<endl;
 }
 
 void userid::set_key(char * plaintext)
@@ -204,7 +200,6 @@ char * userid::decipher()
 		decryptedpass[i] = (char) ( ( (cipher_i - key_i + 256) % 256 ) - 127);
 	}
 	decryptedpass[i] = '\0';
-//	cout<<endl<<decryptedpass<<endl;
 	return decryptedpass;
 }
 

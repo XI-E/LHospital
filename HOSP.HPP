@@ -9,8 +9,9 @@
 #include "base.hpp"
 #include "patient.hpp"
 
+//!Stores the no. of days in each month of the year(for hospital::get_date_difference())
 const int monthDays[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-const int stay_charge = 50;  // $50 per day
+const int stay_charge = 50;  //!> The charge per day of stay in the hospital($50 per day)
 
 //!Class containing all the basic hospital management functions used in the program
 class hospital
