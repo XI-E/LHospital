@@ -29,13 +29,13 @@ class hospital
 		*/
 		static transaction deduct_money(float amt, char* reason, Date dt, Time tm);
 		
-		//!Adds the input amount from hospital::balance
+		//!Adds the input amount to hospital::balance
 		/*!
-		\param amt The amount to be added from hospital::balance
-		\param reason The reason for addition of money
-		\param dt The date of addition of money
-		\param tm The time of addiction of money
-		\return A transaction type variable containing details about the amount addition
+		\param amt The amount to be added to hospital::balance
+		\param reason The reason for deposit
+		\param dt The date of deposit
+		\param tm The time of deposit
+		\return A transaction type variable containing details about the deposit
 		*/
 		static transaction add_money(float, char*, Date, Time);
 		
@@ -49,7 +49,7 @@ class hospital
 		
 		//!@{Patient management functions
 		
-		//!Gets a patient object from file corresponding to an input id
+		//!Gets a patient object from file corresponding to the inputted id
 		/*!
 		Reads a patient object from a file base.dat that is present in 
 		a folder with name as the id of the patient. All such folders are 
@@ -80,7 +80,7 @@ class hospital
 		
 		//!Discharges a patient from the hospital
 		/*!
-		Basically calls the patient::discharge() function, sets the patient's discharge
+		Calls the patient::discharge() function, sets the patient's discharge
 		date to the current system date, and writes the patient back to file
 		\param temp The object of the patient who is to be discharged
 		*/
@@ -92,8 +92,8 @@ class hospital
 		
 		//!Gets a medicine from file corresponding to an input code
 		/*!
-		Reads a medicine type variable from a file STOCK/MED.DAT that has code equal to that
-		input to the function
+		Reads a medicine type variable from a file STOCK/MED.DAT that has code equal to the
+		code inputted to the function
 		\param inp_code The code of the required medicine
 		\return The medicine corresponding to inp_code
 		*/
@@ -101,8 +101,8 @@ class hospital
 		
 		//!Writes a medicine to file
 		/*!
-		Writes a medicine type variable to the file STOCK/MED.DAT
-		(actually I don't understand what exactly this function does)
+		Writes a medicine type variable back to the file STOCK/MED.DAT which stores all 
+		medicines, after it has	been edited, into its position in the file.
 		*/
 		static void write_med(medicine);
 		//!}@
@@ -115,7 +115,7 @@ class hospital
 		a folder with name as the id of the employee. All such folders are 
 		present in a folder named EMPLOYEE, or EMPLOYEE/DOCTOR, or
 		EMPLOYEE/NURSE, or EMPLOYEE/RECEPTIONIST
-		This function basically converts the id input to it into the 
+		This function converts the id inputted to it into the 
 		employee type, sets the string of the path to the folder containing
 		the employee object file, and reads the object from the file to a 
 		buffer pointed to by a void pointer
@@ -128,11 +128,11 @@ class hospital
 		*/
 		static int get_employee_by_id(unsigned long id, void * target);
 		
-		//!Writes an object of an employee(or its derivative) to file
+		//!Writes an object of type employee(or its derivative) to file
 		/*!
 		This function converts the id of the object pointed to by the pointer
 		a into the employee type, sets the string of the path to the folder that should 
-		contain the employee object file,and then makes a new folder(if it doesn't exist)
+		contain the employee object file, and then makes a new folder(if it doesn't exist)
 		in EMPLOYEE, or EMPLOYEE/DOCTOR, or EMPLOYEE/NURSE, or EMPLOYEE/RECEPTIONIST
 		(depending upon the type of the object pointed by the input void pointer), whose
 		name is the id of the employee object that is to be written, and writes the 
@@ -140,7 +140,7 @@ class hospital
 		A void pointer is used in this function to handle the different data types 
 		i.e. employee, doctor, nurse, receptionist that can be input into the
 		function as the parameter a.
-		\param a Void pointer pointing to the object that is to be written to file
+		\param a void pointer pointing to the object that is to be written to file
 		\return 1 if the function executed without errors, 0 otherwise
 		*/
 		static int write_employee(void * a);
@@ -149,11 +149,11 @@ class hospital
 		/*!
 		Obtains the employee's object from file using get_employee_by_id(),
 		gets the salary of the employee, deducts the salary from hospital::balance 
-		using deduct_money(), and then writes the transaction details of this payment
-		to a file TRANS.DAT present in the folder of the employee (i.e the folder 
-		having name as the id of the employee), that is present in folder EMPLOYEE, 
-		or EMPLOYEE/DOCTOR, or EMPLOYEE/NURSE, or EMPLOYEE/RECEPTIONIST, depending
-		on the employee type
+		using hospital::deduct_money(), and then writes the transaction details of
+		this payment to a file TRANS.DAT present in the folder of the employee (i.e 
+		the folder having name as the id of the employee), that is present in folder
+		EMPLOYEE, or EMPLOYEE/DOCTOR, or EMPLOYEE/NURSE, or EMPLOYEE/RECEPTIONIST, 
+		depending on the employee type.
 		\param id ID of the employee to whom salary is to be paid
 		\param d1 Date of payment of salary
 		\param t1 Time of payment of salary
@@ -184,24 +184,19 @@ class hospital
 		//!}@
 
 	private:
-		hospital();
+		hospital();//!>Objects of this class shouldn't be created
+
 		//! Reads an object from a file on disk and stores it in a buffer
 		/*!
-		Basically a specialization of the fstream::read() function
+		A specific implementation of the fstream::read() function for the hospital's
+		purposes.
 		\param ID ID of the object that is to be read(for error logging purposes only)
 		\param dest The path string to the file from which the object is to be read
 		\param size Size in bytes of the object that is to be read
 		\param temp Pointer to the buffer at which the read object is to be stored
 		*/
 		static int read_from(unsigned long ID, char * dest, int size, char *temp);
-		static double balance; //!>net balance of the hospital
-};
-
-//!Huh??!!
-class pharmacy{
-	public:
-		static void sale(int, int, int);
-		static void purchase(int, int);
+		static double balance; //!>Current balance of the hospital
 };
 
 #endif

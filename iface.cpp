@@ -160,7 +160,7 @@ void interface::stock_management(){
 				coord c(ui::scr_width / 3, ui::scr_height / 3);
 				box stock_menu (c, ui::scr_width / 3, ui::scr_height / 3);
 				stock_menu.settcolor_input(YELLOW);
-				stock_menu << ui::centeralign << "Medicine Sale" << ui::endl;
+				stock_menu << ui::centeralign << "Stock check" << ui::endl;
 				stock_menu << "Code : ";
 				stock_menu.setdefault(42);
 				stock_menu >> temp.code;
