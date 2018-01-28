@@ -198,7 +198,7 @@ void interface::patient_management(){
 					<< ui::endl << "Date of Birth : ";
 			
 			form.setdefault("25/12/1991");
-			form >> inp_dob_str;
+			form >> hospital::date_validity >> inp_dob_str;
 			
 			
 			form << ui::endl << "Address"
@@ -284,14 +284,14 @@ void interface::patient_management(){
 			
 			form << ui::endl << "\tExpiry";
 			form.setdefault("25/12/2022");
-			form >> inp_insur_expiry;
+			form >> hospital::date_validity >> inp_insur_expiry;
 			
 			
 			form << ui::endl << ui::endl
 					<< "Admission Date : ";
 			char dnow[11];
 			form.setdefault("01/01/2018");
-			form >> inp_admdate_str;
+			form >> hospital::date_validity >> inp_admdate_str;
 
 			form << ui::endl << ui::endl;
 			form.setexit_button("Submit");
